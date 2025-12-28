@@ -21,6 +21,12 @@ export default function MaterialDetailModal({ material, onClose }: MaterialDetai
   const startTimeRef = useRef<number>(0)
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
+  const [targetLanguage, setTargetLanguage] = useState('')
+  const [translatedText, setTranslatedText] = useState('')
+  const [isTranslating, setIsTranslating] = useState(false)
+  const [translationError, setTranslationError] = useState<string | null>(null)
+  const [showTranslation, setShowTranslation] = useState(false)
+
   const estimateDuration = (text: string, rate: number) => {
     const wordsPerMinute = 150 * rate
     const words = text.split(/\s+/).length
@@ -198,6 +204,43 @@ export default function MaterialDetailModal({ material, onClose }: MaterialDetai
     return `${mins}:${secs.toString().padStart(2, '0')}`
   }
 
+  const handleTranslate = async () => {
+    if (!targetLanguage.trim()) {
+      setTranslationError('Mohon masukkan bahasa tujuan')
+      return
+    }
+
+    setIsTranslating(true)
+    setTranslationError(null)
+
+    try {
+      const response = await fetch('/api/AI/translate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text: material.content,
+          targetLanguage: targetLanguage
+        })
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Gagal menerjemahkan teks')
+      }
+
+      setTranslatedText(data.translatedText)
+      setShowTranslation(true)
+      setIsTranslating(false)
+    } catch (err) {
+      console.error('Translation error:', err)
+      setTranslationError(err instanceof Error ? err.message : 'Gagal menerjemahkan teks')
+      setIsTranslating(false)
+    }
+  }
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
@@ -236,8 +279,86 @@ export default function MaterialDetailModal({ material, onClose }: MaterialDetai
             </h3>
             <div className="prose dark:prose-invert max-w-none">
               <p className="text-gray-800 dark:text-gray-200 whitespace-pre-wrap">
-                {material.content}
+                {showTranslation ? translatedText : material.content}
               </p>
+            </div>
+
+            <div className="mt-6 p-4 bg-gradient-to-r from-green-50 to-teal-50 dark:from-green-900/20 dark:to-teal-900/20 rounded-lg border border-green-200 dark:border-green-700">
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-green-600 flex items-center justify-center">
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                      Terjemahkan Materi
+                    </p>
+                    <p className="text-xs text-gray-600 dark:text-gray-400">
+                      Terjemahkan ke bahasa apapun menggunakan AI
+                    </p>
+                  </div>
+                  {showTranslation && (
+                    <button
+                      onClick={() => setShowTranslation(false)}
+                      className="px-3 py-1 text-xs bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
+                    >
+                      Lihat Asli
+                    </button>
+                  )}
+                </div>
+
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={targetLanguage}
+                    onChange={(e) => setTargetLanguage(e.target.value)}
+                    placeholder="Contoh: English, Jepang, Spanyol, dll"
+                    className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
+                    disabled={isTranslating}
+                  />
+                  <button
+                    onClick={handleTranslate}
+                    disabled={isTranslating || !targetLanguage.trim()}
+                    className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold flex items-center gap-2 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isTranslating ? (
+                      <>
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                        Menerjemahkan...
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                        </svg>
+                        Terjemahkan
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                {translationError && (
+                  <div className="flex items-center gap-2 px-3 py-2 bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 rounded-lg">
+                    <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span className="text-sm text-red-600 dark:text-red-400">{translationError}</span>
+                  </div>
+                )}
+
+                {showTranslation && (
+                  <div className="flex items-center gap-2 px-3 py-2 bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 rounded-lg">
+                    <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span className="text-sm text-green-600 dark:text-green-400">
+                      Berhasil diterjemahkan ke {targetLanguage}
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="mt-6 p-4 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-lg border border-indigo-200 dark:border-indigo-700">
