@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import type { Topic, Material } from '@/types/database'
+import { getCurrentUserProfile } from '@/lib/profile'
 import AddMaterialModal from './AddMaterialModal'
 import AddTopicModal from './AddTopicModal'
 import MaterialDetailModal from './MaterialDetailModal'
@@ -17,6 +18,7 @@ export default function MaterialList() {
   const [isMaterialDetailOpen, setIsMaterialDetailOpen] = useState(false)
   const [loading, setLoading] = useState(true)
   const [userId, setUserId] = useState<string | null>(null)
+  const [userRole, setUserRole] = useState<string | null>(null)
 
   useEffect(() => {
     loadUserAndTopics()
@@ -28,6 +30,11 @@ export default function MaterialList() {
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
         setUserId(user.id)
+        // Get user profile for role
+        const profile = await getCurrentUserProfile()
+        if (profile) {
+          setUserRole(profile.role)
+        }
       }
 
       // Load topics
@@ -127,15 +134,17 @@ export default function MaterialList() {
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
           Daftar Topik & Materi
         </h2>
-        <button
-          onClick={handleAddTopic}
-          className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold flex items-center gap-2"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          Tambah Topik
-        </button>
+        {userRole === 'mentor' && (
+          <button
+            onClick={handleAddTopic}
+            className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold flex items-center gap-2"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Tambah Topik
+          </button>
+        )}
       </div>
 
       {/* Topics List */}
@@ -147,12 +156,14 @@ export default function MaterialList() {
           <p className="text-gray-500 dark:text-gray-400 mb-4">
             Belum ada topik pembelajaran.
           </p>
-          <button
-            onClick={handleAddTopic}
-            className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-semibold"
-          >
-            Buat Topik Pertama
-          </button>
+          {userRole === 'mentor' && (
+            <button
+              onClick={handleAddTopic}
+              className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-semibold"
+            >
+              Buat Topik Pertama
+            </button>
+          )}
         </div>
       ) : (
         <div className="space-y-4">
@@ -174,12 +185,14 @@ export default function MaterialList() {
                       </p>
                     )}
                   </div>
-                  <button
-                    onClick={() => handleAddMaterial(topic)}
-                    className="ml-4 px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 transition-colors font-semibold whitespace-nowrap"
-                  >
-                    + Add Materi
-                  </button>
+                  {userRole === 'mentor' && (
+                    <button
+                      onClick={() => handleAddMaterial(topic)}
+                      className="ml-4 px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 transition-colors font-semibold whitespace-nowrap"
+                    >
+                      + Add Materi
+                    </button>
+                  )}
                 </div>
               </div>
 
