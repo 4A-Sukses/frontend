@@ -104,6 +104,15 @@ export default function UserNav() {
         </Link>
       )}
 
+      {profile.role === 'mentor' && (
+        <Link
+          href="/mentor/dashboard"
+          className="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors font-semibold"
+        >
+          Mentor Dashboard
+        </Link>
+      )}
+
       <Link
         href="/profile"
         className="px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 transition-colors font-semibold"

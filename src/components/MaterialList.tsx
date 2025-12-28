@@ -1,8 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
-import type { Topic, Material } from '@/types/database'
+import type { Topic, Material, UserProfile } from '@/types/database'
 import { getCurrentUserProfile } from '@/lib/profile'
 import AddMaterialModal from './AddMaterialModal'
 import AddTopicModal from './AddTopicModal'
@@ -11,6 +12,7 @@ import MaterialDetailModal from './MaterialDetailModal'
 export default function MaterialList() {
   const [topics, setTopics] = useState<Topic[]>([])
   const [materials, setMaterials] = useState<{ [topicId: number]: Material[] }>({})
+  const [authors, setAuthors] = useState<{ [userId: string]: UserProfile }>({})
   const [selectedTopic, setSelectedTopic] = useState<Topic | null>(null)
   const [selectedMaterial, setSelectedMaterial] = useState<Material | null>(null)
   const [isMaterialModalOpen, setIsMaterialModalOpen] = useState(false)
@@ -68,6 +70,33 @@ export default function MaterialList() {
     }
   }
 
+  const fetchAuthors = async (userIds: string[]) => {
+    if (userIds.length === 0) return
+
+    // Filter out IDs we already have
+    const newIds = userIds.filter(id => !authors[id])
+    if (newIds.length === 0) return
+
+    try {
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .in('user_id', newIds)
+
+      if (error) throw error
+
+      if (data) {
+        const newAuthors = { ...authors }
+        data.forEach(author => {
+          newAuthors[author.user_id] = author
+        })
+        setAuthors(prev => ({ ...prev, ...newAuthors }))
+      }
+    } catch (error) {
+      console.error('Error fetching authors:', error)
+    }
+  }
+
   const loadMaterialsForTopic = async (topicId: number) => {
     try {
       const { data, error } = await supabase
@@ -78,10 +107,16 @@ export default function MaterialList() {
 
       if (error) throw error
 
-      setMaterials(prev => ({
-        ...prev,
-        [topicId]: data || []
-      }))
+      if (data) {
+        setMaterials(prev => ({
+          ...prev,
+          [topicId]: data
+        }))
+        
+        // Collect author IDs
+        const authorIds = Array.from(new Set(data.map(m => m.created_by)))
+        await fetchAuthors(authorIds)
+      }
     } catch (error) {
       console.error('Error loading materials:', error)
     }
@@ -203,11 +238,13 @@ export default function MaterialList() {
                     {materials[topic.id].map((material) => (
                       <div
                         key={material.id}
-                        onClick={() => handleMaterialClick(material)}
-                        className="flex items-start p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors cursor-pointer"
+                        className="flex items-start p-4 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
                       >
                         {/* Material Type Icon */}
-                        <div className="flex-shrink-0 mr-4">
+                        <div 
+                          className="flex-shrink-0 mr-4 cursor-pointer"
+                          onClick={() => handleMaterialClick(material)}
+                        >
                           <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center">
                             <span className="text-indigo-600 dark:text-indigo-400 text-xs font-semibold">
                               {material.material_type.substring(0, 3).toUpperCase()}
@@ -217,22 +254,59 @@ export default function MaterialList() {
 
                         {/* Material Info */}
                         <div className="flex-1">
-                          <h4 className="text-base font-semibold text-gray-900 dark:text-white mb-1">
+                          <h4 
+                            className="text-base font-semibold text-gray-900 dark:text-white mb-1 cursor-pointer hover:text-indigo-600 dark:hover:text-indigo-400"
+                            onClick={() => handleMaterialClick(material)}
+                          >
                             {material.title}
                           </h4>
-                          <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                          <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-2">
                             {material.content}
                           </p>
-                          <div className="flex items-center gap-3 mt-2">
+                          
+                          <div className="flex flex-wrap items-center gap-3">
+                            <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+                              <span>Oleh:</span>
+                              <Link 
+                                href={`/mentor/${material.created_by}`}
+                                className="font-medium text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1"
+                              >
+                                {authors[material.created_by]?.avatar_url && (
+                                  <img 
+                                    src={authors[material.created_by].avatar_url!} 
+                                    alt="avatar" 
+                                    className="w-4 h-4 rounded-full"
+                                  />
+                                )}
+                                {authors[material.created_by]?.nama || 'Mentor'}
+                              </Link>
+                            </div>
+
+                            <span className="text-gray-300 dark:text-gray-600">|</span>
+
                             <span className="text-xs text-gray-500 dark:text-gray-500">
                               {material.material_type}
                             </span>
+
                             {material.url && (
-                              <span className="text-xs text-indigo-600 dark:text-indigo-400">
-                                Lihat Sumber
-                              </span>
+                              <>
+                                <span className="text-gray-300 dark:text-gray-600">|</span>
+                                <span className="text-xs text-indigo-600 dark:text-indigo-400">
+                                  Lihat Sumber
+                                </span>
+                              </>
                             )}
                           </div>
+
+                          {material.tags && material.tags.length > 0 && (
+                            <div className="flex flex-wrap gap-2 mt-2">
+                              {material.tags.map((tag, index) => (
+                                <span key={index} className="px-2 py-0.5 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 text-xs rounded-full">
+                                  #{tag}
+                                </span>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       </div>
                     ))}

@@ -283,6 +283,21 @@ export default function MaterialDetailModal({ material, onClose }: MaterialDetai
               </p>
             </div>
 
+            {material.tags && material.tags.length > 0 && (
+              <div className="mt-4">
+                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">
+                  Tags
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  {material.tags.map((tag, index) => (
+                    <span key={index} className="px-3 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 text-sm font-medium rounded-full border border-indigo-100 dark:border-indigo-800">
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div className="mt-6 p-4 bg-gradient-to-r from-green-50 to-teal-50 dark:from-green-900/20 dark:to-teal-900/20 rounded-lg border border-green-200 dark:border-green-700">
               <div className="space-y-3">
                 <div className="flex items-center gap-3">

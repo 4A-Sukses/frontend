@@ -1,52 +1,131 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
-import type { Topic, MaterialInsert } from '@/types/database'
+import type { Topic, MaterialInsert, Material, MaterialUpdate } from '@/types/database'
 
 interface AddMaterialModalProps {
-  topic: Topic
+  topic?: Topic
+  material?: Material
   userId: string
   onClose: () => void
   onSuccess: () => void
 }
 
-export default function AddMaterialModal({ topic, userId, onClose, onSuccess }: AddMaterialModalProps) {
+export default function AddMaterialModal({ topic, material, userId, onClose, onSuccess }: AddMaterialModalProps) {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<{ type: 'error' | 'success', text: string } | null>(null)
+  const [topics, setTopics] = useState<Topic[]>([])
+  const [selectedTopicId, setSelectedTopicId] = useState<number | string>(topic?.id || material?.topic_id || '')
 
   const [formData, setFormData] = useState({
     title: '',
     content: '',
     material_type: 'article',
     url: '',
+    tags: '',
   })
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  useEffect(() => {
+    if (!topic && !material) {
+      loadTopics()
+    }
+    
+    if (material) {
+      setFormData({
+        title: material.title,
+        content: material.content,
+        material_type: material.material_type,
+        url: material.url || '',
+        tags: material.tags ? material.tags.join(', ') : '',
+      })
+      if (!topic) {
+        // We need topics to be loaded if we are editing without a pre-selected topic context
+        // OR if we want to allow changing topic (which might be advanced, but let's load topics anyway)
+        loadTopics()
+      }
+    }
+  }, [topic, material])
+
+  const loadTopics = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('topics')
+        .select('*')
+        .order('title')
+      
+      if (error) throw error
+      setTopics(data || [])
+    } catch (error) {
+      console.error('Error loading topics:', error)
+    }
+  }
+
+  const handleSubmit = async (e: React.FormEvent | null, status: 'published' | 'draft' = 'published') => {
+    if (e) e.preventDefault()
+    
+    if (!selectedTopicId) {
+      setMessage({ type: 'error', text: 'Pilih topik terlebih dahulu' })
+      return
+    }
+
     setLoading(true)
     setMessage(null)
 
+    // Parse tags
+    const tagsArray = formData.tags
+      .split(',')
+      .map(tag => tag.trim())
+      .filter(tag => tag.length > 0)
+
     try {
-      const materialData: MaterialInsert = {
-        topic_id: topic.id,
-        title: formData.title,
-        content: formData.content,
-        material_type: formData.material_type,
-        url: formData.url || null,
-        created_by: userId,
+      if (material) {
+        // Update existing material
+        const materialData: MaterialUpdate = {
+          topic_id: Number(selectedTopicId),
+          title: formData.title,
+          content: formData.content,
+          material_type: formData.material_type,
+          url: formData.url || null,
+          status: status,
+          tags: tagsArray
+        }
+
+        const { error } = await supabase
+          .from('materials')
+          .update(materialData)
+          .eq('id', material.id)
+
+        if (error) throw error
+
+        setMessage({
+          type: 'success',
+          text: `Materi berhasil diperbarui${status === 'draft' ? ' (Draft)' : ''}!`
+        })
+      } else {
+        // Create new material
+        const materialData: MaterialInsert = {
+          topic_id: Number(selectedTopicId),
+          title: formData.title,
+          content: formData.content,
+          material_type: formData.material_type,
+          url: formData.url || null,
+          created_by: userId,
+          status: status,
+          tags: tagsArray
+        }
+
+        const { error } = await supabase
+          .from('materials')
+          .insert(materialData)
+
+        if (error) throw error
+
+        setMessage({
+          type: 'success',
+          text: `Materi berhasil ${status === 'published' ? 'dipublish' : 'disimpan sebagai draft'}!`
+        })
       }
-
-      const { error } = await supabase
-        .from('materials')
-        .insert(materialData)
-
-      if (error) throw error
-
-      setMessage({
-        type: 'success',
-        text: 'Materi berhasil ditambahkan!'
-      })
 
       setTimeout(() => {
         onSuccess()
@@ -54,7 +133,7 @@ export default function AddMaterialModal({ topic, userId, onClose, onSuccess }: 
     } catch (error: any) {
       setMessage({
         type: 'error',
-        text: error.message || 'Gagal menambahkan materi'
+        text: error.message || 'Gagal menyimpan materi'
       })
     } finally {
       setLoading(false)
@@ -68,10 +147,10 @@ export default function AddMaterialModal({ topic, userId, onClose, onSuccess }: 
         <div className="flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700">
           <div>
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-              Tambah Materi Baru
+              {material ? 'Edit Materi' : 'Tambah Materi Baru'}
             </h2>
             <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-              Topik: {topic.title}
+              {topic ? `Topik: ${topic.title}` : (material ? 'Edit materi yang sudah ada' : 'Buat materi baru untuk topik pembelajaran')}
             </p>
           </div>
           <button
@@ -86,7 +165,29 @@ export default function AddMaterialModal({ topic, userId, onClose, onSuccess }: 
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <div className="p-6 space-y-4">
+          {/* Topic Selection (if no topic prop) */}
+          {(!topic || material) && (
+            <div>
+              <label htmlFor="topic_id" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Pilih Topik <span className="text-red-500">*</span>
+              </label>
+              <select
+                id="topic_id"
+                required
+                value={selectedTopicId}
+                onChange={(e) => setSelectedTopicId(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                disabled={loading}
+              >
+                <option value="">-- Pilih Topik --</option>
+                {topics.map(t => (
+                  <option key={t.id} value={t.id}>{t.title}</option>
+                ))}
+              </select>
+            </div>
+          )}
+
           {/* Title */}
           <div>
             <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -159,6 +260,22 @@ export default function AddMaterialModal({ topic, userId, onClose, onSuccess }: 
             />
           </div>
 
+          {/* Tags */}
+          <div>
+            <label htmlFor="tags" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Tags (Pisahkan dengan koma)
+            </label>
+            <input
+              type="text"
+              id="tags"
+              value={formData.tags}
+              onChange={(e) => setFormData(prev => ({ ...prev, tags: e.target.value }))}
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+              placeholder="Contoh: fisika, matematika, dasar, advanced"
+              disabled={loading}
+            />
+          </div>
+
           {/* Message */}
           {message && (
             <div
@@ -173,7 +290,7 @@ export default function AddMaterialModal({ topic, userId, onClose, onSuccess }: 
           )}
 
           {/* Buttons */}
-          <div className="flex gap-3 pt-4">
+          <div className="flex flex-col sm:flex-row gap-3 pt-4">
             <button
               type="button"
               onClick={onClose}
@@ -183,14 +300,23 @@ export default function AddMaterialModal({ topic, userId, onClose, onSuccess }: 
               Batal
             </button>
             <button
-              type="submit"
+              type="button"
+              onClick={() => handleSubmit(null, 'draft')}
+              disabled={loading}
+              className="flex-1 px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition-colors disabled:opacity-50"
+            >
+              {material ? 'Simpan Draft' : 'Simpan Draft'}
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSubmit(null, 'published')}
               disabled={loading}
               className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors disabled:opacity-50"
             >
-              {loading ? 'Menyimpan...' : 'Tambah Materi'}
+              {loading ? 'Menyimpan...' : (material ? 'Publish Update' : 'Publish')}
             </button>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   )

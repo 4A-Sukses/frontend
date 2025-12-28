@@ -91,6 +91,8 @@ export interface Material {
   created_by: string // uuid - Foreign Key to auth.users.id
   created_at: string // timestamptz
   updated_at: string // timestamptz
+  status: 'published' | 'draft' // text - default: 'draft'
+  tags: string[] | null // array of text
 }
 
 export interface MaterialInsert {
@@ -100,11 +102,16 @@ export interface MaterialInsert {
   material_type: string
   url?: string | null
   created_by: string
+  status?: 'published' | 'draft'
+  tags?: string[] | null
 }
 
 export interface MaterialUpdate {
+  topic_id?: number
   title?: string
   content?: string
   material_type?: string
   url?: string | null
+  status?: 'published' | 'draft'
+  tags?: string[] | null
 }
