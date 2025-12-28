@@ -1,7 +1,43 @@
-import Link from "next/link";
-import UserNav from "@/components/UserNav";
+'use client'
+
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import Link from "next/link"
+import UserNav from "@/components/UserNav"
+import { getCurrentUserProfile } from '@/lib/profile'
+import type { Profile } from '@/types/database'
 
 export default function Home() {
+  const router = useRouter()
+  const [loading, setLoading] = useState(true)
+  const [user, setUser] = useState<Profile | null>(null)
+
+  useEffect(() => {
+    async function checkUser() {
+      try {
+        const profile = await getCurrentUserProfile()
+        setUser(profile)
+
+        if (profile) {
+          if (profile.role === 'user') {
+            router.push('/select-role')
+            return
+          }
+          if (profile.role === 'pending_mentor') {
+            router.push('/mentor-pending')
+            return
+          }
+        }
+      } catch (error) {
+        console.error('Error checking user:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    checkUser()
+  }, [router])
+
   const features = [
     {
       path: "/AdaptiveMaterial",
@@ -34,6 +70,14 @@ export default function Home() {
       description: "Task Integration & Management"
     }
   ];
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-8">
