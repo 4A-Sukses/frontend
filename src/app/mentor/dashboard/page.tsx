@@ -103,8 +103,7 @@ export default function MentorDashboardPage() {
   }
 
   const handleCreateClick = () => {
-    setEditingMaterial(undefined)
-    setIsAddModalOpen(true)
+    router.push('/mentor/material/create')
   }
 
   const getTopicTitle = (topicId: number) => {

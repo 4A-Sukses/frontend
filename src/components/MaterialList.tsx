@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import type { Topic, Material, UserProfile } from '@/types/database'
 import { getCurrentUserProfile } from '@/lib/profile'
@@ -10,6 +11,7 @@ import AddTopicModal from './AddTopicModal'
 import MaterialDetailModal from './MaterialDetailModal'
 
 export default function MaterialList() {
+  const router = useRouter()
   const [topics, setTopics] = useState<Topic[]>([])
   const [materials, setMaterials] = useState<{ [topicId: number]: Material[] }>({})
   const [authors, setAuthors] = useState<{ [userId: string]: UserProfile }>({})
@@ -123,8 +125,7 @@ export default function MaterialList() {
   }
 
   const handleAddMaterial = (topic: Topic) => {
-    setSelectedTopic(topic)
-    setIsMaterialModalOpen(true)
+    router.push(`/mentor/material/create?topicId=${topic.id}`)
   }
 
   const handleMaterialAdded = () => {
