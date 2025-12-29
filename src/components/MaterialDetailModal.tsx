@@ -288,9 +288,13 @@ export default function MaterialDetailModal({ material, onClose }: MaterialDetai
               .material-content ul { list-style-type: disc; padding-left: 1.5rem; margin: 0.75rem 0; }
               .material-content ol { list-style-type: decimal; padding-left: 1.5rem; margin: 0.75rem 0; }
               .material-content li { margin: 0.25rem 0; display: list-item; }
-              .material-content img { max-width: 100%; height: auto; border-radius: 0.5rem; margin: 1rem 0; }
-              .material-content video { max-width: 100%; border-radius: 0.5rem; margin: 1rem 0; }
-              .material-content audio { width: 100%; margin: 1rem 0; }
+              .material-content img { display: block; max-width: 100%; height: auto; border-radius: 0.5rem; margin: 1rem 0; }
+              .material-content video { display: block !important; max-width: 100% !important; width: 100%; min-height: 150px; border-radius: 0.5rem; margin: 1rem 0; background: #000; }
+              .material-content audio { display: block !important; width: 100% !important; margin: 1rem 0; }
+              .material-content iframe { display: block !important; max-width: 100%; border-radius: 0.5rem; }
+              .material-content .youtube-embed { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; margin: 1rem 0; border-radius: 0.5rem; background: #000; }
+              .material-content .youtube-embed iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; border-radius: 0.5rem; }
+              .material-content div[style*="padding-bottom"] { margin: 1rem 0; }
               .material-content blockquote { border-left: 4px solid #6366f1; padding-left: 1rem; margin: 1rem 0; color: #6b7280; font-style: italic; }
               .material-content pre { background: #1f2937; color: #e5e7eb; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin: 1rem 0; }
               .material-content code { background: #e5e7eb; padding: 0.125rem 0.25rem; border-radius: 0.25rem; font-size: 0.875rem; }

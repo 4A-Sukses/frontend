@@ -23,6 +23,9 @@ const FileImporter = dynamic(() => import('./FileImporter'), { ssr: false })
 // Dynamic import for MediaUploader
 const MediaUploader = dynamic(() => import('./MediaUploader'), { ssr: false })
 
+// Dynamic import for YouTubeEmbed
+const YouTubeEmbed = dynamic(() => import('./YouTubeEmbed'), { ssr: false })
+
 interface MaterialFormProps {
   userId: string
   initialMaterial?: Material
@@ -54,6 +57,21 @@ export default function MaterialForm({ userId, initialMaterial, initialTopicId, 
     url: initialMaterial?.url || '',
     tags: initialMaterial?.tags ? initialMaterial.tags.join(', ') : '',
   })
+  // Separate state for raw HTML that Tiptap can't handle (videos, iframes, etc.)
+  const [rawMediaHtml, setRawMediaHtml] = useState<string[]>([])
+
+  useEffect(() => {
+    // Extract raw media HTML from existing content if editing
+    if (initialMaterial?.content) {
+      const mediaRegex = /<(video|audio)[^>]*>.*?<\/\1>|<div[^>]*class="youtube-embed"[^>]*>.*?<\/div>|<div[^>]*style="[^"]*padding-bottom[^"]*"[^>]*>.*?<\/div>/gi
+      const existingMedia = initialMaterial.content.match(mediaRegex) || []
+      setRawMediaHtml(existingMedia)
+
+      // Remove media from content for editor
+      const contentWithoutMedia = initialMaterial.content.replace(mediaRegex, '')
+      setFormData(prev => ({ ...prev, content: contentWithoutMedia }))
+    }
+  }, [initialMaterial])
 
   useEffect(() => {
     loadTopics()
@@ -96,25 +114,21 @@ export default function MaterialForm({ userId, initialMaterial, initialTopicId, 
     }
     setUploadedMedia(prev => [...prev, media])
 
-    // Auto-insert media into content
+    // Images can go into editor, but videos/audio go to rawMediaHtml
     if (result.fileType === 'image') {
-      const imageHtml = `<img src="${result.url}" alt="${result.fileName}" class="max-w-full h-auto rounded-lg my-4" />`
+      const imageHtml = `<img src="${result.url}" alt="${result.fileName}" style="max-width: 100%; height: auto; border-radius: 8px; margin: 16px 0;" />`
       setFormData(prev => ({
         ...prev,
         content: prev.content ? `${prev.content}\n${imageHtml}` : imageHtml
       }))
     } else if (result.fileType === 'video') {
-      const videoHtml = `<video controls class="max-w-full my-4 rounded-lg"><source src="${result.url}" type="video/mp4">Your browser does not support the video tag.</video>`
-      setFormData(prev => ({
-        ...prev,
-        content: prev.content ? `${prev.content}\n${videoHtml}` : videoHtml
-      }))
+      // Store video in rawMediaHtml instead of editor content
+      const videoHtml = `<video src="${result.url}" controls style="max-width: 100%; border-radius: 8px; margin: 16px 0;"></video>`
+      setRawMediaHtml(prev => [...prev, videoHtml])
     } else if (result.fileType === 'audio') {
-      const audioHtml = `<audio controls class="w-full my-4"><source src="${result.url}" type="audio/mpeg">Your browser does not support the audio tag.</audio>`
-      setFormData(prev => ({
-        ...prev,
-        content: prev.content ? `${prev.content}\n${audioHtml}` : audioHtml
-      }))
+      // Store audio in rawMediaHtml instead of editor content
+      const audioHtml = `<audio src="${result.url}" controls style="width: 100%; margin: 16px 0;"></audio>`
+      setRawMediaHtml(prev => [...prev, audioHtml])
     }
   }
 
@@ -147,11 +161,15 @@ export default function MaterialForm({ userId, initialMaterial, initialTopicId, 
 
     try {
       if (initialMaterial) {
-        // Update existing material
+        // Update existing material - combine editor content with raw media HTML
+        const finalContent = rawMediaHtml.length > 0
+          ? `${formData.content}\n${rawMediaHtml.join('\n')}`
+          : formData.content
+
         const materialData: MaterialUpdate = {
           topic_id: Number(selectedTopicId),
           title: formData.title,
-          content: formData.content,
+          content: finalContent,
           material_type: formData.material_type,
           url: formData.url || null,
           status: status,
@@ -170,11 +188,15 @@ export default function MaterialForm({ userId, initialMaterial, initialTopicId, 
           text: `Materi berhasil diperbarui${status === 'draft' ? ' (Draft)' : ''}!`
         })
       } else {
-        // Create new material
+        // Create new material - combine editor content with raw media HTML
+        const finalContent = rawMediaHtml.length > 0
+          ? `${formData.content}\n${rawMediaHtml.join('\n')}`
+          : formData.content
+
         const materialData: MaterialInsert = {
           topic_id: Number(selectedTopicId),
           title: formData.title,
-          content: formData.content,
+          content: finalContent,
           material_type: formData.material_type,
           url: formData.url || null,
           created_by: userId,
@@ -337,9 +359,50 @@ export default function MaterialForm({ userId, initialMaterial, initialTopicId, 
             onImageUpload={() => setShowMediaUploader(true)}
           />
           <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-            💡 Tips: Gunakan toolbar untuk memformat teks. Anda juga bisa import dari file DOCX/PDF atau upload media.
+            💡 Tips: Gunakan toolbar untuk memformat teks. Anda juga bisa import dari file DOCX atau upload media.
           </p>
         </div>
+
+        <YouTubeEmbed
+          onEmbed={(embedHtml) => {
+            // Store YouTube embed in rawMediaHtml instead of editor content
+            setRawMediaHtml(prev => [...prev, embedHtml])
+          }}
+          disabled={loading}
+        />
+
+        {/* Raw Media Preview */}
+        {rawMediaHtml.length > 0 && (
+          <div className="space-y-4 border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-gray-800/50">
+            <h4 className="font-semibold text-gray-900 dark:text-white text-sm flex justify-between items-center">
+              <span>Media Terlampir ({rawMediaHtml.length})</span>
+              <button
+                type="button"
+                onClick={() => setRawMediaHtml([])}
+                className="text-xs text-red-600 hover:text-red-700 font-normal"
+              >
+                Hapus Semua
+              </button>
+            </h4>
+            <div className="space-y-4">
+              {rawMediaHtml.map((html, index) => (
+                <div key={index} className="relative group">
+                  <div dangerouslySetInnerHTML={{ __html: html }} />
+                  <button
+                    type="button"
+                    onClick={() => setRawMediaHtml(prev => prev.filter((_, i) => i !== index))}
+                    className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                    title="Hapus media ini"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* URL */}
         <div>

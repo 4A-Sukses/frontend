@@ -18,6 +18,7 @@ const RichTextEditor = dynamic(() => import('./RichTextEditor'), {
 
 const FileImporter = dynamic(() => import('./FileImporter'), { ssr: false })
 const MediaUploader = dynamic(() => import('./MediaUploader'), { ssr: false })
+const YouTubeEmbed = dynamic(() => import('./YouTubeEmbed'), { ssr: false })
 
 interface AddMaterialModalProps {
   topic?: Topic
@@ -41,6 +42,8 @@ export default function AddMaterialModal({ topic, material, userId, onClose, onS
     url: '',
     tags: '',
   })
+  // Separate state for raw HTML that Tiptap can't handle (videos, iframes, etc.)
+  const [rawMediaHtml, setRawMediaHtml] = useState<string[]>([])
 
   useEffect(() => {
     if (!topic && !material) {
@@ -48,9 +51,17 @@ export default function AddMaterialModal({ topic, material, userId, onClose, onS
     }
 
     if (material) {
+      // Extract raw media HTML from existing content
+      const mediaRegex = /<(video|audio)[^>]*>.*?<\/\1>|<div[^>]*class="youtube-embed"[^>]*>.*?<\/div>|<div[^>]*style="[^"]*padding-bottom[^"]*"[^>]*>.*?<\/div>/gi
+      const existingMedia = material.content.match(mediaRegex) || []
+      setRawMediaHtml(existingMedia)
+
+      // Remove media from content for editor (editor will strip it anyway)
+      const contentWithoutMedia = material.content.replace(mediaRegex, '')
+
       setFormData({
         title: material.title,
-        content: material.content,
+        content: contentWithoutMedia,
         material_type: material.material_type,
         url: material.url || '',
         tags: material.tags ? material.tags.join(', ') : '',
@@ -89,25 +100,21 @@ export default function AddMaterialModal({ topic, material, userId, onClose, onS
   }
 
   const handleMediaUpload = (result: UploadResult) => {
-    // Auto-insert media into content
+    // Store media HTML separately instead of adding to editor content
     if (result.fileType === 'image') {
-      const imageHtml = `<img src="${result.url}" alt="${result.fileName}" class="max-w-full h-auto rounded-lg my-4" />`
+      const imageHtml = `<img src="${result.url}" alt="${result.fileName}" style="max-width: 100%; height: auto; border-radius: 8px; margin: 16px 0;" />`
       setFormData(prev => ({
         ...prev,
         content: prev.content ? `${prev.content}\n${imageHtml}` : imageHtml
       }))
     } else if (result.fileType === 'video') {
-      const videoHtml = `<video controls class="max-w-full my-4 rounded-lg"><source src="${result.url}" type="video/mp4">Your browser does not support the video tag.</video>`
-      setFormData(prev => ({
-        ...prev,
-        content: prev.content ? `${prev.content}\n${videoHtml}` : videoHtml
-      }))
+      // Add video to rawMediaHtml instead of editor content
+      const videoHtml = `<video src="${result.url}" controls style="max-width: 100%; border-radius: 8px; margin: 16px 0;"></video>`
+      setRawMediaHtml(prev => [...prev, videoHtml])
     } else if (result.fileType === 'audio') {
-      const audioHtml = `<audio controls class="w-full my-4"><source src="${result.url}" type="audio/mpeg">Your browser does not support the audio tag.</audio>`
-      setFormData(prev => ({
-        ...prev,
-        content: prev.content ? `${prev.content}\n${audioHtml}` : audioHtml
-      }))
+      // Add audio to rawMediaHtml instead of editor content
+      const audioHtml = `<audio src="${result.url}" controls style="width: 100%; margin: 16px 0;"></audio>`
+      setRawMediaHtml(prev => [...prev, audioHtml])
     }
   }
 
@@ -130,11 +137,15 @@ export default function AddMaterialModal({ topic, material, userId, onClose, onS
 
     try {
       if (material) {
-        // Update existing material
+        // Update existing material - combine editor content with raw media HTML
+        const finalContent = rawMediaHtml.length > 0
+          ? `${formData.content}\n${rawMediaHtml.join('\n')}`
+          : formData.content
+
         const materialData: MaterialUpdate = {
           topic_id: Number(selectedTopicId),
           title: formData.title,
-          content: formData.content,
+          content: finalContent,
           material_type: formData.material_type,
           url: formData.url || null,
           status: status,
@@ -153,11 +164,15 @@ export default function AddMaterialModal({ topic, material, userId, onClose, onS
           text: `Materi berhasil diperbarui${status === 'draft' ? ' (Draft)' : ''}!`
         })
       } else {
-        // Create new material
+        // Create new material - combine editor content with raw media HTML
+        const finalContent = rawMediaHtml.length > 0
+          ? `${formData.content}\n${rawMediaHtml.join('\n')}`
+          : formData.content
+
         const materialData: MaterialInsert = {
           topic_id: Number(selectedTopicId),
           title: formData.title,
-          content: formData.content,
+          content: finalContent,
           material_type: formData.material_type,
           url: formData.url || null,
           created_by: userId,
@@ -319,6 +334,48 @@ export default function AddMaterialModal({ topic, material, userId, onClose, onS
             </div>
           )}
 
+          {/* YouTube Embed */}
+          <YouTubeEmbed
+            onEmbed={(embedHtml) => {
+              // Store YouTube embed in rawMediaHtml instead of editor content
+              setRawMediaHtml(prev => [...prev, embedHtml])
+            }}
+            disabled={loading}
+          />
+
+          {/* Raw Media Preview */}
+          {rawMediaHtml.length > 0 && (
+            <div className="space-y-4 border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-gray-50 dark:bg-gray-800/50">
+              <h4 className="font-semibold text-gray-900 dark:text-white text-sm flex justify-between items-center">
+                <span>Media Terlampir ({rawMediaHtml.length})</span>
+                <button
+                  type="button"
+                  onClick={() => setRawMediaHtml([])}
+                  className="text-xs text-red-600 hover:text-red-700 font-normal"
+                >
+                  Hapus Semua
+                </button>
+              </h4>
+              <div className="space-y-4">
+                {rawMediaHtml.map((html, index) => (
+                  <div key={index} className="relative group">
+                    <div dangerouslySetInnerHTML={{ __html: html }} />
+                    <button
+                      type="button"
+                      onClick={() => setRawMediaHtml(prev => prev.filter((_, i) => i !== index))}
+                      className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                      title="Hapus media ini"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* URL */}
           <div>
             <label htmlFor="url" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -355,8 +412,8 @@ export default function AddMaterialModal({ topic, material, userId, onClose, onS
           {message && (
             <div
               className={`rounded-md p-4 ${message.type === 'error'
-                  ? 'bg-red-50 text-red-800 dark:bg-red-900 dark:text-red-200'
-                  : 'bg-green-50 text-green-800 dark:bg-green-900 dark:text-green-200'
+                ? 'bg-red-50 text-red-800 dark:bg-red-900 dark:text-red-200'
+                : 'bg-green-50 text-green-800 dark:bg-green-900 dark:text-green-200'
                 }`}
             >
               <p className="text-sm">{message.text}</p>

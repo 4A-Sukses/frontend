@@ -2,17 +2,16 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import type { Topic, Material, UserProfile } from '@/types/database'
 import { stripHtml } from '@/lib/htmlUtils'
-import MaterialDetailModal from './MaterialDetailModal'
 
 export default function MaterialList() {
+  const router = useRouter()
   const [topics, setTopics] = useState<Topic[]>([])
   const [materials, setMaterials] = useState<{ [topicId: number]: Material[] }>({})
   const [authors, setAuthors] = useState<{ [userId: string]: UserProfile }>({})
-  const [selectedMaterial, setSelectedMaterial] = useState<Material | null>(null)
-  const [isMaterialDetailOpen, setIsMaterialDetailOpen] = useState(false)
   const [loading, setLoading] = useState(true)
   const [currentUserId, setCurrentUserId] = useState<string | null>(null)
 
@@ -85,7 +84,7 @@ export default function MaterialList() {
         .from('materials')
         .select('*')
         .eq('topic_id', topicId)
-        .eq('status', 'published') // Only show published materials
+        .eq('status', 'published')
         .order('created_at', { ascending: false })
 
       if (error) throw error
@@ -96,7 +95,6 @@ export default function MaterialList() {
           [topicId]: data
         }))
 
-        // Collect author IDs
         const authorIds = Array.from(new Set(data.map(m => m.created_by)))
         await fetchAuthors(authorIds)
       }
@@ -106,13 +104,14 @@ export default function MaterialList() {
   }
 
   const handleMaterialClick = (material: Material) => {
-    setSelectedMaterial(material)
-    setIsMaterialDetailOpen(true)
-  }
-
-  const handleCloseMaterialDetail = () => {
-    setIsMaterialDetailOpen(false)
-    setSelectedMaterial(null)
+    // Create slug from title and encode ID
+    const slug = material.title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '')
+    // Encode ID as base64
+    const encodedId = btoa(material.id.toString())
+    router.push(`/material/${slug}?ref=${encodedId}`)
   }
 
   if (loading) {
@@ -184,12 +183,9 @@ export default function MaterialList() {
 
                         {/* Material Info */}
                         <div className="flex-1">
-                          <h4 className="text-base font-semibold text-gray-900 dark:text-white mb-1 hover:text-indigo-600 dark:hover:text-indigo-400">
+                          <h4 className="text-base font-semibold text-gray-900 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400">
                             {material.title}
                           </h4>
-                          <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-2">
-                            {stripHtml(material.content, 150)}
-                          </p>
 
                           <div className="flex flex-wrap items-center gap-3">
                             <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
@@ -239,14 +235,6 @@ export default function MaterialList() {
             </div>
           ))}
         </div>
-      )}
-
-      {/* Material Detail Modal */}
-      {isMaterialDetailOpen && selectedMaterial && (
-        <MaterialDetailModal
-          material={selectedMaterial}
-          onClose={handleCloseMaterialDetail}
-        />
       )}
     </div>
   )

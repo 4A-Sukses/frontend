@@ -5,6 +5,7 @@ import StarterKit from '@tiptap/starter-kit'
 import Link from '@tiptap/extension-link'
 import Image from '@tiptap/extension-image'
 import Underline from '@tiptap/extension-underline'
+import { Video, Audio, Iframe, CustomDiv } from '@/lib/tiptapExtensions'
 import { useEffect, useCallback } from 'react'
 
 interface RichTextEditorProps {
@@ -248,7 +249,11 @@ export default function RichTextEditor({
                     class: 'max-w-full h-auto rounded-lg my-4'
                 }
             }),
-            Underline
+            Underline,
+            Video,
+            Audio,
+            Iframe,
+            CustomDiv
         ],
         content: content,
         editable: !disabled,
@@ -377,6 +382,52 @@ export default function RichTextEditor({
         }
         .dark .ProseMirror code {
           background: #374151;
+        }
+        .ProseMirror video {
+          display: block;
+          max-width: 100%;
+          width: 100%;
+          min-height: 150px;
+          border-radius: 0.5rem;
+          margin: 1rem 0;
+          background: #000;
+        }
+        .ProseMirror audio {
+          display: block;
+          width: 100%;
+          margin: 1rem 0;
+        }
+        .ProseMirror iframe {
+          display: block;
+          max-width: 100%;
+          width: 100%;
+          min-height: 200px;
+          border-radius: 0.5rem;
+          margin: 1rem 0;
+          border: none;
+        }
+        .ProseMirror div {
+          margin: 0.5rem 0;
+        }
+        .ProseMirror .youtube-embed {
+          position: relative;
+          padding-bottom: 56.25%;
+          height: 0;
+          overflow: hidden;
+          max-width: 100%;
+          margin: 1rem 0;
+          border-radius: 0.5rem;
+          background: #000;
+        }
+        .ProseMirror .youtube-embed iframe {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          border: none;
+          border-radius: 0.5rem;
+          min-height: 0;
         }
       `}</style>
         </div>

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { getCurrentUserProfile } from '@/lib/profile'
+import { deleteFile } from '@/lib/storage'
 import type { Material, Topic } from '@/types/database'
 import { stripHtml } from '@/lib/htmlUtils'
 import AddMaterialModal from '@/components/AddMaterialModal'
@@ -22,6 +23,7 @@ export default function MentorDashboardPage() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [isTopicModalOpen, setIsTopicModalOpen] = useState(false)
   const [isPreviewOpen, setIsPreviewOpen] = useState(false)
+  const [deletingId, setDeletingId] = useState<number | null>(null)
   const [editingMaterial, setEditingMaterial] = useState<Material | undefined>(undefined)
   const [previewMaterial, setPreviewMaterial] = useState<Material | null>(null)
 
@@ -111,8 +113,69 @@ export default function MentorDashboardPage() {
   }
 
   const handlePreviewClick = (material: Material) => {
-    setPreviewMaterial(material)
-    setIsPreviewOpen(true)
+    // Create slug from title and encode ID
+    const slug = material.title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '')
+    // Encode ID as base64
+    const encodedId = btoa(material.id.toString())
+    router.push(`/material/${slug}?ref=${encodedId}`)
+  }
+
+  const handleDeleteClick = async (material: Material) => {
+    if (!confirm(`Apakah Anda yakin ingin menghapus materi "${material.title}"? Semua file media yang terkait juga akan dihapus.`)) {
+      return
+    }
+
+    setDeletingId(material.id)
+
+    try {
+      // Extract media URLs from content and delete from storage
+      const mediaUrls = extractMediaUrls(material.content)
+      for (const url of mediaUrls) {
+        try {
+          // Extract path from URL (e.g., userId/images/filename.jpg)
+          const pathMatch = url.match(/materials\/([^?]+)/)
+          if (pathMatch && pathMatch[1]) {
+            await deleteFile(pathMatch[1])
+          }
+        } catch (err) {
+          console.error('Error deleting file:', err)
+          // Continue deleting other files even if one fails
+        }
+      }
+
+      // Delete material from database
+      const { error } = await supabase
+        .from('materials')
+        .delete()
+        .eq('id', material.id)
+
+      if (error) throw error
+
+      // Reload materials
+      if (userId) {
+        await loadMaterials(userId)
+      }
+    } catch (error: any) {
+      console.error('Error deleting material:', error)
+      alert('Gagal menghapus materi: ' + error.message)
+    } finally {
+      setDeletingId(null)
+    }
+  }
+
+  // Helper function to extract media URLs from HTML content
+  const extractMediaUrls = (content: string): string[] => {
+    const urls: string[] = []
+    // Match src attributes in img, video, audio tags
+    const srcRegex = /src=["']([^"']+supabase[^"']+)["']/g
+    let match
+    while ((match = srcRegex.exec(content)) !== null) {
+      urls.push(match[1])
+    }
+    return urls
   }
 
   const getTopicTitle = (topicId: number) => {
@@ -256,6 +319,20 @@ export default function MentorDashboardPage() {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                       </svg>
                     </button>
+                    <button
+                      onClick={() => handleDeleteClick(material)}
+                      disabled={deletingId === material.id}
+                      className="p-2 bg-gray-800 text-white rounded-lg hover:bg-red-600 transition-colors disabled:opacity-50"
+                      title="Hapus"
+                    >
+                      {deletingId === material.id ? (
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      ) : (
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      )}
+                    </button>
                   </div>
 
                   <div className="flex items-start gap-6">
@@ -288,9 +365,6 @@ export default function MentorDashboardPage() {
                       <h3 className="text-xl font-bold text-white mb-2 truncate group-hover:text-yellow-400 transition-colors">
                         {material.title}
                       </h3>
-                      <p className="text-gray-400 text-sm line-clamp-2 mb-3 max-w-2xl">
-                        {stripHtml(material.content, 200)}
-                      </p>
                       {material.url && (
                         <a
                           href={material.url}
