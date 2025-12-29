@@ -2,8 +2,26 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import dynamic from 'next/dynamic'
 import { supabase } from '@/lib/supabase'
 import type { Topic, MaterialInsert, Material, MaterialUpdate } from '@/types/database'
+import type { UploadResult } from '@/lib/storage'
+
+// Dynamic import for RichTextEditor to avoid SSR issues with Tiptap
+const RichTextEditor = dynamic(() => import('./RichTextEditor'), {
+  ssr: false,
+  loading: () => (
+    <div className="border border-gray-300 dark:border-gray-600 rounded-lg p-4 min-h-[300px] flex items-center justify-center">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500"></div>
+    </div>
+  )
+})
+
+// Dynamic import for FileImporter
+const FileImporter = dynamic(() => import('./FileImporter'), { ssr: false })
+
+// Dynamic import for MediaUploader
+const MediaUploader = dynamic(() => import('./MediaUploader'), { ssr: false })
 
 interface MaterialFormProps {
   userId: string
@@ -13,12 +31,21 @@ interface MaterialFormProps {
   onCancel?: () => void
 }
 
+interface UploadedMedia {
+  id: string
+  type: 'image' | 'video' | 'audio' | 'document'
+  url: string
+  name: string
+}
+
 export default function MaterialForm({ userId, initialMaterial, initialTopicId, onSuccess, onCancel }: MaterialFormProps) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState<{ type: 'error' | 'success', text: string } | null>(null)
   const [topics, setTopics] = useState<Topic[]>([])
   const [selectedTopicId, setSelectedTopicId] = useState<number | string>(initialMaterial?.topic_id || initialTopicId || '')
+  const [uploadedMedia, setUploadedMedia] = useState<UploadedMedia[]>([])
+  const [showMediaUploader, setShowMediaUploader] = useState(false)
 
   const [formData, setFormData] = useState({
     title: initialMaterial?.title || '',
@@ -38,7 +65,7 @@ export default function MaterialForm({ userId, initialMaterial, initialTopicId, 
         .from('topics')
         .select('*')
         .order('title')
-      
+
       if (error) throw error
       setTopics(data || [])
     } catch (error) {
@@ -46,11 +73,66 @@ export default function MaterialForm({ userId, initialMaterial, initialTopicId, 
     }
   }
 
+  const handleContentChange = (html: string) => {
+    setFormData(prev => ({ ...prev, content: html }))
+  }
+
+  const handleFileImport = (importedContent: string) => {
+    // Append imported content to existing content
+    setFormData(prev => ({
+      ...prev,
+      content: prev.content
+        ? `${prev.content}\n\n${importedContent}`
+        : importedContent
+    }))
+  }
+
+  const handleMediaUpload = (result: UploadResult) => {
+    const media: UploadedMedia = {
+      id: Date.now().toString(),
+      type: result.fileType as 'image' | 'video' | 'audio' | 'document',
+      url: result.url,
+      name: result.fileName
+    }
+    setUploadedMedia(prev => [...prev, media])
+
+    // Auto-insert media into content
+    if (result.fileType === 'image') {
+      const imageHtml = `<img src="${result.url}" alt="${result.fileName}" class="max-w-full h-auto rounded-lg my-4" />`
+      setFormData(prev => ({
+        ...prev,
+        content: prev.content ? `${prev.content}\n${imageHtml}` : imageHtml
+      }))
+    } else if (result.fileType === 'video') {
+      const videoHtml = `<video controls class="max-w-full my-4 rounded-lg"><source src="${result.url}" type="video/mp4">Your browser does not support the video tag.</video>`
+      setFormData(prev => ({
+        ...prev,
+        content: prev.content ? `${prev.content}\n${videoHtml}` : videoHtml
+      }))
+    } else if (result.fileType === 'audio') {
+      const audioHtml = `<audio controls class="w-full my-4"><source src="${result.url}" type="audio/mpeg">Your browser does not support the audio tag.</audio>`
+      setFormData(prev => ({
+        ...prev,
+        content: prev.content ? `${prev.content}\n${audioHtml}` : audioHtml
+      }))
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent | null, status: 'published' | 'draft' = 'published') => {
     if (e) e.preventDefault()
-    
+
     if (!selectedTopicId) {
       setMessage({ type: 'error', text: 'Pilih topik terlebih dahulu' })
+      return
+    }
+
+    if (!formData.title.trim()) {
+      setMessage({ type: 'error', text: 'Judul materi tidak boleh kosong' })
+      return
+    }
+
+    if (!formData.content.trim()) {
+      setMessage({ type: 'error', text: 'Konten materi tidak boleh kosong' })
       return
     }
 
@@ -137,7 +219,7 @@ export default function MaterialForm({ userId, initialMaterial, initialTopicId, 
           {initialMaterial ? 'Edit Materi' : 'Buat Materi Baru'}
         </h2>
         <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-          {initialMaterial ? 'Perbarui informasi materi pembelajaran' : 'Isi form di bawah untuk membuat materi baru'}
+          {initialMaterial ? 'Perbarui informasi materi pembelajaran' : 'Gunakan editor di bawah untuk membuat materi dengan konten yang kaya'}
         </p>
       </div>
 
@@ -187,12 +269,12 @@ export default function MaterialForm({ userId, initialMaterial, initialTopicId, 
           </label>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {['article', 'video', 'pdf', 'slides', 'book', 'other'].map((type) => (
-              <label 
+              <label
                 key={type}
                 className={`
                   relative flex items-center justify-center px-4 py-3 rounded-lg border cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-all
-                  ${formData.material_type === type 
-                    ? 'border-indigo-500 ring-2 ring-indigo-500 ring-opacity-50 bg-indigo-50 dark:bg-indigo-900/20' 
+                  ${formData.material_type === type
+                    ? 'border-indigo-500 ring-2 ring-indigo-500 ring-opacity-50 bg-indigo-50 dark:bg-indigo-900/20'
                     : 'border-gray-300 dark:border-gray-600'
                   }
                 `}
@@ -212,21 +294,51 @@ export default function MaterialForm({ userId, initialMaterial, initialTopicId, 
           </div>
         </div>
 
-        {/* Content */}
+        {/* Import & Upload Section */}
+        <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4 space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Import & Upload
+            </h3>
+            <button
+              type="button"
+              onClick={() => setShowMediaUploader(!showMediaUploader)}
+              className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline"
+            >
+              {showMediaUploader ? 'Sembunyikan' : 'Tampilkan'} Upload Media
+            </button>
+          </div>
+
+          {/* File Importer */}
+          <FileImporter onImport={handleFileImport} disabled={loading} />
+
+          {/* Media Uploader (Collapsible) */}
+          {showMediaUploader && (
+            <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+              <MediaUploader
+                userId={userId}
+                onUpload={handleMediaUpload}
+                disabled={loading}
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Rich Text Editor for Content */}
         <div>
           <label htmlFor="content" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Konten/Deskripsi <span className="text-red-500">*</span>
+            Konten Materi <span className="text-red-500">*</span>
           </label>
-          <textarea
-            id="content"
-            required
-            rows={6}
-            value={formData.content}
-            onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
-            className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-shadow"
-            placeholder="Masukkan deskripsi materi atau konten singkat"
+          <RichTextEditor
+            content={formData.content}
+            onChange={handleContentChange}
+            placeholder="Tulis konten materi di sini... Gunakan toolbar untuk format teks."
             disabled={loading}
+            onImageUpload={() => setShowMediaUploader(true)}
           />
+          <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+            💡 Tips: Gunakan toolbar untuk memformat teks. Anda juga bisa import dari file DOCX/PDF atau upload media.
+          </p>
         </div>
 
         {/* URL */}
@@ -239,7 +351,7 @@ export default function MaterialForm({ userId, initialMaterial, initialTopicId, 
               <span className="text-gray-500 sm:text-sm">https://</span>
             </div>
             <input
-              type="text" // using text to allow pasting without protocol, but logic should handle it ideally
+              type="text"
               id="url"
               value={formData.url?.replace(/^https?:\/\//, '') || ''}
               onChange={(e) => setFormData(prev => ({ ...prev, url: e.target.value ? `https://${e.target.value.replace(/^https?:\/\//, '')}` : '' }))}
@@ -272,11 +384,10 @@ export default function MaterialForm({ userId, initialMaterial, initialTopicId, 
         {/* Message */}
         {message && (
           <div
-            className={`rounded-lg p-4 flex items-start gap-3 ${
-              message.type === 'error'
-                ? 'bg-red-50 text-red-800 dark:bg-red-900/30 dark:text-red-200 border border-red-200 dark:border-red-800'
-                : 'bg-green-50 text-green-800 dark:bg-green-900/30 dark:text-green-200 border border-green-200 dark:border-green-800'
-            }`}
+            className={`rounded-lg p-4 flex items-start gap-3 ${message.type === 'error'
+              ? 'bg-red-50 text-red-800 dark:bg-red-900/30 dark:text-red-200 border border-red-200 dark:border-red-800'
+              : 'bg-green-50 text-green-800 dark:bg-green-900/30 dark:text-green-200 border border-green-200 dark:border-green-800'
+              }`}
           >
             {message.type === 'success' ? (
               <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -6,8 +6,10 @@ import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { getCurrentUserProfile } from '@/lib/profile'
 import type { Material, Topic } from '@/types/database'
+import { stripHtml } from '@/lib/htmlUtils'
 import AddMaterialModal from '@/components/AddMaterialModal'
 import AddTopicModal from '@/components/AddTopicModal'
+import MaterialDetailModal from '@/components/MaterialDetailModal'
 import Navbar from '@/components/Navbar'
 
 export default function MentorDashboardPage() {
@@ -19,7 +21,9 @@ export default function MentorDashboardPage() {
   const [activeTab, setActiveTab] = useState<'published' | 'draft'>('published')
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [isTopicModalOpen, setIsTopicModalOpen] = useState(false)
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false)
   const [editingMaterial, setEditingMaterial] = useState<Material | undefined>(undefined)
+  const [previewMaterial, setPreviewMaterial] = useState<Material | null>(null)
 
   useEffect(() => {
     checkAuthAndLoadData()
@@ -28,7 +32,7 @@ export default function MentorDashboardPage() {
   const checkAuthAndLoadData = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser()
-      
+
       if (!user) {
         router.push('/login')
         return
@@ -76,7 +80,7 @@ export default function MentorDashboardPage() {
         .from('topics')
         .select('*')
         .order('created_at', { ascending: false })
-      
+
       if (error) throw error
       setTopics(data || [])
     } catch (error) {
@@ -106,6 +110,11 @@ export default function MentorDashboardPage() {
     router.push('/mentor/material/create')
   }
 
+  const handlePreviewClick = (material: Material) => {
+    setPreviewMaterial(material)
+    setIsPreviewOpen(true)
+  }
+
   const getTopicTitle = (topicId: number) => {
     const topic = topics.find(t => t.id === topicId)
     return topic ? topic.title : 'Unknown Topic'
@@ -131,24 +140,24 @@ export default function MentorDashboardPage() {
       <Navbar />
 
       <div className="relative flex-1 overflow-hidden">
-         {/* Decorative curved lines */}
-         <div className="absolute inset-0 opacity-20 pointer-events-none">
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full">
-              {[...Array(12)].map((_, i) => (
-                <div
-                  key={i}
-                  className="absolute border-2 border-gray-600 rounded-full"
-                  style={{
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    width: `${(i + 1) * 150}px`,
-                    height: `${(i + 1) * 100}px`,
-                  }}
-                />
-              ))}
-            </div>
+        {/* Decorative curved lines */}
+        <div className="absolute inset-0 opacity-20 pointer-events-none">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full">
+            {[...Array(12)].map((_, i) => (
+              <div
+                key={i}
+                className="absolute border-2 border-gray-600 rounded-full"
+                style={{
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  width: `${(i + 1) * 150}px`,
+                  height: `${(i + 1) * 100}px`,
+                }}
+              />
+            ))}
           </div>
+        </div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           {/* Header */}
@@ -194,11 +203,10 @@ export default function MentorDashboardPage() {
             <div className="flex gap-2 p-1 bg-gray-900 rounded-xl inline-flex border border-gray-800">
               <button
                 onClick={() => setActiveTab('published')}
-                className={`px-6 py-2.5 text-sm font-bold rounded-lg transition-all ${
-                  activeTab === 'published'
-                    ? 'bg-purple-600 text-white shadow-lg'
-                    : 'text-gray-400 hover:text-white hover:bg-gray-800'
-                }`}
+                className={`px-6 py-2.5 text-sm font-bold rounded-lg transition-all ${activeTab === 'published'
+                  ? 'bg-purple-600 text-white shadow-lg'
+                  : 'text-gray-400 hover:text-white hover:bg-gray-800'
+                  }`}
               >
                 Published
                 <span className="ml-2 bg-black/20 text-white py-0.5 px-2 rounded-full text-xs">
@@ -207,11 +215,10 @@ export default function MentorDashboardPage() {
               </button>
               <button
                 onClick={() => setActiveTab('draft')}
-                className={`px-6 py-2.5 text-sm font-bold rounded-lg transition-all ${
-                  activeTab === 'draft'
-                    ? 'bg-yellow-500 text-black shadow-lg'
-                    : 'text-gray-400 hover:text-white hover:bg-gray-800'
-                }`}
+                className={`px-6 py-2.5 text-sm font-bold rounded-lg transition-all ${activeTab === 'draft'
+                  ? 'bg-yellow-500 text-black shadow-lg'
+                  : 'text-gray-400 hover:text-white hover:bg-gray-800'
+                  }`}
               >
                 Drafts
                 <span className="ml-2 bg-black/20 text-current py-0.5 px-2 rounded-full text-xs">
@@ -225,29 +232,38 @@ export default function MentorDashboardPage() {
           <div className="grid gap-4">
             {filteredMaterials.length > 0 ? (
               filteredMaterials.map((material) => (
-                <div 
-                  key={material.id} 
+                <div
+                  key={material.id}
                   className="group bg-gray-900 border border-gray-800 rounded-2xl p-6 hover:border-gray-600 transition-all hover:-translate-y-1 relative overflow-hidden"
                 >
-                  <div className="absolute top-0 right-0 p-6 opacity-0 group-hover:opacity-100 transition-opacity">
-                     <button 
-                        onClick={() => handleEditClick(material)}
-                        className="p-2 bg-gray-800 text-white rounded-lg hover:bg-indigo-600 transition-colors" 
-                        title="Edit"
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                        </svg>
-                      </button>
+                  <div className="absolute top-0 right-0 p-6 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+                    <button
+                      onClick={() => handlePreviewClick(material)}
+                      className="p-2 bg-gray-800 text-white rounded-lg hover:bg-green-600 transition-colors"
+                      title="Preview"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={() => handleEditClick(material)}
+                      className="p-2 bg-gray-800 text-white rounded-lg hover:bg-indigo-600 transition-colors"
+                      title="Edit"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                    </button>
                   </div>
-                  
+
                   <div className="flex items-start gap-6">
                     {/* Icon */}
-                    <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-xl font-black shadow-lg transform group-hover:rotate-3 transition-transform ${
-                      material.status === 'draft' 
-                        ? 'bg-gradient-to-br from-yellow-400 to-yellow-600 text-black'
-                        : 'bg-gradient-to-br from-purple-500 to-indigo-600 text-white'
-                    }`}>
+                    <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-xl font-black shadow-lg transform group-hover:rotate-3 transition-transform ${material.status === 'draft'
+                      ? 'bg-gradient-to-br from-yellow-400 to-yellow-600 text-black'
+                      : 'bg-gradient-to-br from-purple-500 to-indigo-600 text-white'
+                      }`}>
                       {material.material_type.substring(0, 3).toUpperCase()}
                     </div>
 
@@ -273,12 +289,12 @@ export default function MentorDashboardPage() {
                         {material.title}
                       </h3>
                       <p className="text-gray-400 text-sm line-clamp-2 mb-3 max-w-2xl">
-                        {material.content}
+                        {stripHtml(material.content, 200)}
                       </p>
                       {material.url && (
-                        <a 
-                          href={material.url} 
-                          target="_blank" 
+                        <a
+                          href={material.url}
+                          target="_blank"
                           rel="noopener noreferrer"
                           className="text-sm font-semibold text-indigo-400 hover:text-indigo-300 hover:underline flex items-center gap-1"
                         >
@@ -303,7 +319,7 @@ export default function MentorDashboardPage() {
                   Belum ada materi {activeTab === 'published' ? 'terpublish' : 'draft'}
                 </h3>
                 <p className="text-gray-500 max-w-sm mb-8">
-                  {activeTab === 'published' 
+                  {activeTab === 'published'
                     ? 'Mulai berbagi pengetahuan Anda dengan membuat materi pembelajaran baru.'
                     : 'Draft materi yang Anda buat akan muncul di sini sebelum dipublish.'}
                 </p>
@@ -339,6 +355,17 @@ export default function MentorDashboardPage() {
             userId={userId}
             onClose={() => setIsTopicModalOpen(false)}
             onSuccess={handleTopicAdded}
+          />
+        )}
+
+        {/* Preview Modal */}
+        {isPreviewOpen && previewMaterial && (
+          <MaterialDetailModal
+            material={previewMaterial}
+            onClose={() => {
+              setIsPreviewOpen(false)
+              setPreviewMaterial(null)
+            }}
           />
         )}
       </div>

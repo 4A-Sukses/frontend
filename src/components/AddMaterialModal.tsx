@@ -1,8 +1,23 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import dynamic from 'next/dynamic'
 import { supabase } from '@/lib/supabase'
 import type { Topic, MaterialInsert, Material, MaterialUpdate } from '@/types/database'
+import type { UploadResult } from '@/lib/storage'
+
+// Dynamic imports for rich text components to avoid SSR issues
+const RichTextEditor = dynamic(() => import('./RichTextEditor'), {
+  ssr: false,
+  loading: () => (
+    <div className="border border-gray-300 dark:border-gray-600 rounded-lg p-4 min-h-[200px] flex items-center justify-center">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500"></div>
+    </div>
+  )
+})
+
+const FileImporter = dynamic(() => import('./FileImporter'), { ssr: false })
+const MediaUploader = dynamic(() => import('./MediaUploader'), { ssr: false })
 
 interface AddMaterialModalProps {
   topic?: Topic
@@ -17,6 +32,7 @@ export default function AddMaterialModal({ topic, material, userId, onClose, onS
   const [message, setMessage] = useState<{ type: 'error' | 'success', text: string } | null>(null)
   const [topics, setTopics] = useState<Topic[]>([])
   const [selectedTopicId, setSelectedTopicId] = useState<number | string>(topic?.id || material?.topic_id || '')
+  const [showMediaUploader, setShowMediaUploader] = useState(false)
 
   const [formData, setFormData] = useState({
     title: '',
@@ -30,7 +46,7 @@ export default function AddMaterialModal({ topic, material, userId, onClose, onS
     if (!topic && !material) {
       loadTopics()
     }
-    
+
     if (material) {
       setFormData({
         title: material.title,
@@ -40,8 +56,6 @@ export default function AddMaterialModal({ topic, material, userId, onClose, onS
         tags: material.tags ? material.tags.join(', ') : '',
       })
       if (!topic) {
-        // We need topics to be loaded if we are editing without a pre-selected topic context
-        // OR if we want to allow changing topic (which might be advanced, but let's load topics anyway)
         loadTopics()
       }
     }
@@ -53,7 +67,7 @@ export default function AddMaterialModal({ topic, material, userId, onClose, onS
         .from('topics')
         .select('*')
         .order('title')
-      
+
       if (error) throw error
       setTopics(data || [])
     } catch (error) {
@@ -61,9 +75,45 @@ export default function AddMaterialModal({ topic, material, userId, onClose, onS
     }
   }
 
+  const handleContentChange = (html: string) => {
+    setFormData(prev => ({ ...prev, content: html }))
+  }
+
+  const handleFileImport = (importedContent: string) => {
+    setFormData(prev => ({
+      ...prev,
+      content: prev.content
+        ? `${prev.content}\n\n${importedContent}`
+        : importedContent
+    }))
+  }
+
+  const handleMediaUpload = (result: UploadResult) => {
+    // Auto-insert media into content
+    if (result.fileType === 'image') {
+      const imageHtml = `<img src="${result.url}" alt="${result.fileName}" class="max-w-full h-auto rounded-lg my-4" />`
+      setFormData(prev => ({
+        ...prev,
+        content: prev.content ? `${prev.content}\n${imageHtml}` : imageHtml
+      }))
+    } else if (result.fileType === 'video') {
+      const videoHtml = `<video controls class="max-w-full my-4 rounded-lg"><source src="${result.url}" type="video/mp4">Your browser does not support the video tag.</video>`
+      setFormData(prev => ({
+        ...prev,
+        content: prev.content ? `${prev.content}\n${videoHtml}` : videoHtml
+      }))
+    } else if (result.fileType === 'audio') {
+      const audioHtml = `<audio controls class="w-full my-4"><source src="${result.url}" type="audio/mpeg">Your browser does not support the audio tag.</audio>`
+      setFormData(prev => ({
+        ...prev,
+        content: prev.content ? `${prev.content}\n${audioHtml}` : audioHtml
+      }))
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent | null, status: 'published' | 'draft' = 'published') => {
     if (e) e.preventDefault()
-    
+
     if (!selectedTopicId) {
       setMessage({ type: 'error', text: 'Pilih topik terlebih dahulu' })
       return
@@ -142,9 +192,9 @@ export default function AddMaterialModal({ topic, material, userId, onClose, onS
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-4xl w-full max-h-[95vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700">
+        <div className="sticky top-0 bg-white dark:bg-gray-800 flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700 z-10">
           <div>
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
               {material ? 'Edit Materi' : 'Tambah Materi Baru'}
@@ -165,7 +215,7 @@ export default function AddMaterialModal({ topic, material, userId, onClose, onS
         </div>
 
         {/* Form */}
-        <div className="p-6 space-y-4">
+        <div className="p-6 space-y-6">
           {/* Topic Selection (if no topic prop) */}
           {(!topic || material) && (
             <div>
@@ -227,22 +277,47 @@ export default function AddMaterialModal({ topic, material, userId, onClose, onS
             </select>
           </div>
 
-          {/* Content */}
+          {/* Content - Rich Text Editor */}
           <div>
-            <label htmlFor="content" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Konten/Deskripsi <span className="text-red-500">*</span>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Konten Materi <span className="text-red-500">*</span>
             </label>
-            <textarea
-              id="content"
-              required
-              rows={5}
-              value={formData.content}
-              onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-              placeholder="Masukkan deskripsi materi atau konten singkat"
+            <RichTextEditor
+              content={formData.content}
+              onChange={handleContentChange}
+              placeholder="Tulis konten materi di sini... Gunakan toolbar untuk format teks."
               disabled={loading}
+              onImageUpload={() => setShowMediaUploader(true)}
             />
           </div>
+
+          {/* File Import */}
+          <FileImporter onImport={handleFileImport} disabled={loading} />
+
+          {/* Media Upload Toggle */}
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Upload Media
+            </span>
+            <button
+              type="button"
+              onClick={() => setShowMediaUploader(!showMediaUploader)}
+              className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline"
+            >
+              {showMediaUploader ? 'Sembunyikan' : 'Tampilkan Upload Media'}
+            </button>
+          </div>
+
+          {/* Media Uploader */}
+          {showMediaUploader && (
+            <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+              <MediaUploader
+                userId={userId}
+                onUpload={handleMediaUpload}
+                disabled={loading}
+              />
+            </div>
+          )}
 
           {/* URL */}
           <div>
@@ -279,18 +354,19 @@ export default function AddMaterialModal({ topic, material, userId, onClose, onS
           {/* Message */}
           {message && (
             <div
-              className={`rounded-md p-4 ${
-                message.type === 'error'
+              className={`rounded-md p-4 ${message.type === 'error'
                   ? 'bg-red-50 text-red-800 dark:bg-red-900 dark:text-red-200'
                   : 'bg-green-50 text-green-800 dark:bg-green-900 dark:text-green-200'
-              }`}
+                }`}
             >
               <p className="text-sm">{message.text}</p>
             </div>
           )}
+        </div>
 
-          {/* Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 pt-4">
+        {/* Sticky Footer with Buttons */}
+        <div className="sticky bottom-0 bg-gray-50 dark:bg-gray-700/50 p-6 border-t border-gray-200 dark:border-gray-600">
+          <div className="flex flex-col sm:flex-row gap-3">
             <button
               type="button"
               onClick={onClose}
@@ -305,7 +381,7 @@ export default function AddMaterialModal({ topic, material, userId, onClose, onS
               disabled={loading}
               className="flex-1 px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 transition-colors disabled:opacity-50"
             >
-              {material ? 'Simpan Draft' : 'Simpan Draft'}
+              {loading ? 'Menyimpan...' : 'Simpan Draft'}
             </button>
             <button
               type="button"

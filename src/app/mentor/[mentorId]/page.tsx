@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import type { Material, Profile, UserProfile } from '@/types/database'
 import Navbar from '@/components/Navbar'
+import { stripHtml } from '@/lib/htmlUtils'
 import LoadingScreen from '@/components/LoadingScreen'
 import MaterialDetailModal from '@/components/MaterialDetailModal'
 
@@ -146,25 +147,25 @@ export default function MentorProfilePage() {
               </div>
               {/* Add more stats if available */}
             </div>
-            
+
             {mentorDetail?.interest && mentorDetail.interest.length > 0 && (
-               <div className="mt-6">
-                 <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">Minat & Keahlian</h3>
-                 <div className="flex flex-wrap gap-2">
-                   {mentorDetail.interest.map((tag, i) => (
-                     <span key={i} className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm">
-                       {tag}
-                     </span>
-                   ))}
-                 </div>
-               </div>
+              <div className="mt-6">
+                <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">Minat & Keahlian</h3>
+                <div className="flex flex-wrap gap-2">
+                  {mentorDetail.interest.map((tag, i) => (
+                    <span key={i} className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
             )}
           </div>
         </div>
 
         {/* Materials List */}
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Materi Pembelajaran</h2>
-        
+
         {materials.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {materials.map((material) => (
@@ -175,29 +176,28 @@ export default function MentorProfilePage() {
               >
                 <div className="p-6 flex-1">
                   <div className="flex items-center gap-3 mb-4">
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide ${
-                        material.material_type === 'video' ? 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400' :
+                    <span className={`px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide ${material.material_type === 'video' ? 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400' :
                         material.material_type === 'article' ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400' :
-                        'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
-                    }`}>
+                          'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
+                      }`}>
                       {material.material_type}
                     </span>
                     {material.tags && material.tags.length > 0 && (
-                       <span className="text-xs text-gray-500 dark:text-gray-400">
-                         {material.tags.slice(0, 2).map(t => `#${t}`).join(' ')}
-                         {material.tags.length > 2 && '...'}
-                       </span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        {material.tags.slice(0, 2).map(t => `#${t}`).join(' ')}
+                        {material.tags.length > 2 && '...'}
+                      </span>
                     )}
                   </div>
-                  
+
                   <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 line-clamp-2">
                     {material.title}
                   </h3>
                   <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-3 mb-4">
-                    {material.content}
+                    {stripHtml(material.content, 150)}
                   </p>
                 </div>
-                
+
                 <div className="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 border-t border-gray-100 dark:border-gray-700 flex justify-between items-center text-sm">
                   <span className="text-gray-500 dark:text-gray-400">
                     {new Date(material.created_at).toLocaleDateString('id-ID', { dateStyle: 'medium' })}

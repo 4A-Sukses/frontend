@@ -11,8 +11,14 @@
   "dependencies": {
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.89.0",
+    "@tiptap/extension-image": "^3.14.0",
+    "@tiptap/extension-link": "^3.14.0",
+    "@tiptap/extension-underline": "^3.14.0",
+    "@tiptap/react": "^3.14.0",
+    "@tiptap/starter-kit": "^3.14.0",
     "groq-sdk": "^0.37.0",
     "gsap": "^3.14.2",
+    "mammoth": "^1.11.0",
     "next": "^15",
     "react": "^18",
     "react-dom": "^18"
