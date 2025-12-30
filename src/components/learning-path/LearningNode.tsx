@@ -28,7 +28,7 @@ function LearningNode({ data, selected }: NodeProps<LearningNodeData>) {
             <Handle
                 type="target"
                 position={Position.Left}
-                className="!w-4 !h-4 !bg-slate-700 !border-2 !border-slate-400 
+                className="!w-4 !h-4 !bg-slate-700 !border-2 !border-slate-400
           hover:!bg-indigo-500 hover:!border-white hover:!scale-125
           transition-all duration-200"
                 style={{ left: -8 }}

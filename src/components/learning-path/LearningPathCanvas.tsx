@@ -11,7 +11,6 @@ import ReactFlow, {
     Controls,
     Background,
     BackgroundVariant,
-    Panel,
     ReactFlowProvider,
     useReactFlow,
     updateEdge,
@@ -115,7 +114,7 @@ function LearningPathCanvasInner({ topic, workflowId, userId, onSave, initialDat
                         data: {
                             label: sourceNode.title,
                             description: sourceNode.description,
-                            icon: sourceNode.icon || '📚',
+                            icon: sourceNode.icon || '',
                             color: sourceNode.color || '#6366f1'
                         }
                     });
@@ -133,7 +132,7 @@ function LearningPathCanvasInner({ topic, workflowId, userId, onSave, initialDat
                         data: {
                             label: targetNode.title,
                             description: targetNode.description,
-                            icon: targetNode.icon || '📚',
+                            icon: targetNode.icon || '',
                             color: targetNode.color || '#6366f1'
                         }
                     });
@@ -150,29 +149,61 @@ function LearningPathCanvasInner({ topic, workflowId, userId, onSave, initialDat
                 for (const e of initialData.edges.filter(edge => edge.source_node && edge.target_node)) {
                     const sourceNode = e.source_node as unknown as { id: string; title: string };
                     const targetNode = e.target_node as unknown as { id: string; title: string };
+                    const validationReason = (e as any).validation_reason;
                     const edgeId = `e${sourceNode.id}-${targetNode.id}`;
 
-                    // Add edge with pending validation
-                    loadedEdges.push({
-                        id: edgeId,
-                        source: sourceNode.id,
-                        target: targetNode.id,
-                        type: 'validation',
-                        data: {
-                            isValid: true,  // Start as valid while validating
-                            reason: 'Validating...',
-                            fromNode: sourceNode.title,
-                            toNode: targetNode.title
-                        }
+                    console.log('Loading edge:', {
+                        from: sourceNode.title,
+                        to: targetNode.title,
+                        validation_reason: validationReason,
+                        hasReason: !!validationReason
                     });
+
+                    // If edge already has validation_reason, use it (no need to re-validate)
+                    if (validationReason) {
+                        console.log('✅ Using existing validation_reason from database:', validationReason);
+                        loadedEdges.push({
+                            id: edgeId,
+                            source: sourceNode.id,
+                            target: targetNode.id,
+                            type: 'validation',
+                            data: {
+                                isValid: true,
+                                reason: validationReason,
+                                fromNode: sourceNode.title,
+                                toNode: targetNode.title
+                            }
+                        });
+                    } else {
+                        // For imported/forked workflows, assume edges are valid (skip validation)
+                        // This prevents re-validating old workflows that don't have validation_reason
+                        console.log('⚠️ No validation_reason found, using default message');
+                        loadedEdges.push({
+                            id: edgeId,
+                            source: sourceNode.id,
+                            target: targetNode.id,
+                            type: 'validation',
+                            data: {
+                                isValid: true,
+                                reason: 'Pre-validated workflow connection',
+                                fromNode: sourceNode.title,
+                                toNode: targetNode.title
+                            }
+                        });
+                    }
                 }
 
                 setEdges(loadedEdges);
 
-                // Validate each edge asynchronously
+        
                 for (let i = 0; i < loadedEdges.length; i++) {
                     const edge = loadedEdges[i];
                     const e = initialData.edges[i];
+                    const validationReason = (e as any).validation_reason;
+
+                    // Skip if already validated
+                    if (validationReason) continue;
+
                     const sourceNode = e.source_node as unknown as { id: string; title: string };
                     const targetNode = e.target_node as unknown as { id: string; title: string };
 
@@ -235,6 +266,9 @@ function LearningPathCanvasInner({ topic, workflowId, userId, onSave, initialDat
                     from_node: fromLabel,
                     to_node: toLabel,
                     user_id: userId,
+                    source_node_id: fromNodeId,
+                    target_node_id: toNodeId,
+                    workflow_id: workflowId
                 }),
             });
 
@@ -272,7 +306,7 @@ function LearningPathCanvasInner({ topic, workflowId, userId, onSave, initialDat
                 return e;
             }));
         }
-    }, [getNodeLabel, setEdges, userId]);
+    }, [getNodeLabel, setEdges, userId, workflowId]);
 
     // Connect nodes - always add edge, then validate async
     const onConnect = useCallback((connection: Connection) => {
@@ -377,9 +411,37 @@ function LearningPathCanvasInner({ topic, workflowId, userId, onSave, initialDat
         setShowAddNode(false);
     }, []);
 
+    const topicPanelStyle = {
+        position: 'absolute' as const,
+        top: '1rem',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        zIndex: 10,
+        pointerEvents: 'none' as const
+    };
+
+    const actionButtonsStyle = {
+        position: 'absolute' as const,
+        top: '1rem',
+        right: '1rem',
+        zIndex: 10,
+        display: 'flex',
+        gap: '0.5rem',
+        pointerEvents: 'auto' as const
+    };
+
+    const instructionsStyle = {
+        position: 'absolute' as const,
+        bottom: '1rem',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        zIndex: 10,
+        pointerEvents: 'none' as const
+    };
+
     return (
         <div
-            className="w-full h-full"
+            className="w-full h-full relative"
             onDrop={handleDrop}
             onDragOver={handleDragOver}
         >
@@ -416,76 +478,69 @@ function LearningPathCanvasInner({ topic, workflowId, userId, onSave, initialDat
                     className="!bg-slate-800 !border-slate-700 !rounded-lg !shadow-lg"
                     showInteractive={false}
                 />
-
-                {/* Topic Info Panel */}
-                <Panel position="top-center">
-                    <div className="bg-slate-800/90 backdrop-blur-sm rounded-xl px-6 py-3 border border-slate-700 shadow-xl">
-                        <div className="text-center">
-                            <div className="text-xs text-indigo-400 mb-1">Topik</div>
-                            <div className="font-semibold text-white">{topic.title}</div>
-                        </div>
-                    </div>
-                </Panel>
-
-                {/* Action Buttons */}
-                <Panel position="top-right" className="flex gap-2">
-                    {isReadOnly && !isEditing && (
-                        <button
-                            onClick={() => setIsEditing(true)}
-                            className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg 
-                                font-medium transition-colors shadow-lg flex items-center gap-2"
-                        >
-                            ✏️ Edit
-                        </button>
-                    )}
-                    {isReadOnly && isEditing && (
-                        <button
-                            onClick={() => setIsEditing(false)}
-                            className="bg-slate-600 hover:bg-slate-500 text-white px-4 py-2 rounded-lg 
-                                font-medium transition-colors shadow-lg flex items-center gap-2"
-                        >
-                            🔒 View Mode
-                        </button>
-                    )}
-                    <button
-                        onClick={() => setShowImplement(true)}
-                        disabled={nodes.length === 0}
-                        className="bg-blue-600 hover:bg-blue-500 disabled:bg-slate-600 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg 
-              font-medium transition-colors shadow-lg flex items-center gap-2"
-                        title={nodes.length === 0 ? 'Tambahkan node terlebih dahulu' : 'Buat jadwal belajar'}
-                    >
-                        📅 Implement
-                    </button>
-                    <button
-                        onClick={() => handleSave(true)}
-                        className="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded-lg 
-              font-medium transition-colors shadow-lg flex items-center gap-2"
-                        title="Simpan sebagai draft (tidak dipublikasi)"
-                    >
-                        💾 Save Draft
-                    </button>
-                    <button
-                        onClick={() => setShowSaveDialog(true)}
-                        className="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-lg 
-              font-medium transition-colors shadow-lg flex items-center gap-2"
-                    >
-                        📤 Simpan
-                    </button>
-                </Panel>
-
-                {/* Instructions */}
-                <Panel position="bottom-center">
-                    <div className="bg-slate-800/90 backdrop-blur-sm rounded-xl px-4 py-2 border border-slate-700">
-                        <span className="text-xs text-slate-400">
-                            Drag node dari sidebar • Hubungkan untuk validasi AI •
-                            Nodes: <span className="text-white font-bold">{nodes.length}</span> •
-                            Edges: <span className="text-white font-bold">{edges.length}</span>
-                        </span>
-                    </div>
-                </Panel>
             </ReactFlow>
 
-            {/* Node Sidebar */}
+            <div style={topicPanelStyle}>
+                <div className="bg-slate-800/90 backdrop-blur-sm rounded-xl px-6 py-3 border border-slate-700 shadow-xl">
+                    <div className="text-center">
+                        <div className="text-xs text-indigo-400 mb-1">Topik</div>
+                        <div className="font-semibold text-white">{topic.title}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div style={actionButtonsStyle}>
+                {isReadOnly && !isEditing && (
+                    <button
+                        onClick={() => setIsEditing(true)}
+                        className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg
+                            font-medium transition-colors shadow-lg flex items-center gap-2"
+                    >
+                        Edit
+                    </button>
+                )}
+                {isReadOnly && isEditing && (
+                    <button
+                        onClick={() => setIsEditing(false)}
+                        className="bg-slate-600 hover:bg-slate-500 text-white px-4 py-2 rounded-lg
+                            font-medium transition-colors shadow-lg flex items-center gap-2"
+                    >
+                        View Mode
+                    </button>
+                )}
+                <button
+                    onClick={() => setShowImplement(true)}
+                    disabled={nodes.length === 0}
+                    className="bg-blue-600 hover:bg-blue-500 disabled:bg-slate-600 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg
+          font-medium transition-colors shadow-lg flex items-center gap-2"
+                    title={nodes.length === 0 ? 'Tambahkan node terlebih dahulu' : 'Buat jadwal belajar'}
+                >
+                    Implement
+                </button>
+                <button
+                    onClick={() => handleSave(true)}
+                    className="bg-amber-600 hover:bg-amber-500 text-white px-4 py-2 rounded-lg
+          font-medium transition-colors shadow-lg flex items-center gap-2"
+                    title="Simpan sebagai draft (tidak dipublikasi)"
+                >
+                    Save Draft
+                </button>
+                <button
+                    onClick={() => setShowSaveDialog(true)}
+                    className="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-lg font-medium transition-colors shadow-lg flex items-center gap-2"
+                >
+                    Simpan
+                </button>
+            </div>
+
+            <div style={instructionsStyle}>
+                <div className="bg-slate-800/90 backdrop-blur-sm rounded-xl px-4 py-2 border border-slate-700">
+                    <span className="text-xs text-slate-400">
+                        Drag node dari sidebar - Hubungkan untuk validasi AI - Nodes: <span className="text-white font-bold">{nodes.length}</span> - Edges: <span className="text-white font-bold">{edges.length}</span>
+                    </span>
+                </div>
+            </div>
+
             <NodeSidebar
                 topicId={topic.id}
                 onDragStart={handleNodeDragStart}
@@ -518,7 +573,7 @@ function LearningPathCanvasInner({ topic, workflowId, userId, onSave, initialDat
             {showSaveDialog && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70">
                     <div className="bg-slate-800 rounded-xl p-6 max-w-md w-full border border-slate-700">
-                        <h3 className="text-lg font-bold text-white mb-4">💾 Simpan Workflow</h3>
+                        <h3 className="text-lg font-bold text-white mb-4">Simpan Workflow</h3>
                         <input
                             type="text"
                             placeholder="Judul workflow..."

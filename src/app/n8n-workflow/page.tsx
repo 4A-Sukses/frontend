@@ -23,7 +23,12 @@ const LearningPathCanvas = dynamic(
   }
 );
 
-type ViewMode = 'entry' | 'select-topic' | 'gallery' | 'canvas';
+const TopicImportModal = dynamic(
+  () => import('@/components/learning-path/TopicImportModal'),
+  { ssr: false }
+);
+
+type ViewMode = 'entry' | 'select-topic' | 'gallery' | 'topic-import' | 'canvas';
 
 interface Workflow {
   id: string;
@@ -78,35 +83,75 @@ export default function LearningPathPage() {
 
       const data = await response.json();
       if (data.success) {
-        // Load the forked workflow data
-        const detailRes = await fetch(`http://localhost:8080/api/workflows/${workflow.id}`);
-        const detailData = await detailRes.json();
-
-        if (detailData.success) {
-          setSelectedTopic({
-            id: workflow.topics?.id || 0,
-            title: workflow.topics?.title || '',
-            description: null,
-            created_by: '',
-            created_at: '',
-            updated_at: ''
-          });
-          setForkedWorkflow(workflow);
-          setInitialData({
-            edges: detailData.data.edges || [],
-            node_positions: detailData.data.node_positions || {}
-          });
-          setMode('canvas');
-        }
+        // Use data directly from fork response (already includes edges with validation_reason)
+        setSelectedTopic({
+          id: workflow.topics?.id || 0,
+          title: workflow.topics?.title || '',
+          description: null,
+          created_by: '',
+          created_at: '',
+          updated_at: ''
+        });
+        setForkedWorkflow(workflow);
+        setInitialData({
+          edges: data.data.edges || [],
+          node_positions: data.data.node_positions || {}
+        });
+        setMode('canvas');
       }
     } catch (error) {
       console.error('Failed to fork workflow:', error);
     }
   };
 
+  const handleTopicImport = async (topicId: number) => {
+    if (!userId) {
+      alert('Please login first');
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:8080/api/topics/${topicId}/convert-to-workflow`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-id': userId
+        }
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        // Load the converted workflow
+        const workflow = data.data;
+        setSelectedTopic({
+          id: workflow.topics?.id || topicId,
+          title: workflow.topics?.title || '',
+          description: null,
+          created_by: '',
+          created_at: '',
+          updated_at: ''
+        });
+        setInitialData({
+          edges: workflow.edges || [],
+          node_positions: workflow.node_positions || {}
+        });
+        setMode('canvas');
+
+        if (data.fromCache) {
+          alert('✅ Workflow dimuat dari database (sudah pernah di-convert)');
+        } else {
+          alert('✨ AI berhasil membuat workflow baru dari topik!');
+        }
+      }
+    } catch (error) {
+      console.error('Failed to convert topic:', error);
+      alert('Gagal mengkonversi topik ke workflow');
+    }
+  };
+
   const handleSaveWorkflow = async (data: {
     title: string;
-    edges: Array<{ source: string; target: string }>;
+    edges: Array<{ source: string; target: string; data?: { reason?: string } }>;
     positions: Record<string, { x: number; y: number }>
   }) => {
     if (!userId || !selectedTopic) return;
@@ -114,7 +159,8 @@ export default function LearningPathPage() {
     try {
       const edgesData = data.edges.map(e => ({
         source_node_id: e.source,
-        target_node_id: e.target
+        target_node_id: e.target,
+        validation_reason: e.data?.reason || null
       }));
 
       const response = await fetch('http://localhost:8080/api/workflows', {
@@ -161,11 +207,11 @@ export default function LearningPathPage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-3 gap-6">
             {/* Create New */}
             <button
               onClick={() => setMode('select-topic')}
-              className="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-2xl p-8 
+              className="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-2xl p-8
                 text-left hover:scale-[1.02] transition-all shadow-2xl group border border-indigo-500/30"
             >
               <div className="text-5xl mb-4">🆕</div>
@@ -180,10 +226,10 @@ export default function LearningPathPage() {
               </div>
             </button>
 
-            {/* Import */}
+            {/* Import from Community */}
             <button
               onClick={() => setMode('gallery')}
-              className="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-2xl p-8 
+              className="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-2xl p-8
                 text-left hover:scale-[1.02] transition-all shadow-2xl group border border-emerald-500/30"
             >
               <div className="text-5xl mb-4">📥</div>
@@ -195,6 +241,24 @@ export default function LearningPathPage() {
               </p>
               <div className="mt-6 text-emerald-300 group-hover:text-white transition-colors flex items-center gap-2">
                 Jelajahi →
+              </div>
+            </button>
+
+            {/* Import from Knowledge Base */}
+            <button
+              onClick={() => setMode('topic-import')}
+              className="bg-gradient-to-br from-amber-600 to-orange-700 rounded-2xl p-8
+                text-left hover:scale-[1.02] transition-all shadow-2xl group border border-amber-500/30"
+            >
+              <div className="text-5xl mb-4">🤖</div>
+              <h2 className="text-2xl font-bold text-white mb-2">
+                Import dari Materi
+              </h2>
+              <p className="text-amber-200">
+                AI otomatis membuat workflow dari topik di knowledge base
+              </p>
+              <div className="mt-6 text-amber-300 group-hover:text-white transition-colors flex items-center gap-2">
+                Import →
               </div>
             </button>
           </div>
@@ -237,6 +301,17 @@ export default function LearningPathPage() {
     return (
       <WorkflowGallery
         onSelect={handleWorkflowSelect}
+        onBack={() => setMode('entry')}
+        userId={userId}
+      />
+    );
+  }
+
+  // Topic Import
+  if (mode === 'topic-import') {
+    return (
+      <TopicImportModal
+        onImport={handleTopicImport}
         onBack={() => setMode('entry')}
         userId={userId}
       />
