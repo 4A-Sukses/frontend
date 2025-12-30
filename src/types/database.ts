@@ -30,7 +30,8 @@ export interface UserProfile {
   nama: string // text
   tanggal_lahir: string | null // date
   gender: string // text (from gender_enum)
-  interest: string[] // _text (array of text)
+  interest: string | null // text - User's free text input
+  interest_id: number | null // int8 - Foreign Key to interests.id (categorized by AI)
   avatar_url: string | null // text
   user_id: string // uuid - Foreign Key to auth.users.id
   badge_id: number | null // int8
@@ -40,7 +41,8 @@ export interface UserProfileInsert {
   nama: string
   tanggal_lahir?: string | null
   gender: string
-  interest?: string[]
+  interest?: string | null
+  interest_id?: number | null
   avatar_url?: string | null
   user_id: string
   badge_id?: number | null
@@ -50,7 +52,8 @@ export interface UserProfileUpdate {
   nama?: string
   tanggal_lahir?: string | null
   gender?: string
-  interest?: string[]
+  interest?: string | null
+  interest_id?: number | null
   avatar_url?: string | null
   badge_id?: number | null
 }
@@ -114,4 +117,29 @@ export interface MaterialUpdate {
   url?: string | null
   status?: 'published' | 'draft'
   tags?: string[] | null
+}
+
+// ============================================
+// PRIVATE CHAT TABLES
+// ============================================
+
+export interface PrivateChat {
+  id: string // UUID
+  user1_id: string // UUID
+  user2_id: string // UUID
+  created_at: string // timestamptz
+  last_message_at: string // timestamptz
+}
+
+export interface PrivateMessage {
+  id: string // UUID
+  chat_id: string // UUID - FK to private_chats.id
+  sender_id: string // UUID - FK to auth.users.id
+  message: string // text
+  created_at: string // timestamptz
+  read_at: string | null // timestamptz
+  user_profiles?: {
+    nama: string
+    avatar_url: string | null
+  }
 }
