@@ -5,6 +5,8 @@ export { default as GroupChatArea } from './GroupChatArea'
 export { default as PrivateChatArea } from './PrivateChatArea'
 export { default as Sidebar } from './Sidebar'
 export { default as LoadingScreen } from './LoadingScreen'
+export { default as MaterialLinkMessage } from './MaterialLinkMessage'
+export { default as MaterialShareModal } from './MaterialShareModal'
 
 export * from './types'
 export * from './utils'

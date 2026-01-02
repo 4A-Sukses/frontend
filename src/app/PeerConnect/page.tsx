@@ -10,13 +10,15 @@ import {
   GroupChatArea,
   PrivateChatArea,
   LoadingScreen,
+  MaterialShareModal,
   type UserProfile,
   type Interest,
   type ChatRoom,
   type ChatMessageData,
   type PrivateChatWithUser,
   type PrivateMessage,
-  type ChatMode
+  type ChatMode,
+  type MaterialLinkData
 } from "@/components/PeerConnect"
 
 export default function PeerConnectPage() {
@@ -48,6 +50,10 @@ export default function PeerConnectPage() {
 
   // Video Call State
   const [isVideoCallOpen, setIsVideoCallOpen] = useState(false)
+
+  // Material Share State
+  const [isMaterialShareOpen, setIsMaterialShareOpen] = useState(false)
+  const [materialShareMode, setMaterialShareMode] = useState<'group' | 'private'>('group')
 
   // ============================================
   // LIFECYCLE EFFECTS
@@ -111,6 +117,7 @@ export default function PeerConnectPage() {
         return
       }
 
+      // Load user profile
       const { data: profile, error } = await supabase
         .from('user_profiles')
         .select('user_id, nama, interest, interest_id, avatar_url')
@@ -127,7 +134,19 @@ export default function PeerConnectPage() {
         return
       }
 
-      setCurrentUser(profile)
+      // Load role from user table
+      const { data: userData } = await supabase
+        .from('user')
+        .select('role')
+        .eq('id', user.id)
+        .single()
+
+      const profileWithRole = {
+        ...profile,
+        role: userData?.role
+      }
+
+      setCurrentUser(profileWithRole)
       setInitialLoading(false)
 
       if (profile.interest_id) {
@@ -365,8 +384,35 @@ export default function PeerConnectPage() {
             .eq('id', msg.user_id)
             .single()
 
+          // Load material data if material_id exists
+          let materialData = null
+          if (msg.material_id) {
+            const { data: material } = await supabase
+              .from('materials')
+              .select(`
+                id,
+                title,
+                url,
+                material_type,
+                topics (title)
+              `)
+              .eq('id', msg.material_id)
+              .single()
+
+            if (material) {
+              materialData = {
+                id: material.id,
+                title: material.title,
+                slug: (material as any).url,
+                material_type: material.material_type,
+                topic: (material as any).topics?.title
+              }
+            }
+          }
+
           return {
             ...msg,
+            material_data: materialData,
             user_profiles: profile ? {
               nama: profile.nama,
               avatar_url: profile.avatar_url,
@@ -410,8 +456,35 @@ export default function PeerConnectPage() {
           .eq('id', payload.new.user_id)
           .single()
 
+        // Load material data if material_id exists
+        let materialData = null
+        if (payload.new.material_id) {
+          const { data: material } = await supabase
+            .from('materials')
+            .select(`
+              id,
+              title,
+              url,
+              material_type,
+              topics (title)
+            `)
+            .eq('id', payload.new.material_id)
+            .single()
+
+          if (material) {
+            materialData = {
+              id: material.id,
+              title: material.title,
+              slug: (material as any).url,
+              material_type: material.material_type,
+              topic: (material as any).topics?.title
+            }
+          }
+        }
+
         const newMsg = {
           ...payload.new,
+          material_data: materialData,
           user_profiles: profile ? {
             nama: profile.nama,
             avatar_url: profile.avatar_url,
@@ -445,6 +518,26 @@ export default function PeerConnectPage() {
     } catch (error) {
       console.error('Error sending message:', error)
       alert('Gagal mengirim pesan')
+    }
+  }
+
+  const sendMaterialMessage = async (material: MaterialLinkData, message?: string) => {
+    if (!currentUser || !chatRoom) return
+
+    try {
+      const { error } = await supabase
+        .from('chat_messages')
+        .insert({
+          room_id: chatRoom.id,
+          user_id: currentUser.user_id,
+          message: message || `📚 Shared: ${material.title}`,
+          material_id: material.id
+        })
+
+      if (error) throw error
+    } catch (error) {
+      console.error('Error sending material:', error)
+      alert('Gagal mengirim materi')
     }
   }
 
@@ -581,7 +674,37 @@ export default function PeerConnectPage() {
             .eq('user_id', msg.sender_id)
             .single()
 
-          return { ...msg, user_profiles: profile }
+          // Load material data if material_id exists
+          let materialData = null
+          if (msg.material_id) {
+            const { data: material } = await supabase
+              .from('materials')
+              .select(`
+                id,
+                title,
+                url,
+                material_type,
+                topics (title)
+              `)
+              .eq('id', msg.material_id)
+              .single()
+
+            if (material) {
+              materialData = {
+                id: material.id,
+                title: material.title,
+                slug: (material as any).url,
+                material_type: material.material_type,
+                topic: (material as any).topics?.title
+              }
+            }
+          }
+
+          return {
+            ...msg,
+            user_profiles: profile,
+            material_data: materialData
+          }
         })
       )
 
@@ -611,6 +734,26 @@ export default function PeerConnectPage() {
     }
   }
 
+  const sendPrivateMaterialMessage = async (material: MaterialLinkData, message?: string) => {
+    if (!currentUser || !selectedPrivateChat) return
+
+    try {
+      const { error } = await supabase
+        .from('private_messages')
+        .insert({
+          chat_id: selectedPrivateChat.id,
+          sender_id: currentUser.user_id,
+          message: message || `📚 Shared: ${material.title}`,
+          material_id: material.id
+        })
+
+      if (error) throw error
+    } catch (error) {
+      console.error('Error sending material:', error)
+      alert('Gagal mengirim materi')
+    }
+  }
+
   const subscribeToPrivateMessages = () => {
     if (!selectedPrivateChat) return
 
@@ -628,9 +771,36 @@ export default function PeerConnectPage() {
           .eq('user_id', payload.new.sender_id)
           .single()
 
+        // Load material data if material_id exists
+        let materialData = null
+        if (payload.new.material_id) {
+          const { data: material } = await supabase
+            .from('materials')
+            .select(`
+              id,
+              title,
+              url,
+              material_type,
+              topics (title)
+            `)
+            .eq('id', payload.new.material_id)
+            .single()
+
+          if (material) {
+            materialData = {
+              id: material.id,
+              title: material.title,
+              slug: (material as any).url,
+              material_type: material.material_type,
+              topic: (material as any).topics?.title
+            }
+          }
+        }
+
         const newMsg = {
           ...payload.new,
-          user_profiles: profile
+          user_profiles: profile,
+          material_data: materialData
         } as PrivateMessage
 
         setPrivateMessages((prev) => [...prev, newMsg])
@@ -729,21 +899,33 @@ export default function PeerConnectPage() {
               messages={messages}
               groupMembers={groupMembers}
               currentUserId={currentUser.user_id}
+              currentUserRole={currentUser.role}
               newMessage={newMessage}
               onNewMessageChange={setNewMessage}
               onSendMessage={sendMessage}
+              onSendMaterialLink={sendMaterialMessage}
               onStartPrivateChat={startPrivateChat}
+              onOpenMaterialShare={() => {
+                setMaterialShareMode('group')
+                setIsMaterialShareOpen(true)
+              }}
             />
           ) : chatMode === 'private' && selectedPrivateChat ? (
             <PrivateChatArea
               selectedChat={selectedPrivateChat}
               messages={privateMessages}
               currentUserId={currentUser.user_id}
+              currentUserRole={currentUser.role}
               newMessage={newMessage}
               onNewMessageChange={setNewMessage}
               onSendMessage={sendPrivateMessage}
+              onSendMaterialLink={sendPrivateMaterialMessage}
               onBack={() => setSelectedPrivateChat(null)}
               onVideoCall={() => setIsVideoCallOpen(true)}
+              onOpenMaterialShare={() => {
+                setMaterialShareMode('private')
+                setIsMaterialShareOpen(true)
+              }}
             />
           ) : (
             <div className="flex-1 flex items-center justify-center text-gray-500 dark:text-gray-400">
@@ -768,6 +950,14 @@ export default function PeerConnectPage() {
           displayName={currentUser.nama}
         />
       )}
+
+      {/* Material Share Modal */}
+      <MaterialShareModal
+        isOpen={isMaterialShareOpen}
+        onClose={() => setIsMaterialShareOpen(false)}
+        onSelectMaterial={materialShareMode === 'group' ? sendMaterialMessage : sendPrivateMaterialMessage}
+        currentUserId={currentUser.user_id}
+      />
     </div>
   )
 }

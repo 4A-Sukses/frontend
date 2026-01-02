@@ -1,5 +1,5 @@
 import { useRef, useEffect } from 'react'
-import { ChatRoom, ChatMessageData, UserProfile } from './types'
+import { ChatRoom, ChatMessageData, UserProfile, MaterialLinkData } from './types'
 import ChatMessage from './ChatMessage'
 
 interface GroupChatAreaProps {
@@ -7,10 +7,13 @@ interface GroupChatAreaProps {
   messages: ChatMessageData[]
   groupMembers: UserProfile[]
   currentUserId: string
+  currentUserRole?: string
   newMessage: string
   onNewMessageChange: (message: string) => void
   onSendMessage: () => void
+  onSendMaterialLink: (material: MaterialLinkData, message?: string) => void
   onStartPrivateChat: (member: UserProfile) => void
+  onOpenMaterialShare: () => void
 }
 
 export default function GroupChatArea({
@@ -18,10 +21,13 @@ export default function GroupChatArea({
   messages,
   groupMembers,
   currentUserId,
+  currentUserRole,
   newMessage,
   onNewMessageChange,
   onSendMessage,
-  onStartPrivateChat
+  onSendMaterialLink,
+  onStartPrivateChat,
+  onOpenMaterialShare
 }: GroupChatAreaProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -68,6 +74,19 @@ export default function GroupChatArea({
       {/* Input */}
       <div className="bg-white dark:bg-gray-800 border-t dark:border-gray-700 p-4">
         <div className="flex gap-3">
+          {/* Share Material Button - Only for mentors */}
+          {currentUserRole === 'mentor' && (
+            <button
+              onClick={onOpenMaterialShare}
+              className="p-3 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-full transition-colors"
+              title="Share learning material"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </button>
+          )}
+
           <input
             type="text"
             value={newMessage}

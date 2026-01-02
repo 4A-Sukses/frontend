@@ -1,5 +1,6 @@
 import { ChatMessageData, UserProfile } from './types'
 import { formatTime } from './utils'
+import MaterialLinkMessage from './MaterialLinkMessage'
 
 interface ChatMessageProps {
   message: ChatMessageData
@@ -14,6 +15,9 @@ export default function ChatMessage({
   groupMembers,
   onStartPrivateChat
 }: ChatMessageProps) {
+  // Check if this message contains a material link
+  const hasMaterialLink = message.material_id && message.material_data
+
   return (
     <div className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'}`}>
       <div className={`max-w-[70%] ${isOwnMessage ? 'order-2' : 'order-1'}`}>
@@ -48,16 +52,39 @@ export default function ChatMessage({
             </div>
           </div>
         )}
-        <div className={`px-4 py-2 rounded-2xl ${
-          isOwnMessage
-            ? 'bg-blue-600 text-white rounded-tr-sm'
-            : 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-tl-sm shadow'
-        }`}>
-          <p className="break-words">{message.message}</p>
-          <p className={`text-xs mt-1 ${isOwnMessage ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'}`}>
-            {formatTime(message.created_at)}
-          </p>
-        </div>
+
+        {/* Render material link if present */}
+        {hasMaterialLink ? (
+          <div className="space-y-2">
+            {message.message && message.message.trim() && (
+              <div className={`px-4 py-2 rounded-2xl ${
+                isOwnMessage
+                  ? 'bg-blue-600 text-white rounded-tr-sm'
+                  : 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-tl-sm shadow'
+              }`}>
+                <p className="break-words">{message.message}</p>
+              </div>
+            )}
+            <MaterialLinkMessage
+              material={message.material_data!}
+              isOwnMessage={isOwnMessage}
+            />
+            <p className={`text-xs ${isOwnMessage ? 'text-right text-gray-400' : 'text-gray-500 dark:text-gray-400'}`}>
+              {formatTime(message.created_at)}
+            </p>
+          </div>
+        ) : (
+          <div className={`px-4 py-2 rounded-2xl ${
+            isOwnMessage
+              ? 'bg-blue-600 text-white rounded-tr-sm'
+              : 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-tl-sm shadow'
+          }`}>
+            <p className="break-words">{message.message}</p>
+            <p className={`text-xs mt-1 ${isOwnMessage ? 'text-blue-100' : 'text-gray-500 dark:text-gray-400'}`}>
+              {formatTime(message.created_at)}
+            </p>
+          </div>
+        )}
       </div>
     </div>
   )

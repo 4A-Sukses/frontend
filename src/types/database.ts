@@ -164,8 +164,16 @@ export interface PrivateMessage {
   message: string // text
   created_at: string // timestamptz
   read_at: string | null // timestamptz
+  material_id?: number | null // FK to materials.id
   user_profiles?: {
     nama: string
     avatar_url: string | null
   }
+  material_data?: {
+    id: number
+    title: string
+    slug: string
+    material_type: string
+    topic?: string
+  } | null
 }

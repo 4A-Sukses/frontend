@@ -13,12 +13,22 @@ export interface ChatRoom {
   created_at: string
 }
 
+export interface MaterialLinkData {
+  id: number
+  title: string
+  slug: string
+  material_type: string
+  topic?: string
+}
+
 export interface ChatMessageData {
   id: string
   room_id: string
   user_id: string
   message: string
   created_at: string
+  material_id?: number | null
+  material_data?: MaterialLinkData | null
   user_profiles?: {
     nama: string
     avatar_url: string
