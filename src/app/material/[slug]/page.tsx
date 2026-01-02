@@ -7,6 +7,7 @@ import { supabase } from '@/lib/supabase'
 import type { Material, Topic, UserProfile } from '@/types/database'
 import Navbar from '@/components/Navbar'
 import LoadingScreen from '@/components/LoadingScreen'
+import { useMaterialTracking } from '@/app/TaskIntegrator/hooks/useMaterialTracking'
 
 export default function MaterialDetailPage() {
     const params = useParams()
@@ -32,6 +33,14 @@ export default function MaterialDetailPage() {
     const [translatedText, setTranslatedText] = useState('')
     const [translating, setTranslating] = useState(false)
     const [targetLanguage, setTargetLanguage] = useState('')
+
+    // Integrate material tracking
+    const { markAsCompleted } = useMaterialTracking({
+        materialId: materialId || '',
+        materialTitle: material?.title || '',
+        topicTitle: topic?.title || '',
+        enabled: !!materialId && !!material && !!topic
+    })
 
     useEffect(() => {
         if (materialId) {
@@ -382,6 +391,32 @@ export default function MaterialDetailPage() {
                                 )}
                             </button>
                         </div>
+                    </div>
+                </div>
+
+                {/* Mark as Completed Button */}
+                <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-2xl shadow-lg p-6 mb-8 text-white">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 className="font-semibold text-lg">Selesai Mempelajari Materi?</h3>
+                                <p className="text-green-100 text-sm">Tandai materi ini sebagai selesai untuk melacak progress Anda</p>
+                            </div>
+                        </div>
+                        <button
+                            onClick={markAsCompleted}
+                            className="px-6 py-3 bg-white text-green-600 rounded-lg font-semibold hover:bg-green-50 transition-colors flex items-center gap-2"
+                        >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                            Tandai Selesai
+                        </button>
                     </div>
                 </div>
 
