@@ -26,7 +26,7 @@ export default function NodeSidebar({ topicId, onDragStart, onAddNode, refreshKe
     const fetchNodes = useCallback(async () => {
         setLoading(true);
         try {
-            const response = await fetch(`http://localhost:8080/api/nodes/${topicId}`);
+            const response = await fetch(`${process.env.PORT_BACKEND}/api/nodes/${topicId}`);
             const data = await response.json();
             if (data.success) {
                 setNodes(data.data || []);

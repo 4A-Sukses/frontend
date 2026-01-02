@@ -120,6 +120,32 @@ export interface MaterialUpdate {
 }
 
 // ============================================
+// PENDING TOPICS TABLE
+// ============================================
+
+export type PendingTopicStatus = 'pending' | 'approved' | 'rejected'
+
+export interface PendingTopic {
+  id: string // uuid - Primary Key
+  title: string // text
+  description: string | null // text
+  requested_by: string | null // uuid - Foreign Key to auth.users.id
+  status: string | null // text - default 'pending'
+  reviewed_by: string | null // uuid - Foreign Key to auth.users.id
+  created_at: string | null // timestamptz
+  updated_at: string | null // timestamptz
+  // Joined data
+  requester?: Profile
+}
+
+export interface PendingTopicInsert {
+  title: string
+  description?: string | null
+  requested_by: string
+  status?: string
+}
+
+// ============================================
 // PRIVATE CHAT TABLES
 // ============================================
 

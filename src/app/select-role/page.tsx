@@ -18,9 +18,8 @@ export default function SelectRole() {
     nama: '',
     tanggal_lahir: '',
     gender: 'Pria' as Gender,
-    interest: [] as string[],
+    interest: '',
   })
-  const [newInterest, setNewInterest] = useState('')
   const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({})
 
   useEffect(() => {
@@ -52,23 +51,6 @@ export default function SelectRole() {
     checkUser()
   }, [router])
 
-  const handleAddInterest = () => {
-    if (newInterest.trim() && !formData.interest.includes(newInterest.trim())) {
-      setFormData(prev => ({
-        ...prev,
-        interest: [...prev.interest, newInterest.trim()]
-      }))
-      setNewInterest('')
-    }
-  }
-
-  const handleRemoveInterest = (interestToRemove: string) => {
-    setFormData(prev => ({
-      ...prev,
-      interest: prev.interest.filter(i => i !== interestToRemove)
-    }))
-  }
-
   const validateForm = () => {
     const errors: { [key: string]: string } = {}
     if (!formData.nama.trim()) errors.nama = 'Nama lengkap wajib diisi'
@@ -79,18 +61,10 @@ export default function SelectRole() {
     return Object.keys(errors).length === 0
   }
 
-  /**
-   * Alur Submit Akhir:
-   * 1. Validasi input data diri dan pemilihan role.
-   * 2. Simpan detail profil ke tabel 'user_profiles' (upsert).
-   * 3. Update role user di tabel 'user' utama (menjadi student atau pending_mentor).
-   * 4. Redirect user berdasarkan pilihan role.
-   */
   async function handleFinalSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!user || !selectedRole) return
 
-    // Pastikan semua field wajib terisi
     if (!validateForm()) {
       window.scrollTo({ top: 0, behavior: 'smooth' })
       return
@@ -104,7 +78,7 @@ export default function SelectRole() {
         nama: formData.nama,
         tanggal_lahir: formData.tanggal_lahir || null,
         gender: formData.gender,
-        interest: JSON.stringify(formData.interest),
+        interest: formData.interest.trim() || null,
         avatar_url: null
       })
 
@@ -210,43 +184,20 @@ export default function SelectRole() {
               </div>
 
               <div>
-                <label className="block text-sm font-bold text-gray-900">
-                  Minat / Keahlian (Contoh: Matematika, Coding, Musik)
+                <label htmlFor="interest" className="block text-sm font-bold text-gray-900">
+                  Minat / Keahlian
                 </label>
-                <div className="mt-1 flex rounded-md shadow-sm">
+                <div className="mt-1">
                   <input
+                    id="interest"
                     type="text"
-                    value={newInterest}
-                    onChange={(e) => setNewInterest(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddInterest())}
-                    className="focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded-none rounded-l-md sm:text-sm border-gray-400 text-gray-900 font-medium placeholder-gray-500"
-                    placeholder="Tambah minat..."
+                    value={formData.interest}
+                    onChange={(e) => setFormData({ ...formData, interest: e.target.value })}
+                    className="appearance-none block w-full px-3 py-2 border border-gray-400 rounded-md shadow-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm font-medium"
+                    placeholder="Contoh: Matematika, Coding, Musik"
                   />
-                  <button
-                    type="button"
-                    onClick={handleAddInterest}
-                    className="-ml-px relative inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 text-sm font-medium rounded-r-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
-                  >
-                    Tambah
-                  </button>
                 </div>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {formData.interest.map((item, idx) => (
-                    <span key={idx} className="inline-flex rounded-full items-center py-0.5 pl-2.5 pr-1 text-sm font-medium bg-indigo-100 text-indigo-700">
-                      {item}
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveInterest(item)}
-                        className="flex-shrink-0 ml-0.5 h-4 w-4 rounded-full inline-flex items-center justify-center text-indigo-400 hover:bg-indigo-200 hover:text-indigo-500 focus:outline-none focus:bg-indigo-500 focus:text-white"
-                      >
-                        <span className="sr-only">Hapus {item}</span>
-                        <svg className="h-2 w-2" stroke="currentColor" fill="none" viewBox="0 0 8 8">
-                          <path strokeLinecap="round" strokeWidth="1.5" d="M1 1l6 6m0-6L1 7" />
-                        </svg>
-                      </button>
-                    </span>
-                  ))}
-                </div>
+                <p className="mt-1 text-sm text-gray-500">Tulis minat atau keahlian Anda</p>
               </div>
             </div>
 

@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
-import type { TopicInsert } from '@/types/database'
 
 interface AddTopicModalProps {
   userId: string
@@ -25,30 +24,31 @@ export default function AddTopicModal({ userId, onClose, onSuccess }: AddTopicMo
     setMessage(null)
 
     try {
-      const topicData: TopicInsert = {
-        title: formData.title,
-        description: formData.description || null,
-        created_by: userId,
-      }
-
+      // Insert into pending_topics table for admin approval
       const { error } = await supabase
-        .from('topics')
-        .insert(topicData)
+        .from('pending_topics')
+        .insert({
+          title: formData.title,
+          description: formData.description || null,
+          requested_by: userId,
+          status: 'pending'
+        })
 
       if (error) throw error
 
       setMessage({
         type: 'success',
-        text: 'Topik berhasil ditambahkan!'
+        text: 'Request topik berhasil dikirim! Menunggu persetujuan admin.'
       })
 
       setTimeout(() => {
         onSuccess()
-      }, 1000)
+      }, 1500)
     } catch (error: any) {
+      console.error('Failed to submit topic request:', error)
       setMessage({
         type: 'error',
-        text: error.message || 'Gagal menambahkan topik'
+        text: error.message || 'Gagal mengirim request topik'
       })
     } finally {
       setLoading(false)
@@ -61,7 +61,7 @@ export default function AddTopicModal({ userId, onClose, onSuccess }: AddTopicMo
         {/* Header */}
         <div className="flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Tambah Topik Baru
+            Request Topik Baru
           </h2>
           <button
             onClick={onClose}
@@ -72,6 +72,13 @@ export default function AddTopicModal({ userId, onClose, onSuccess }: AddTopicMo
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
+        </div>
+
+        {/* Info Banner */}
+        <div className="mx-6 mt-4 p-3 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 rounded-lg">
+          <p className="text-sm text-amber-800 dark:text-amber-200">
+            ⚠️ Topik baru akan memerlukan persetujuan dari admin sebelum dapat digunakan.
+          </p>
         </div>
 
         {/* Form */}
@@ -112,11 +119,10 @@ export default function AddTopicModal({ userId, onClose, onSuccess }: AddTopicMo
           {/* Message */}
           {message && (
             <div
-              className={`rounded-md p-4 ${
-                message.type === 'error'
+              className={`rounded-md p-4 ${message.type === 'error'
                   ? 'bg-red-50 text-red-800 dark:bg-red-900 dark:text-red-200'
                   : 'bg-green-50 text-green-800 dark:bg-green-900 dark:text-green-200'
-              }`}
+                }`}
             >
               <p className="text-sm">{message.text}</p>
             </div>
@@ -137,7 +143,7 @@ export default function AddTopicModal({ userId, onClose, onSuccess }: AddTopicMo
               disabled={loading}
               className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors disabled:opacity-50"
             >
-              {loading ? 'Menyimpan...' : 'Tambah Topik'}
+              {loading ? 'Mengirim...' : 'Kirim Request'}
             </button>
           </div>
         </form>

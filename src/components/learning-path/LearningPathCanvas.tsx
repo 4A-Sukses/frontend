@@ -154,7 +154,7 @@ function LearningPathCanvasInner({ topic, workflowId, userId, onSave, initialDat
                     // Always call API to lookup validation from database by NAME
                     // API will check node_pair_validations table using source_name and target_name
                     try {
-                        const response = await fetch('http://localhost:8080/api/validate-path', {
+                        const response = await fetch(`${process.env.PORT_BACKEND}/api/validate-path`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
@@ -234,7 +234,7 @@ function LearningPathCanvasInner({ topic, workflowId, userId, onSave, initialDat
         const toLabel = getNodeLabel(toNodeId);
 
         try {
-            const response = await fetch('http://localhost:8080/api/validate-path', {
+            const response = await fetch(`${process.env.PORT_BACKEND}/api/validate-path`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

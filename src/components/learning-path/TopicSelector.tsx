@@ -42,16 +42,22 @@ export default function TopicSelector({ onSelect, onCancel, userId }: TopicSelec
         setSubmitting(true);
         try {
             // Insert into pending_topics table
-            const { error } = await supabase
+            const { data, error } = await supabase
                 .from('pending_topics')
                 .insert({
                     title: newTopicTitle.trim(),
                     description: newTopicDesc.trim() || null,
                     requested_by: userId,
                     status: 'pending'
-                });
+                })
+                .select();
 
-            if (!error) {
+            console.log('Insert pending topic result:', { data, error, userId });
+
+            if (error) {
+                console.error('Failed to insert pending topic:', error);
+                alert(`Gagal mengirim request: ${error.message}`);
+            } else {
                 setRequestSent(true);
                 setNewTopicTitle('');
                 setNewTopicDesc('');
