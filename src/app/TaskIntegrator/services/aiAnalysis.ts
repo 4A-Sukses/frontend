@@ -83,6 +83,13 @@ class AIAnalysisService {
         cache: 'no-store'
       })
 
+      // Check if response is JSON before parsing
+      const contentType = response.headers.get('content-type')
+      if (!contentType || !contentType.includes('application/json')) {
+        console.error('❌ API returned non-JSON response:', contentType)
+        throw new Error('Server returned non-JSON response')
+      }
+
       if (!response.ok) {
         const error = await response.json()
         console.error('❌ API Error:', error)
