@@ -39,7 +39,7 @@ export default function WorkflowGallery({ onSelect, onBack, userId }: WorkflowGa
 
     const fetchWorkflows = async () => {
         try {
-            const response = await fetch(`${process.env.PORT_BACKEND}/api/workflows`);
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/workflows`);
             const data = await response.json();
 
             if (data.success) {
@@ -66,7 +66,7 @@ export default function WorkflowGallery({ onSelect, onBack, userId }: WorkflowGa
         }
 
         try {
-            const response = await fetch(`${process.env.PORT_BACKEND}/api/workflows/${workflow.id}/star`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/workflows/${workflow.id}/star`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

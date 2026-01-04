@@ -69,7 +69,7 @@ export default function ImplementModal({ isOpen, onClose, workflowId, workflowTi
                     description: n.data.description
                 }));
 
-                const response = await fetch(`${process.env.PORT_BACKEND}/api/estimate-nodes`, {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/estimate-nodes`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ nodes })
@@ -83,7 +83,7 @@ export default function ImplementModal({ isOpen, onClose, workflowId, workflowTi
                 }
             } else if (workflowId) {
                 // Use workflow ID for saved workflows
-                const response = await fetch(`${process.env.PORT_BACKEND}/api/workflows/${workflowId}/estimate`, {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/workflows/${workflowId}/estimate`, {
                     method: 'POST'
                 });
                 const data = await response.json();
@@ -111,7 +111,7 @@ export default function ImplementModal({ isOpen, onClose, workflowId, workflowTi
 
     const handleConnectGoogle = async () => {
         try {
-            const response = await fetch(`${process.env.PORT_BACKEND}/api/auth/google/url`);
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/google/url`);
             const data = await response.json();
             if (data.success) {
                 window.location.href = data.url;
@@ -132,7 +132,7 @@ export default function ImplementModal({ isOpen, onClose, workflowId, workflowTi
         setLoading(true);
         setError(null);
         try {
-            const response = await fetch(`${process.env.PORT_BACKEND}/api/workflows/${workflowId}/implement`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/workflows/${workflowId}/implement`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

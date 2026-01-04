@@ -74,7 +74,7 @@ export default function LearningPathPage() {
 
     try {
       // Just GET the workflow to view (not fork)
-      const response = await fetch(`${process.env.PORT_BACKEND}/api/workflows/${workflow.id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/workflows/${workflow.id}`, {
         method: 'GET',
         headers: {
           'x-user-id': userId
@@ -110,7 +110,7 @@ export default function LearningPathPage() {
     }
 
     try {
-      const response = await fetch(`${process.env.PORT_BACKEND}/api/topics/${topicId}/convert-to-workflow`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/topics/${topicId}/convert-to-workflow`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -163,7 +163,7 @@ export default function LearningPathPage() {
         is_valid: e.data?.isValid ?? true
       }));
 
-      const response = await fetch(`${process.env.PORT_BACKEND}/api/workflows`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/workflows`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

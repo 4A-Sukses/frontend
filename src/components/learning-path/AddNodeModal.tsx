@@ -29,7 +29,7 @@ export default function AddNodeModal({ topicId, isOpen, onClose, onNodeCreated, 
         setSuggestion(null);
 
         try {
-            const response = await fetch(`${process.env.PORT_BACKEND}/api/nodes`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/nodes`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
