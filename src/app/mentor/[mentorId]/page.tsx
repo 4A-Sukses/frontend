@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
@@ -22,13 +22,7 @@ export default function MentorProfilePage() {
   const [selectedMaterial, setSelectedMaterial] = useState<Material | null>(null)
   const [isMaterialDetailOpen, setIsMaterialDetailOpen] = useState(false)
 
-  useEffect(() => {
-    if (mentorId) {
-      loadMentorData()
-    }
-  }, [mentorId])
-
-  const loadMentorData = async () => {
+  const loadMentorData = useCallback(async () => {
     try {
       // 1. Load Mentor Profile (auth info)
       const { data: profile, error: profileError } = await supabase
@@ -73,7 +67,13 @@ export default function MentorProfilePage() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [mentorId])
+
+  useEffect(() => {
+    if (mentorId) {
+      loadMentorData()
+    }
+  }, [mentorId, loadMentorData])
 
   const handleMaterialClick = (material: Material) => {
     setSelectedMaterial(material)
@@ -148,7 +148,7 @@ export default function MentorProfilePage() {
               {/* Add more stats if available */}
             </div>
 
-            {mentorDetail?.interest && mentorDetail.interest.length > 0 && (
+            {mentorDetail?.interest && Array.isArray(mentorDetail.interest) && mentorDetail.interest.length > 0 && (
               <div className="mt-6">
                 <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">Minat & Keahlian</h3>
                 <div className="flex flex-wrap gap-2">
@@ -177,8 +177,8 @@ export default function MentorProfilePage() {
                 <div className="p-6 flex-1">
                   <div className="flex items-center gap-3 mb-4">
                     <span className={`px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide ${material.material_type === 'video' ? 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400' :
-                        material.material_type === 'article' ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400' :
-                          'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
+                      material.material_type === 'article' ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400' :
+                        'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
                       }`}>
                       {material.material_type}
                     </span>

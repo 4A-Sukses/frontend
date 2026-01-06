@@ -5,7 +5,7 @@ import { supabase } from '@/lib/supabase'
 import type { UserProfile, UserProfileUpdate, Gender } from '@/types/database'
 
 interface UserProfileFormProps {
-  userId?: string 
+  userId?: string
   onSuccess?: () => void
 }
 
@@ -19,11 +19,9 @@ export default function UserProfileForm({ userId, onSuccess }: UserProfileFormPr
     nama: '',
     tanggal_lahir: '',
     gender: 'Pria' as Gender,
-    interest: [] as string[],
+    interest: '',
     avatar_url: '',
   })
-
-  const [newInterest, setNewInterest] = useState('')
 
   useEffect(() => {
     if (userId) {
@@ -48,8 +46,8 @@ export default function UserProfileForm({ userId, onSuccess }: UserProfileFormPr
         setFormData({
           nama: data.nama || '',
           tanggal_lahir: data.tanggal_lahir || '',
-          gender: data.gender || 'pria',
-          interest: data.interest || [],
+          gender: data.gender || 'Pria',
+          interest: data.interest || '',
           avatar_url: data.avatar_url || '',
         })
       }
@@ -104,22 +102,6 @@ export default function UserProfileForm({ userId, onSuccess }: UserProfileFormPr
     }
   }
 
-  const handleAddInterest = () => {
-    if (newInterest.trim() && !formData.interest.includes(newInterest.trim())) {
-      setFormData(prev => ({
-        ...prev,
-        interest: [...prev.interest, newInterest.trim()]
-      }))
-      setNewInterest('')
-    }
-  }
-
-  const handleRemoveInterest = (interestToRemove: string) => {
-    setFormData(prev => ({
-      ...prev,
-      interest: prev.interest.filter(i => i !== interestToRemove)
-    }))
-  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -135,8 +117,11 @@ export default function UserProfileForm({ userId, onSuccess }: UserProfileFormPr
         nama: formData.nama,
         tanggal_lahir: formData.tanggal_lahir || null,
         gender: formData.gender,
-        interest: formData.interest,
+        interest: formData.interest || null,
         avatar_url: formData.avatar_url || null,
+        // Reset interest_id jika user mengubah interest
+        // Agar AI kategorisasi ulang saat buka PeerConnect
+        ...(formData.interest !== profile?.interest && { interest_id: null })
       }
 
       if (profile) {
@@ -266,6 +251,7 @@ export default function UserProfileForm({ userId, onSuccess }: UserProfileFormPr
             <select
               id="gender"
               required
+              
               value={formData.gender}
               onChange={(e) => setFormData(prev => ({ ...prev, gender: e.target.value as Gender }))}
               className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
@@ -279,54 +265,21 @@ export default function UserProfileForm({ userId, onSuccess }: UserProfileFormPr
 
           {/* Interest */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Interest
+            <label htmlFor="interest" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Interest / Minat
             </label>
-            <div className="flex gap-2 mb-2">
-              <input
-                type="text"
-                value={newInterest}
-                onChange={(e) => setNewInterest(e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault()
-                    handleAddInterest()
-                  }
-                }}
-                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                placeholder="Add an interest"
-                disabled={loading}
-              />
-              <button
-                type="button"
-                onClick={handleAddInterest}
-                className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
-                disabled={loading}
-              >
-                Add
-              </button>
-            </div>
-
-            {formData.interest.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-3">
-                {formData.interest.map((interest, index) => (
-                  <span
-                    key={index}
-                    className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200"
-                  >
-                    {interest}
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveInterest(interest)}
-                      className="ml-2 text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-200"
-                      disabled={loading}
-                    >
-                      ×
-                    </button>
-                  </span>
-                ))}
-              </div>
-            )}
+            <textarea
+              id="interest"
+              value={formData.interest}
+              onChange={(e) => setFormData(prev => ({ ...prev, interest: e.target.value }))}
+              placeholder="Contoh: Saya suka web development, coding, dan teknologi terbaru..."
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white resize-none"
+              rows={3}
+              disabled={loading}
+            />
+            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+              Ceritakan minat atau hobi Anda secara bebas. Ini akan digunakan untuk menghubungkan Anda dengan komunitas yang sesuai.
+            </p>
           </div>
 
           {/* Message */}

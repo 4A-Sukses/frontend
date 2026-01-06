@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { Material } from '@/types/database'
 
 interface MaterialDetailModalProps {
@@ -33,7 +33,7 @@ export default function MaterialDetailModal({ material, onClose }: MaterialDetai
     return (words / wordsPerMinute) * 60
   }
 
-  const startProgressTracking = () => {
+  const startProgressTracking = useCallback(() => {
     if (progressIntervalRef.current) {
       clearInterval(progressIntervalRef.current)
     }
@@ -49,16 +49,30 @@ export default function MaterialDetailModal({ material, onClose }: MaterialDetai
         progressIntervalRef.current = null
       }
     }, 100)
-  }
+  }, [duration])
 
-  const stopProgressTracking = () => {
+  const stopProgressTracking = useCallback(() => {
     if (progressIntervalRef.current) {
       clearInterval(progressIntervalRef.current)
       progressIntervalRef.current = null
     }
-  }
+  }, [])
 
   useEffect(() => {
+    // Hide navbar and prevent body scroll when modal is open
+    document.body.classList.add('modal-open')
+    const style = document.createElement('style')
+    style.id = 'modal-style'
+    style.innerHTML = `
+      body.modal-open nav {
+        display: none !important;
+      }
+      body.modal-open {
+        overflow: hidden !important;
+      }
+    `
+    document.head.appendChild(style)
+
     if ('speechSynthesis' in window) {
       setIsTTSSupported(true)
 
@@ -120,8 +134,14 @@ export default function MaterialDetailModal({ material, onClose }: MaterialDetai
       if (window.speechSynthesis.speaking) {
         window.speechSynthesis.cancel()
       }
+      // Restore navbar and body scroll when modal is closed
+      document.body.classList.remove('modal-open')
+      const styleElement = document.getElementById('modal-style')
+      if (styleElement) {
+        styleElement.remove()
+      }
     }
-  }, [material.content, playbackRate, duration])
+  }, [material.content, playbackRate, duration, startProgressTracking, stopProgressTracking])
 
   const handlePlayPause = () => {
     if (!utteranceRef.current) return
@@ -242,7 +262,7 @@ export default function MaterialDetailModal({ material, onClose }: MaterialDetai
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-6 flex justify-between items-start">
           <div className="flex-1 pr-4">
@@ -366,7 +386,7 @@ export default function MaterialDetailModal({ material, onClose }: MaterialDetai
                   ) : (
                     <>
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                       </svg>
                       Terjemahkan
                     </>
@@ -421,9 +441,10 @@ export default function MaterialDetailModal({ material, onClose }: MaterialDetai
                       <button
                         key={rate}
                         onClick={() => handleRateChange(rate)}
-                        className={`px-2 py-1 text-xs rounded transition-colors ${playbackRate === rate
-                          ? 'bg-indigo-600 text-white font-semibold'
-                          : 'text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                        className={`px-2 py-1 text-xs rounded transition-colors ${
+                          playbackRate === rate
+                            ? 'bg-indigo-600 text-white font-semibold'
+                            : 'text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                           }`}
                       >
                         {rate}x

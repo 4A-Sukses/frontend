@@ -4,37 +4,49 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { getCurrentUserProfile } from '@/lib/profile'
-import { getAllUsers, getPendingMentors, approveMentor, rejectMentor } from '@/lib/admin'
-import type { Profile } from '@/types/database'
+import {
+  getAllUsers,
+  getPendingMentors,
+  approveMentor,
+  rejectMentor,
+  getPendingTopics,
+  approvePendingTopic,
+  rejectPendingTopic
+} from '@/lib/admin'
+import type { Profile, PendingTopic } from '@/types/database'
 
 export default function AdminDashboard() {
   const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [currentUser, setCurrentUser] = useState<Profile | null>(null)
   const [pendingMentors, setPendingMentors] = useState<Profile[]>([])
+  const [pendingTopics, setPendingTopics] = useState<PendingTopic[]>([])
   const [allUsers, setAllUsers] = useState<Profile[]>([])
   const [actionLoading, setActionLoading] = useState<string | null>(null)
+
+  async function fetchAllData() {
+    const [mentorsData, usersData, topicsData] = await Promise.all([
+      getPendingMentors(),
+      getAllUsers(),
+      getPendingTopics()
+    ])
+    setPendingMentors(mentorsData)
+    setAllUsers(usersData)
+    setPendingTopics(topicsData)
+  }
 
   useEffect(() => {
     async function checkAccessAndFetchData() {
       try {
         const user = await getCurrentUserProfile()
-        
+
         if (!user || user.role !== 'superadmin') {
           router.push('/')
           return
         }
 
         setCurrentUser(user)
-        
-        // Fetch data in parallel
-        const [mentorsData, usersData] = await Promise.all([
-          getPendingMentors(),
-          getAllUsers()
-        ])
-
-        setPendingMentors(mentorsData)
-        setAllUsers(usersData)
+        await fetchAllData()
       } catch (error) {
         console.error('Error loading dashboard:', error)
       } finally {
@@ -45,38 +57,52 @@ export default function AdminDashboard() {
     checkAccessAndFetchData()
   }, [router])
 
-  async function handleApprove(userId: string) {
+  async function handleApproveMentor(userId: string) {
     setActionLoading(userId)
     const { success } = await approveMentor(userId)
     if (success) {
-      // Refresh data
-      const [mentorsData, usersData] = await Promise.all([
-        getPendingMentors(),
-        getAllUsers()
-      ])
-      setPendingMentors(mentorsData)
-      setAllUsers(usersData)
+      await fetchAllData()
     } else {
       alert('Failed to approve mentor')
     }
     setActionLoading(null)
   }
 
-  async function handleReject(userId: string) {
+  async function handleRejectMentor(userId: string) {
     if (!confirm('Are you sure you want to reject this application?')) return
 
     setActionLoading(userId)
     const { success } = await rejectMentor(userId)
     if (success) {
-      // Refresh data
-      const [mentorsData, usersData] = await Promise.all([
-        getPendingMentors(),
-        getAllUsers()
-      ])
-      setPendingMentors(mentorsData)
-      setAllUsers(usersData)
+      await fetchAllData()
     } else {
       alert('Failed to reject application')
+    }
+    setActionLoading(null)
+  }
+
+  async function handleApproveTopic(topicId: string) {
+    if (!currentUser) return
+    setActionLoading(topicId)
+    const { success } = await approvePendingTopic(topicId, currentUser.id)
+    if (success) {
+      await fetchAllData()
+    } else {
+      alert('Failed to approve topic')
+    }
+    setActionLoading(null)
+  }
+
+  async function handleRejectTopic(topicId: string) {
+    if (!currentUser) return
+    if (!confirm('Are you sure you want to reject this topic request?')) return
+
+    setActionLoading(topicId)
+    const { success } = await rejectPendingTopic(topicId, currentUser.id)
+    if (success) {
+      await fetchAllData()
+    } else {
+      alert('Failed to reject topic request')
     }
     setActionLoading(null)
   }
@@ -89,14 +115,14 @@ export default function AdminDashboard() {
     )
   }
 
-  if (!currentUser) return null // Will redirect
+  if (!currentUser) return null
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-7xl mx-auto space-y-8">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-4">
-            <Link 
+            <Link
               href="/"
               className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
@@ -118,10 +144,10 @@ export default function AdminDashboard() {
             <h2 className="text-xl font-semibold text-gray-800">Pending Mentor Approvals</h2>
             <p className="text-sm text-gray-500 mt-1">Approve or reject users applying to be mentors.</p>
           </div>
-          
+
           <div className="overflow-x-auto">
             {pendingMentors.length === 0 ? (
-              <div className="p-6 text-center text-gray-500">No pending approvals.</div>
+              <div className="p-6 text-center text-gray-500">No pending mentor approvals.</div>
             ) : (
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
@@ -146,15 +172,75 @@ export default function AdminDashboard() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
                         <button
-                          onClick={() => handleApprove(user.id)}
+                          onClick={() => handleApproveMentor(user.id)}
                           disabled={actionLoading === user.id}
                           className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
                         >
                           Approve
                         </button>
                         <button
-                          onClick={() => handleReject(user.id)}
+                          onClick={() => handleRejectMentor(user.id)}
                           disabled={actionLoading === user.id}
+                          className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50"
+                        >
+                          Reject
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </section>
+
+        {/* Pending Topic Requests Section */}
+        <section className="bg-white rounded-lg shadow overflow-hidden">
+          <div className="p-6 border-b border-gray-200">
+            <h2 className="text-xl font-semibold text-gray-800">Pending Topic Requests</h2>
+            <p className="text-sm text-gray-500 mt-1">Approve or reject new topic requests from mentors.</p>
+          </div>
+
+          <div className="overflow-x-auto">
+            {pendingTopics.length === 0 ? (
+              <div className="p-6 text-center text-gray-500">No pending topic requests.</div>
+            ) : (
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Topic Title</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Requested By</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {pendingTopics.map((topic) => (
+                    <tr key={topic.id}>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {topic.created_at ? new Date(topic.created_at).toLocaleDateString() : '-'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {topic.title}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
+                        {topic.description || '-'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {topic.requester?.username || topic.requester?.email || 'Unknown'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                        <button
+                          onClick={() => handleApproveTopic(topic.id)}
+                          disabled={actionLoading === topic.id}
+                          className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
+                        >
+                          Approve
+                        </button>
+                        <button
+                          onClick={() => handleRejectTopic(topic.id)}
+                          disabled={actionLoading === topic.id}
                           className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50"
                         >
                           Reject
@@ -174,7 +260,7 @@ export default function AdminDashboard() {
             <h2 className="text-xl font-semibold text-gray-800">All Users</h2>
             <p className="text-sm text-gray-500 mt-1">Overview of all registered users and their roles.</p>
           </div>
-          
+
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
@@ -199,10 +285,10 @@ export default function AdminDashboard() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                        ${user.role === 'superadmin' ? 'bg-purple-100 text-purple-800' : 
-                          user.role === 'mentor' ? 'bg-green-100 text-green-800' : 
-                          user.role === 'pending_mentor' ? 'bg-yellow-100 text-yellow-800' : 
-                          'bg-gray-100 text-gray-800'}`}>
+                        ${user.role === 'superadmin' ? 'bg-purple-100 text-purple-800' :
+                          user.role === 'mentor' ? 'bg-green-100 text-green-800' :
+                            user.role === 'pending_mentor' ? 'bg-yellow-100 text-yellow-800' :
+                              'bg-gray-100 text-gray-800'}`}>
                         {user.role}
                       </span>
                     </td>
