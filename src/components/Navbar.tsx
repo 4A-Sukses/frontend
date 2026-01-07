@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import {
   getCurrentUserProfile,
@@ -20,6 +21,7 @@ export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     async function loadUser() {
@@ -57,6 +59,23 @@ export default function Navbar() {
       };
     }
   }, [isDropdownOpen]);
+
+  // Close mobile menu when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      const target = event.target as HTMLElement;
+      if (!target.closest(".mobile-menu-container") && !target.closest(".hamburger-button")) {
+        setIsMobileMenuOpen(false);
+      }
+    }
+
+    if (isMobileMenuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
+    }
+  }, [isMobileMenuOpen]);
 
   // Track scroll position
   useEffect(() => {
@@ -103,6 +122,10 @@ export default function Navbar() {
     },
   ];
 
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -117,24 +140,28 @@ export default function Navbar() {
         <div
           className={`flex justify-between items-center h-16 transition-all duration-300 ${
             isScrolled
-              ? "bg-gray-800 rounded-full shadow-lg px-8"
+              ? "bg-white border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] rounded-full px-8"
               : "bg-transparent px-4 sm:px-6 lg:px-8"
           }`}
         >
           {/* Logo/Brand */}
           <div className="flex items-center">
-            <Link href="/home" className={`text-2xl font-black transition-colors ${
-              isScrolled ? 'text-white' : 'text-black'
-            }`}>
-              SINAUIN
+            <Link href="/home">
+              <Image
+                src="/SINAUIN.png"
+                alt="SINAUIN"
+                width={120}
+                height={40}
+                className="object-contain"
+              />
             </Link>
           </div>
 
-          {/* Navigation Links */}
+          {/* Desktop Navigation Links */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link href="/home" className={`font-semibold transition-colors ${
+            <Link href="/home" className={`font-black transition-colors ${
               isScrolled
-                ? 'text-gray-300 hover:text-white'
+                ? 'text-black hover:text-gray-700'
                 : 'text-black hover:text-gray-700'
             }`}>
               Home
@@ -144,9 +171,9 @@ export default function Navbar() {
             <div className="relative dropdown-container">
               <button
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className={`flex items-center gap-1 font-semibold transition-colors ${
+                className={`flex items-center gap-1 font-black transition-colors ${
                   isScrolled
-                    ? 'text-gray-300 hover:text-white'
+                    ? 'text-black hover:text-gray-700'
                     : 'text-black hover:text-gray-700'
                 }`}
               >
@@ -191,12 +218,12 @@ export default function Navbar() {
             </div>
           </div>
 
-          {/* User Navigation */}
-          <div className="flex items-center gap-3">
+          {/* Desktop User Navigation */}
+          <div className="hidden md:flex items-center gap-3">
             {!user ? (
               <button
                 onClick={() => setShowAuthModal(true)}
-                className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-semibold"
+                className="px-6 py-2 bg-teal-400 border-2 border-black text-black rounded-xl hover:bg-teal-500 transition-all font-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5"
               >
                 Login
               </button>
@@ -207,20 +234,20 @@ export default function Navbar() {
                   <img
                     src={userProfile.avatar_url}
                     alt={user.username}
-                    className="w-10 h-10 rounded-full object-cover"
+                    className="w-10 h-10 rounded-full object-cover border-2 border-black"
                   />
                 ) : (
-                  <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold">
+                  <div className="w-10 h-10 rounded-full bg-indigo-400 border-2 border-black flex items-center justify-center text-black font-bold">
                     {user.username.charAt(0).toUpperCase()}
                   </div>
                 )}
-                <div className="text-right hidden sm:block">
-                  <p className={`text-sm font-semibold ${
-                    isScrolled ? 'text-white' : 'text-black'
+                <div className="text-right">
+                  <p className={`text-sm font-black ${
+                    isScrolled ? 'text-black' : 'text-black'
                   }`}>
                     {user.username}
                   </p>
-                  <p className="text-xs text-gray-300">{user.role}</p>
+                  <p className="text-xs font-bold text-gray-600">{user.role}</p>
                   {badge ? (
                     <div className="flex items-center justify-end gap-1 mt-1">
                       {badge.gambar && (
@@ -233,13 +260,13 @@ export default function Navbar() {
                       
                     </div>
                   ) : (
-                    <p className="text-xs text-gray-400">No Badge</p>
+                    <p className="text-xs font-bold text-gray-600">No Badge</p>
                   )}
                 </div>
                 {user.role === "superadmin" && (
                   <Link
                     href="/admin/dashboard"
-                    className="px-4 py-2 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700 transition-colors font-semibold"
+                    className="px-4 py-2 bg-purple-400 border-2 border-black text-black text-sm rounded-xl hover:bg-purple-500 transition-all font-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5"
                   >
                     Admin
                   </Link>
@@ -247,25 +274,158 @@ export default function Navbar() {
                 {user.role === "mentor" && (
                   <Link
                     href="/mentor/dashboard"
-                    className="px-4 py-2 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors font-semibold"
+                    className="px-4 py-2 bg-green-400 border-2 border-black text-black text-sm rounded-xl hover:bg-green-500 transition-all font-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5"
                   >
                     Dashboard
                   </Link>
                 )}
                 <button
                   onClick={() => setShowProfileModal(true)}
-                  className="px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 transition-colors font-semibold"
+                  className="px-4 py-2 bg-indigo-400 border-2 border-black text-black text-sm rounded-xl hover:bg-indigo-500 transition-all font-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5"
                 >
                   Profile
                 </button>
                 <button
                   onClick={handleSignOut}
-                  className="px-4 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition-colors font-semibold"
+                  className="px-4 py-2 bg-red-400 border-2 border-black text-black text-sm rounded-xl hover:bg-red-500 transition-all font-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5"
                 >
                   Logout
                 </button>
               </>
             )}
+          </div>
+
+          {/* Hamburger Menu Button (Mobile) */}
+          <button
+            onClick={toggleMobileMenu}
+            className="hamburger-button md:hidden flex flex-col justify-center items-center gap-1.5 w-8 h-8"
+            aria-label="Toggle menu"
+          >
+            <span
+              className={`block w-6 h-0.5 bg-black transition-all duration-300 ${
+                isScrolled ? "bg-black" : "bg-black"
+              } ${isMobileMenuOpen ? "rotate-45 translate-y-2" : ""}`}
+            ></span>
+            <span
+              className={`block w-6 h-0.5 bg-black transition-all duration-300 ${
+                isScrolled ? "bg-black" : "bg-black"
+              } ${isMobileMenuOpen ? "opacity-0" : ""}`}
+            ></span>
+            <span
+              className={`block w-6 h-0.5 bg-black transition-all duration-300 ${
+                isScrolled ? "bg-black" : "bg-black"
+              } ${isMobileMenuOpen ? "-rotate-45 -translate-y-2" : ""}`}
+            ></span>
+          </button>
+        </div>
+
+        {/* Mobile Menu (Slide-Down) */}
+        <div
+          className={`mobile-menu-container md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
+            isMobileMenuOpen ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"
+          }`}
+        >
+          <div className="bg-gradient-to-b from-blue-100 to-blue-200 border-2 border-t-0 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+            {/* Mobile Navigation Links */}
+            <div className="px-4 py-4 space-y-2">
+              <Link
+                href="/home"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="block px-4 py-3 bg-white border-2 border-black rounded-xl font-black text-black hover:bg-yellow-400 transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5"
+              >
+                Home
+              </Link>
+
+              {/* Features Section */}
+              <div className="pt-2">
+                <p className="px-4 py-2 text-sm font-bold text-gray-700">Features:</p>
+                {features.map((feature) => (
+                  <Link
+                    key={feature.path}
+                    href={feature.path}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="block px-4 py-3 bg-white border-2 border-black rounded-xl font-black text-black hover:bg-pink-400 transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5"
+                  >
+                    {feature.title}
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            {/* Mobile User Navigation */}
+            <div className="px-4 pb-4 space-y-2">
+              {!user ? (
+                <button
+                  onClick={() => {
+                    setShowAuthModal(true);
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="w-full px-4 py-3 bg-teal-400 border-2 border-black rounded-xl font-black text-black hover:bg-teal-500 transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5"
+                >
+                  Login
+                </button>
+              ) : (
+                <>
+                  {/* User Info */}
+                  <div className="flex items-center gap-3 px-4 py-3 bg-white border-2 border-black rounded-xl">
+                    {userProfile?.avatar_url ? (
+                      <img
+                        src={userProfile.avatar_url}
+                        alt={user.username}
+                        className="w-12 h-12 rounded-full object-cover border-2 border-black"
+                      />
+                    ) : (
+                      <div className="w-12 h-12 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold text-xl border-2 border-black">
+                        {user.username.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    <div>
+                      <p className="font-black text-black">{user.username}</p>
+                      <p className="text-sm font-bold text-gray-600">{user.role}</p>
+                    </div>
+                  </div>
+
+                  {/* Role-based buttons */}
+                  {user.role === "superadmin" && (
+                    <Link
+                      href="/admin/dashboard"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block px-4 py-3 bg-purple-400 border-2 border-black rounded-xl font-black text-black hover:bg-purple-500 transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5"
+                    >
+                      Admin Dashboard
+                    </Link>
+                  )}
+                  {user.role === "mentor" && (
+                    <Link
+                      href="/mentor/dashboard"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block px-4 py-3 bg-green-400 border-2 border-black rounded-xl font-black text-black hover:bg-green-500 transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5"
+                    >
+                      Mentor Dashboard
+                    </Link>
+                  )}
+
+                  {/* Profile Button */}
+                  <button
+                    onClick={() => {
+                      setShowProfileModal(true);
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="w-full px-4 py-3 bg-indigo-400 border-2 border-black rounded-xl font-black text-black hover:bg-indigo-500 transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5"
+                  >
+                    Profile
+                  </button>
+
+                  {/* Logout Button */}
+                  <button
+                    onClick={handleSignOut}
+                    className="w-full px-4 py-3 bg-red-400 border-2 border-black rounded-xl font-black text-black hover:bg-red-500 transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5"
+                  >
+                    Logout
+                  </button>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>

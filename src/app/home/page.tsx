@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from "next/link"
 import { getCurrentUserProfile } from '@/lib/profile'
 import Navbar from '@/components/Navbar'
 import type { Profile } from '@/types/database'
@@ -11,6 +10,7 @@ export default function HomePage() {
   const router = useRouter()
   const [showLoading, setShowLoading] = useState(true)
   const [user, setUser] = useState<Profile | null>(null)
+  const [openFAQ, setOpenFAQ] = useState<number | null>(null)
 
   useEffect(() => {
     async function checkUser() {
@@ -62,73 +62,64 @@ export default function HomePage() {
       {/* Main Content */}
       <div className="flex-1">
         {/* Hero Section - Light Blue Background */}
-        <div className="relative bg-gradient-to-b from-blue-100 to-blue-200 min-h-screen overflow-hidden flex flex-col">
-          {/* Decorative clouds */}
-          <div className="absolute top-20 left-10 w-32 h-16 bg-white rounded-full opacity-70 blur-sm"></div>
-          <div className="absolute top-32 left-32 w-20 h-10 bg-white rounded-full opacity-60 blur-sm"></div>
-          <div className="absolute top-24 right-20 w-40 h-20 bg-white rounded-full opacity-70 blur-sm"></div>
-          <div className="absolute top-40 right-48 w-24 h-12 bg-white rounded-full opacity-60 blur-sm"></div>
+        <div className="relative bg-gradient-to-b from-blue-100 to-blue-200 min-h-[55vh] sm:min-h-[65vh] md:min-h-screen overflow-hidden flex flex-col">
+          {/* Decorative clouds - Responsive sizing */}
+          <div className="absolute top-10 md:top-20 left-5 md:left-10 w-16 md:w-32 h-8 md:h-16 bg-white rounded-full opacity-70 blur-sm"></div>
+          <div className="absolute top-16 md:top-32 left-16 md:left-32 w-10 md:w-20 h-5 md:h-10 bg-white rounded-full opacity-60 blur-sm"></div>
+          <div className="absolute top-12 md:top-24 right-10 md:right-20 w-20 md:w-40 h-10 md:h-20 bg-white rounded-full opacity-70 blur-sm"></div>
+          <div className="absolute top-20 md:top-40 right-24 md:right-48 w-12 md:w-24 h-6 md:h-12 bg-white rounded-full opacity-60 blur-sm"></div>
 
-          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 flex-1 flex flex-col justify-center">
-            <div className="text-center mb-auto pt-10">
-              {/* Main Title - SINAUIN */}
-              <h1 className="text-8xl md:text-9xl font-black text-black mb-8 leading-tight tracking-tighter">
-                SINAUIN
-              </h1>
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 md:pt-20 flex-1 flex flex-col justify-center">
+            <div className="text-center mb-auto pt-5 md:pt-10">
+              {/* Main Title is now an image */}
             </div>
           </div>
 
-          {/* Character and Mountain Illustration - Positioned to overlap with checkerboard */}
-          <div className="absolute bottom-24 left-1/2 -translate-x-1/2 flex justify-center">
+          {/* Character and Logo - Stacked Vertically */}
+          <div className="absolute bottom-[6rem] sm:bottom-[4rem] md:bottom-[2rem] lg:bottom-[0rem] left-1/2 -translate-x-1/2 flex flex-col items-center w-full gap-0">
+            {/* Logo on top */}
             <img
-              src="/landingpage1.png"
-              alt="SINAUIN Character"
-              className="w-auto h-80 md:h-[32rem] lg:h-[40rem] object-contain"
+              src="/SINAUIN.png"
+              alt="SINAUIN Logo"
+              className="w-auto h-[6rem] sm:h-[12rem] md:h-[16rem] lg:h-[20rem] xl:h-[24rem] object-contain mb-[-1.5rem] sm:mb-[-3rem] md:mb-[-4rem] lg:mb-[-5rem]"
             />
+            {/* Character below - smaller size */}
+            <img src="/landingpage1.png"
+              alt="SINAUIN Character"
+              className="w-auto h-[14rem] sm:h-[26rem] md:h-[34rem] lg:h-[42rem] xl:h-[50rem] object-contain" />
           </div>
 
-          {/* Checkered Pattern at Bottom - 4 rows */}
-          <div className="absolute bottom-0 left-0 right-0 h-48 overflow-hidden z-0">
+          {/* Checkered Pattern at Bottom - Responsive sizing */}
+          <div className="absolute bottom-0 left-0 right-0 h-20 sm:h-28 md:h-36 overflow-hidden z-0">
             {/* Row 1 */}
-            <div className="flex h-12">
+            <div className="flex h-7 sm:h-9 md:h-12">
               {[...Array(100)].map((_, i) => (
                 <div
                   key={`row1-${i}`}
-                  className={`flex-shrink-0 w-12 h-12 ${
+                  className={`flex-shrink-0 w-7 sm:w-9 md:w-12 h-7 sm:h-9 md:h-12 ${
                     i % 2 === 0 ? 'bg-black' : 'bg-white'
                   }`}
                 />
               ))}
             </div>
             {/* Row 2 */}
-            <div className="flex h-12">
+            <div className="flex h-7 sm:h-9 md:h-12">
               {[...Array(100)].map((_, i) => (
                 <div
                   key={`row2-${i}`}
-                  className={`flex-shrink-0 w-12 h-12 ${
+                  className={`flex-shrink-0 w-7 sm:w-9 md:w-12 h-7 sm:h-9 md:h-12 ${
                     i % 2 === 0 ? 'bg-white' : 'bg-black'
                   }`}
                 />
               ))}
             </div>
             {/* Row 3 */}
-            <div className="flex h-12">
+            <div className="flex h-7 sm:h-9 md:h-12">
               {[...Array(100)].map((_, i) => (
                 <div
                   key={`row3-${i}`}
-                  className={`flex-shrink-0 w-12 h-12 ${
+                  className={`flex-shrink-0 w-7 sm:w-9 md:w-12 h-7 sm:h-9 md:h-12 ${
                     i % 2 === 0 ? 'bg-black' : 'bg-white'
-                  }`}
-                />
-              ))}
-            </div>
-            {/* Row 4 */}
-            <div className="flex h-12">
-              {[...Array(100)].map((_, i) => (
-                <div
-                  key={`row4-${i}`}
-                  className={`flex-shrink-0 w-12 h-12 ${
-                    i % 2 === 0 ? 'bg-white' : 'bg-black'
                   }`}
                 />
               ))}
@@ -139,93 +130,557 @@ export default function HomePage() {
         {/* Services Section */}
         <div className="relative bg-white py-20">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            {/* Section Header */}
-            <div className="text-center mb-16">
+            {/* Epic Features Section */}
+            <div className="text-center mb-12">
+              <div className="inline-block bg-yellow-400 px-8 py-3 rounded-full border-[3px] border-black mb-4 rotate-[-2deg]">
+                <span className="text-base font-bold text-black">Superpowers Included</span>
+              </div>
               <h2 className="text-4xl md:text-5xl font-black text-black mb-4">
-                FITUR UNGGULAN
+                Epic Features for Smart Learners
               </h2>
               <p className="text-gray-600 text-lg">
-                Platform pembelajaran terlengkap untuk kebutuhan belajar Anda
+                Discover the magic tools that make Sinauin the best place to grow your brain!
               </p>
             </div>
 
-            {/* Services Grid - Simplified */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {/* Card 1 - Adaptive Material */}
-              <Link href="/AdaptiveMaterial" className="group">
-                <div className="bg-gradient-to-br from-pink-400 to-pink-500 rounded-3xl p-6 border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-1">
-                  <div className="text-center">
-                    <div className="text-4xl mb-4">📚</div>
-                    <h3 className="text-xl font-black text-white mb-2">
-                      Adaptive Material
+            {/* Features Grid - 4 columns */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
+              {/* Feature 1 - AI Task Integrator */}
+              <div className="bg-white rounded-2xl p-6 border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-1">
+                <div className="flex flex-col items-center text-center">
+                  <div className="flex-shrink-0 w-16 h-16 bg-pink-400 rounded-full flex items-center justify-center border-2 border-black mb-4">
+                    <span className="text-3xl">🤖</span>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-black text-black mb-2">
+                      AI Task Integrator & Timekeeper
                     </h3>
-                    <p className="text-sm text-white">
-                      Materi yang menyesuaikan dengan Anda
+                    <p className="text-sm text-gray-600">
+                      Let our friendly AI plan your day! It organizes homework, study time, and play into a fun schedule so you never miss a beat.
                     </p>
                   </div>
                 </div>
-              </Link>
+              </div>
 
-              {/* Card 2 - Educational Games */}
-              <Link href="/EducationalGames" className="group">
-                <div className="bg-gradient-to-br from-purple-400 to-purple-500 rounded-3xl p-6 border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-1">
-                  <div className="text-center">
-                    <div className="text-4xl mb-4">🎮</div>
-                    <h3 className="text-xl font-black text-white mb-2">
-                      Educational Games
+              {/* Feature 2 - AI Adaptive Material */}
+              <div className="bg-white rounded-2xl p-6 border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-1">
+                <div className="flex flex-col items-center text-center">
+                  <div className="flex-shrink-0 w-16 h-16 bg-teal-400 rounded-full flex items-center justify-center border-2 border-black mb-4">
+                    <span className="text-3xl">📖</span>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-black text-black mb-2">
+                      AI Adaptive Material Generator
                     </h3>
-                    <p className="text-sm text-white">
-                      Belajar sambil bermain
+                    <p className="text-sm text-gray-600">
+                      Lessons that magically change just for you! If it's too hard, we make it simpler; if it's too easy, get ready for a challenge.
                     </p>
                   </div>
                 </div>
-              </Link>
+              </div>
 
-              {/* Card 3 - PeerConnect */}
-              <Link href="/PeerConnect" className="group">
-                <div className="bg-gradient-to-br from-blue-400 to-blue-500 rounded-3xl p-6 border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-1">
-                  <div className="text-center">
-                    <div className="text-4xl mb-4">👥</div>
-                    <h3 className="text-xl font-black text-white mb-2">
-                      Peer Connect
+              {/* Feature 3 - AI Multi-Source */}
+              <div className="bg-white rounded-2xl p-6 border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-1">
+                <div className="flex flex-col items-center text-center">
+                  <div className="flex-shrink-0 w-16 h-16 bg-yellow-400 rounded-full flex items-center justify-center border-2 border-black mb-4">
+                    <span className="text-3xl">🔗</span>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-black text-black mb-2">
+                      AI Multi-Source Knowledge Graph
                     </h3>
-                    <p className="text-sm text-white">
-                      Belajar bersama teman
+                    <p className="text-sm text-gray-600">
+                      Connect the dots! See how math links to music and science links to stories in a giant, interactive web of fun facts.
                     </p>
                   </div>
                 </div>
-              </Link>
+              </div>
 
-              {/* Card 4 - Multi-Source Knowledge */}
-              <Link href="/Multi-Source-Knowledge" className="group">
-                <div className="bg-gradient-to-br from-yellow-400 to-yellow-500 rounded-3xl p-6 border-4 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-1">
-                  <div className="text-center">
-                    <div className="text-4xl mb-4">🌐</div>
-                    <h3 className="text-xl font-black text-black mb-2">
-                      Multi-Source
+              {/* Feature 4 - Peer Connect */}
+              <div className="bg-white rounded-2xl p-6 border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-1">
+                <div className="flex flex-col items-center text-center">
+                  <div className="flex-shrink-0 w-16 h-16 bg-green-400 rounded-full flex items-center justify-center border-2 border-black mb-4">
+                    <span className="text-3xl">👥</span>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-black text-black mb-2">
+                      PEER CONNECT & Groups
                     </h3>
-                    <p className="text-sm text-black">
-                      Berbagai sumber pengetahuan
+                    <p className="text-sm text-gray-600">
+                      Join clubs, video call friends to study together, and make new buddies who love what you love in a safe space!
                     </p>
                   </div>
                 </div>
-              </Link>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        {/* Skateboard Character Divider */}
+        <div className="relative w-full" style={{ height: '400px' }}>
+          {/* Smooth gradient transition from white to blue */}
+          <div className="absolute inset-0 bg-gradient-to-b from-white via-blue-50 to-blue-100"></div>
+
+          {/* Character Image - 3x bigger in left corner */}
+          <div className="absolute bottom-0 left-0 z-10">
+            <img
+              src="/skate.png"
+              alt="SINAUIN Skateboard Character"
+              className="h-[600px] w-auto object-contain"
+            />
+          </div>
+        </div>
+
+        {/* How It Works Section */}
+        <div className="relative bg-gradient-to-b from-blue-100 to-blue-200 py-20 overflow-hidden">
+          {/* Decorative Dots Pattern */}
+          <div className="absolute inset-0 opacity-30">
+            <div className="absolute top-0 left-0 w-full h-full" style={{
+              backgroundImage: 'radial-gradient(circle, #64748B 1px, transparent 1px)',
+              backgroundSize: '30px 30px'
+            }}></div>
+          </div>
+
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            {/* Section Header */}
+            <div className="text-center mb-16">
+              <h2 className="text-4xl md:text-5xl font-black text-black mb-4">
+                How It Works
+              </h2>
+              <p className="text-gray-700 text-lg">
+                Start your learning adventure in 3 easy steps!
+              </p>
+            </div>
+
+            {/* Steps Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-12 relative">
+              {/* Dashed Line Connector - Hidden on mobile */}
+              <div className="hidden md:block absolute top-[42px] left-0 right-0 z-0">
+                <div className="mx-auto" style={{ maxWidth: '900px', paddingLeft: '80px', paddingRight: '80px' }}>
+                  <svg width="100%" height="2" preserveAspectRatio="none" className="w-full">
+                    <line
+                      x1="0"
+                      y1="1"
+                      x2="100%"
+                      y2="1"
+                      stroke="#94A3B8"
+                      strokeWidth="2"
+                      strokeDasharray="10 10"
+                      vectorEffect="non-scaling-stroke"
+                    />
+                  </svg>
+                </div>
+              </div>
+
+              {/* Step 1 - Create Profile */}
+              <div className="relative z-10">
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-[85px] h-[85px] bg-white rounded-full flex items-center justify-center border-[4px] border-black mb-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                    <span className="text-5xl font-black text-pink-500">1</span>
+                  </div>
+                  <h3 className="text-xl font-black text-black mb-2">
+                    Create Profile
+                  </h3>
+                  <p className="text-sm text-gray-800 leading-relaxed">
+                    Sign up for free and customize your avatar.
+                  </p>
+                </div>
+              </div>
+
+              {/* Step 2 - Pick a Course */}
+              <div className="relative z-10">
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-[85px] h-[85px] bg-yellow-400 rounded-full flex items-center justify-center border-[4px] border-black mb-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                    <span className="text-5xl font-black text-black">2</span>
+                  </div>
+                  <h3 className="text-xl font-black text-black mb-2">
+                    Pick a Course
+                  </h3>
+                  <p className="text-sm text-gray-800 leading-relaxed">
+                    Choose Math, Reading, or Science adventures.
+                  </p>
+                </div>
+              </div>
+
+              {/* Step 3 - Play & Learn */}
+              <div className="relative z-10">
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-[85px] h-[85px] bg-teal-400 rounded-full flex items-center justify-center border-[4px] border-black mb-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                    <span className="text-5xl font-black text-white">3</span>
+                  </div>
+                  <h3 className="text-xl font-black text-black mb-2">
+                    Play & Learn
+                  </h3>
+                  <p className="text-sm text-gray-800 leading-relaxed">
+                    Start the game and collect rewards!
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* CTA Section */}
-        <div className="bg-gradient-to-r from-pink-400 to-purple-500 relative">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
-            <h2 className="text-3xl md:text-4xl font-black text-white mb-6">
-              Mulai Petualangan Belajar Anda!
-            </h2>
-            <p className="text-xl text-white mb-8 max-w-2xl mx-auto">
-              Bergabunglah dengan SINAUIN dan rasakan cara belajar yang lebih menyenangkan
-            </p>
+        {/* Thinking Character Divider */}
+        <div className="relative w-full" style={{ height: '400px' }}>
+          {/* Smooth gradient transition from blue-200 to blue-200 */}
+          <div className="absolute inset-0 bg-gradient-to-b from-blue-200 to-blue-200"></div>
+
+          {/* Character Image - Right side */}
+          <div className="absolute bottom-0 right-0 z-10">
+            <img
+              src="/mikir.png"
+              alt="SINAUIN Thinking Character"
+              className="h-[600px] w-auto object-contain"
+            />
           </div>
         </div>
+
+        {/* FAQ Section */}
+        <div className="relative bg-gradient-to-b from-blue-200 via-blue-50 to-white py-20">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            {/* Section Header */}
+            <div className="text-center mb-16">
+              <h2 className="text-4xl md:text-5xl font-black text-black mb-4">
+                Frequently Asked Questions
+              </h2>
+              <p className="text-gray-600 text-lg">
+                Punya pertanyaan? Kami punya jawabannya!
+              </p>
+            </div>
+
+            {/* FAQ Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* FAQ 1 */}
+              <div className="bg-white rounded-xl border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+                <button
+                  onClick={() => setOpenFAQ(openFAQ === 0 ? null : 0)}
+                  className="w-full p-5 text-left flex items-center justify-between hover:bg-blue-50 transition-colors"
+                  aria-expanded={openFAQ === 0}
+                >
+                  <h3 className="text-lg font-black text-black pr-4">
+                    Apakah SINAUIN gratis?
+                  </h3>
+                  <span className="flex-shrink-0 text-2xl font-bold transition-transform duration-300" style={{ transform: openFAQ === 0 ? 'rotate(45deg)' : 'rotate(0deg)' }}>
+                    +
+                  </span>
+                </button>
+                <div
+                  className="overflow-hidden transition-all duration-300 ease-in-out"
+                  style={{ maxHeight: openFAQ === 0 ? '200px' : '0' }}
+                >
+                  <div className="p-5 pt-0 text-sm text-gray-700 leading-relaxed">
+                    Ya! SINAUIN 100% gratis untuk semua fitur. Tidak ada biaya tersembunyi atau premium subscription.
+                  </div>
+                </div>
+              </div>
+
+              {/* FAQ 2 */}
+              <div className="bg-white rounded-xl border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+                <button
+                  onClick={() => setOpenFAQ(openFAQ === 1 ? null : 1)}
+                  className="w-full p-5 text-left flex items-center justify-between hover:bg-blue-50 transition-colors"
+                  aria-expanded={openFAQ === 1}
+                >
+                  <h3 className="text-lg font-black text-black pr-4">
+                    Untuk usia berapa SINAUIN cocok?
+                  </h3>
+                  <span className="flex-shrink-0 text-2xl font-bold transition-transform duration-300" style={{ transform: openFAQ === 1 ? 'rotate(45deg)' : 'rotate(0deg)' }}>
+                    +
+                  </span>
+                </button>
+                <div
+                  className="overflow-hidden transition-all duration-300 ease-in-out"
+                  style={{ maxHeight: openFAQ === 1 ? '200px' : '0' }}
+                >
+                  <div className="p-5 pt-0 text-sm text-gray-700 leading-relaxed">
+                    SINAUIN dirancang untuk semua usia! Dari anak SD hingga remaja SMA bisa belajar dengan cara yang fun dan interaktif.
+                  </div>
+                </div>
+              </div>
+
+              {/* FAQ 3 */}
+              <div className="bg-white rounded-xl border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+                <button
+                  onClick={() => setOpenFAQ(openFAQ === 2 ? null : 2)}
+                  className="w-full p-5 text-left flex items-center justify-between hover:bg-blue-50 transition-colors"
+                  aria-expanded={openFAQ === 2}
+                >
+                  <h3 className="text-lg font-black text-black pr-4">
+                    Apakah aman untuk anak-anak?
+                  </h3>
+                  <span className="flex-shrink-0 text-2xl font-bold transition-transform duration-300" style={{ transform: openFAQ === 2 ? 'rotate(45deg)' : 'rotate(0deg)' }}>
+                    +
+                  </span>
+                </button>
+                <div
+                  className="overflow-hidden transition-all duration-300 ease-in-out"
+                  style={{ maxHeight: openFAQ === 2 ? '200px' : '0' }}
+                >
+                  <div className="p-5 pt-0 text-sm text-gray-700 leading-relaxed">
+                    Sangat aman! Kami menjaga privasi data siswa dan menyediakan lingkungan belajar yang aman dengan moderasi konten.
+                  </div>
+                </div>
+              </div>
+
+              {/* FAQ 4 */}
+              <div className="bg-white rounded-xl border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+                <button
+                  onClick={() => setOpenFAQ(openFAQ === 3 ? null : 3)}
+                  className="w-full p-5 text-left flex items-center justify-between hover:bg-blue-50 transition-colors"
+                  aria-expanded={openFAQ === 3}
+                >
+                  <h3 className="text-lg font-black text-black pr-4">
+                    Berapa lama waktu belajar yang disarankan per hari?
+                  </h3>
+                  <span className="flex-shrink-0 text-2xl font-bold transition-transform duration-300" style={{ transform: openFAQ === 3 ? 'rotate(45deg)' : 'rotate(0deg)' }}>
+                    +
+                  </span>
+                </button>
+                <div
+                  className="overflow-hidden transition-all duration-300 ease-in-out"
+                  style={{ maxHeight: openFAQ === 3 ? '200px' : '0' }}
+                >
+                  <div className="p-5 pt-0 text-sm text-gray-700 leading-relaxed">
+                    Kami merekomendasikan 20-30 menit per hari. Tapi siswa bisa belajar sesuai kecepatan mereka sendiri!
+                  </div>
+                </div>
+              </div>
+
+              {/* FAQ 5 */}
+              <div className="bg-white rounded-xl border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+                <button
+                  onClick={() => setOpenFAQ(openFAQ === 4 ? null : 4)}
+                  className="w-full p-5 text-left flex items-center justify-between hover:bg-blue-50 transition-colors"
+                  aria-expanded={openFAQ === 4}
+                >
+                  <h3 className="text-lg font-black text-black pr-4">
+                    Bisa diakses dari perangkat apa saja?
+                  </h3>
+                  <span className="flex-shrink-0 text-2xl font-bold transition-transform duration-300" style={{ transform: openFAQ === 4 ? 'rotate(45deg)' : 'rotate(0deg)' }}>
+                    +
+                  </span>
+                </button>
+                <div
+                  className="overflow-hidden transition-all duration-300 ease-in-out"
+                  style={{ maxHeight: openFAQ === 4 ? '200px' : '0' }}
+                >
+                  <div className="p-5 pt-0 text-sm text-gray-700 leading-relaxed">
+                    SINAUIN bisa diakses melalui web browser di desktop, laptop, tablet, atau smartphone. Tidak perlu download aplikasi!
+                  </div>
+                </div>
+              </div>
+
+              {/* FAQ 6 */}
+              <div className="bg-white rounded-xl border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+                <button
+                  onClick={() => setOpenFAQ(openFAQ === 5 ? null : 5)}
+                  className="w-full p-5 text-left flex items-center justify-between hover:bg-blue-50 transition-colors"
+                  aria-expanded={openFAQ === 5}
+                >
+                  <h3 className="text-lg font-black text-black pr-4">
+                    Apakah orang tua bisa memantau progress anak?
+                  </h3>
+                  <span className="flex-shrink-0 text-2xl font-bold transition-transform duration-300" style={{ transform: openFAQ === 5 ? 'rotate(45deg)' : 'rotate(0deg)' }}>
+                    +
+                  </span>
+                </button>
+                <div
+                  className="overflow-hidden transition-all duration-300 ease-in-out"
+                  style={{ maxHeight: openFAQ === 5 ? '200px' : '0' }}
+                >
+                  <div className="p-5 pt-0 text-sm text-gray-700 leading-relaxed">
+                    Ya! Orang tua memiliki akses ke dashboard untuk melihat progress belajar, achievement, dan aktivitas anak mereka.
+                  </div>
+                </div>
+              </div>
+
+              {/* FAQ 7 */}
+              <div className="bg-white rounded-xl border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+                <button
+                  onClick={() => setOpenFAQ(openFAQ === 6 ? null : 6)}
+                  className="w-full p-5 text-left flex items-center justify-between hover:bg-blue-50 transition-colors"
+                  aria-expanded={openFAQ === 6}
+                >
+                  <h3 className="text-lg font-black text-black pr-4">
+                    Apa saja mata pelajaran yang tersedia?
+                  </h3>
+                  <span className="flex-shrink-0 text-2xl font-bold transition-transform duration-300" style={{ transform: openFAQ === 6 ? 'rotate(45deg)' : 'rotate(0deg)' }}>
+                    +
+                  </span>
+                </button>
+                <div
+                  className="overflow-hidden transition-all duration-300 ease-in-out"
+                  style={{ maxHeight: openFAQ === 6 ? '200px' : '0' }}
+                >
+                  <div className="p-5 pt-0 text-sm text-gray-700 leading-relaxed">
+                    Saat ini kami menyediakan Matematika, Science, dan Reading. Lebih banyak mata pelajaran akan segera hadir!
+                  </div>
+                </div>
+              </div>
+
+              {/* FAQ 8 */}
+              <div className="bg-white rounded-xl border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+                <button
+                  onClick={() => setOpenFAQ(openFAQ === 7 ? null : 7)}
+                  className="w-full p-5 text-left flex items-center justify-between hover:bg-blue-50 transition-colors"
+                  aria-expanded={openFAQ === 7}
+                >
+                  <h3 className="text-lg font-black text-black pr-4">
+                    Bagaimana cara mendaftar?
+                  </h3>
+                  <span className="flex-shrink-0 text-2xl font-bold transition-transform duration-300" style={{ transform: openFAQ === 7 ? 'rotate(45deg)' : 'rotate(0deg)' }}>
+                    +
+                  </span>
+                </button>
+                <div
+                  className="overflow-hidden transition-all duration-300 ease-in-out"
+                  style={{ maxHeight: openFAQ === 7 ? '200px' : '0' }}
+                >
+                  <div className="p-5 pt-0 text-sm text-gray-700 leading-relaxed">
+                    Klik tombol "Mulai Gratis" di atas, isi informasi dasar, dan langsung mulai belajar! Proses registrasi hanya 2 menit.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Contact CTA */}
+            <div className="text-center mt-12">
+              <p className="text-gray-600 text-base">
+                Masih punya pertanyaan lain?{' '}
+                <a href="/contact" className="text-blue-600 font-bold hover:underline">
+                  Hubungi kami
+                </a>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Running Text */}
+        <div className="relative bg-white py-4 overflow-hidden border-t-[12px] border-b-[12px]" style={{ borderColor: '#7dd3d8' }}>
+          <style jsx>{`
+            @keyframes scroll {
+              0% {
+                transform: translateX(0);
+              }
+              100% {
+                transform: translateX(-50%);
+              }
+            }
+            .animate-scroll {
+              animation: scroll 30s linear infinite;
+            }
+          `}</style>
+          <div className="flex whitespace-nowrap animate-scroll">
+            {[...Array(20)].map((_, i) => (
+              <span key={i} className="text-6xl md:text-8xl font-extrabold mx-16" style={{ letterSpacing: '0.15em', fontFamily: 'Impact, Arial Black, sans-serif', fontWeight: 900, color: '#a8d8dc' }}>
+                SINAUIN
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <footer className="relative bg-gradient-to-b from-white via-blue-50 to-blue-200 py-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+              {/* About SINAUIN Section */}
+              <div>
+                <div className="inline-block mb-6">
+                  <img
+                    src="/SINAUIN.png"
+                    alt="SINAUIN"
+                    className="h-25 w-auto object-contain"
+                  />
+                </div>
+                <p className="text-gray-700 text-sm leading-relaxed">
+                  Membantu Anda mencapai keseimbangan pembelajaran dan kesehatan optimal dengan teknologi AI.
+                </p>
+              </div>
+
+              {/* Navigasi */}
+              <div>
+                <h3 className="text-lg font-black text-black mb-6">Navigasi</h3>
+                <ul className="space-y-3">
+                  <li>
+                    <a href="#" className="text-gray-700 hover:text-blue-600 transition-colors text-sm">
+                      Beranda
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#features" className="text-gray-700 hover:text-blue-600 transition-colors text-sm">
+                      Fitur Unggulan
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="text-gray-700 hover:text-blue-600 transition-colors text-sm">
+                      Blog Artikel
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="text-gray-700 hover:text-blue-600 transition-colors text-sm">
+                      Tentang Kami
+                    </a>
+                  </li>
+                  <li>
+                    <a href="/contact" className="text-gray-700 hover:text-blue-600 transition-colors text-sm">
+                      Hubungi Kami
+                    </a>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Sumber Daya */}
+              <div>
+                <h3 className="text-lg font-black text-black mb-6">Sumber Daya</h3>
+                <ul className="space-y-3">
+                  <li>
+                    <a href="#" className="text-gray-700 hover:text-blue-600 transition-colors text-sm">
+                      Visi Misi
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="text-gray-700 hover:text-blue-600 transition-colors text-sm">
+                      Komitmen Kami
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#faq" className="text-gray-700 hover:text-blue-600 transition-colors text-sm">
+                      FAQ
+                    </a>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Hubungi Kami */}
+              <div>
+                <h3 className="text-lg font-black text-black mb-6">Hubungi Kami</h3>
+                <div className="flex gap-4">
+                  <a href="#" className="w-12 h-12 bg-white rounded-xl flex items-center justify-center border-2 border-black hover:bg-yellow-400 transition-colors">
+                    <span className="text-2xl">📧</span>
+                  </a>
+                  <a href="#" className="w-12 h-12 bg-white rounded-xl flex items-center justify-center border-2 border-black hover:bg-yellow-400 transition-colors">
+                    <span className="text-2xl">📞</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom Bar */}
+            <div className="border-t-2 pt-8" style={{ borderColor: '#7dd3d8' }}>
+              <div className="flex flex-col md:flex-row justify-between items-center">
+                <p className="text-gray-700 text-sm mb-4 md:mb-0">
+                  © 2024 SINAUIN. Semua hak dilindungi.
+                </p>
+                <p className="text-gray-700 text-sm">
+                  Dibuat dengan ❤️ untuk kesehatan optimal
+                </p>
+              </div>
+            </div>
+          </div>
+        </footer>
       </div>
     </div>
   );
 }
+
