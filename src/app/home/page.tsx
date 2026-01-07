@@ -11,6 +11,39 @@ export default function HomePage() {
   const [showLoading, setShowLoading] = useState(true)
   const [user, setUser] = useState<Profile | null>(null)
   const [openFAQ, setOpenFAQ] = useState<number | null>(null)
+  const [hoveredCard, setHoveredCard] = useState<number | null>(null)
+  const [visibleCards, setVisibleCards] = useState<Set<number>>(new Set())
+
+  // Animation styles
+  const getCardAnimation = (delay: number, isVisible: boolean) => ({
+    animation: isVisible
+      ? `fadeInUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) ${delay}s forwards`
+      : 'none',
+    opacity: isVisible ? 1 : 0,
+    transform: isVisible ? 'translateY(0) rotateX(0deg)' : 'translateY(30px) rotateX(0deg)',
+  })
+
+  // Intersection Observer for scroll animations
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const cardId = parseInt(entry.target.id.replace('feature-card-', ''))
+            setVisibleCards((prev) => new Set([...prev, cardId]))
+          }
+        })
+      },
+      { threshold: 0.1 }
+    )
+
+    // Observe all feature cards
+    document.querySelectorAll('[id^="feature-card-"]').forEach((card) => {
+      observer.observe(card)
+    })
+
+    return () => observer.disconnect()
+  }, [])
 
   useEffect(() => {
     async function checkUser() {
@@ -129,9 +162,21 @@ export default function HomePage() {
 
         {/* Services Section */}
         <div className="relative bg-white py-20">
+          <style jsx>{`
+            @keyframes fadeInUp {
+              from {
+                opacity: 0;
+                transform: translateY(30px) rotateX(0deg);
+              }
+              to {
+                opacity: 1;
+                transform: translateY(0) rotateX(0deg);
+              }
+            }
+          `}</style>
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             {/* Epic Features Section */}
-            <div className="text-center mb-12">
+            <div className="text-center mb-12" style={getCardAnimation(0, true)}>
               <div className="inline-block bg-yellow-400 px-8 py-3 rounded-full border-[3px] border-black mb-4 rotate-[-2deg]">
                 <span className="text-base font-bold text-black">Superpowers Included</span>
               </div>
@@ -146,9 +191,15 @@ export default function HomePage() {
             {/* Features Grid - 4 columns */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
               {/* Feature 1 - AI Task Integrator */}
-              <div className="bg-white rounded-2xl p-6 border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-1">
+              <div
+                id="feature-card-0"
+                className="relative bg-white rounded-2xl p-6 border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all duration-500 cubic-bezier(0.34, 1.56, 0.64, 1) hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-3 hover:scale-110 hover:rotate-2"
+                style={getCardAnimation(0.1, visibleCards.has(0))}
+                onMouseEnter={() => setHoveredCard(0)}
+                onMouseLeave={() => setHoveredCard(null)}
+              >
                 <div className="flex flex-col items-center text-center">
-                  <div className="flex-shrink-0 w-16 h-16 bg-pink-400 rounded-full flex items-center justify-center border-2 border-black mb-4">
+                  <div className={`flex-shrink-0 w-16 h-16 bg-pink-400 rounded-full flex items-center justify-center border-2 border-black mb-4 transition-all duration-500 cubic-bezier(0.34, 1.56, 0.64, 1) ${hoveredCard === 0 ? 'scale-125 rotate-12' : 'scale-100 rotate-0'}`}>
                     <span className="text-3xl">🤖</span>
                   </div>
                   <div>
@@ -163,9 +214,15 @@ export default function HomePage() {
               </div>
 
               {/* Feature 2 - AI Adaptive Material */}
-              <div className="bg-white rounded-2xl p-6 border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-1">
+              <div
+                id="feature-card-1"
+                className="relative bg-white rounded-2xl p-6 border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all duration-500 cubic-bezier(0.34, 1.56, 0.64, 1) hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-3 hover:scale-110 hover:rotate-[-2deg]"
+                style={getCardAnimation(0.2, visibleCards.has(1))}
+                onMouseEnter={() => setHoveredCard(1)}
+                onMouseLeave={() => setHoveredCard(null)}
+              >
                 <div className="flex flex-col items-center text-center">
-                  <div className="flex-shrink-0 w-16 h-16 bg-teal-400 rounded-full flex items-center justify-center border-2 border-black mb-4">
+                  <div className={`flex-shrink-0 w-16 h-16 bg-teal-400 rounded-full flex items-center justify-center border-2 border-black mb-4 transition-all duration-500 cubic-bezier(0.34, 1.56, 0.64, 1) ${hoveredCard === 1 ? 'scale-125 rotate-[-12deg]' : 'scale-100 rotate-0'}`}>
                     <span className="text-3xl">📖</span>
                   </div>
                   <div>
@@ -180,9 +237,15 @@ export default function HomePage() {
               </div>
 
               {/* Feature 3 - AI Multi-Source */}
-              <div className="bg-white rounded-2xl p-6 border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-1">
+              <div
+                id="feature-card-2"
+                className="relative bg-white rounded-2xl p-6 border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all duration-500 cubic-bezier(0.34, 1.56, 0.64, 1) hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-3 hover:scale-110 hover:rotate-2"
+                style={getCardAnimation(0.3, visibleCards.has(2))}
+                onMouseEnter={() => setHoveredCard(2)}
+                onMouseLeave={() => setHoveredCard(null)}
+              >
                 <div className="flex flex-col items-center text-center">
-                  <div className="flex-shrink-0 w-16 h-16 bg-yellow-400 rounded-full flex items-center justify-center border-2 border-black mb-4">
+                  <div className={`flex-shrink-0 w-16 h-16 bg-yellow-400 rounded-full flex items-center justify-center border-2 border-black mb-4 transition-all duration-500 cubic-bezier(0.34, 1.56, 0.64, 1) ${hoveredCard === 2 ? 'scale-125 rotate-12' : 'scale-100 rotate-0'}`}>
                     <span className="text-3xl">🔗</span>
                   </div>
                   <div>
@@ -197,9 +260,15 @@ export default function HomePage() {
               </div>
 
               {/* Feature 4 - Peer Connect */}
-              <div className="bg-white rounded-2xl p-6 border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all hover:-translate-y-1">
+              <div
+                id="feature-card-3"
+                className="relative bg-white rounded-2xl p-6 border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all duration-500 cubic-bezier(0.34, 1.56, 0.64, 1) hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-3 hover:scale-110 hover:rotate-[-2deg]"
+                style={getCardAnimation(0.4, visibleCards.has(3))}
+                onMouseEnter={() => setHoveredCard(3)}
+                onMouseLeave={() => setHoveredCard(null)}
+              >
                 <div className="flex flex-col items-center text-center">
-                  <div className="flex-shrink-0 w-16 h-16 bg-green-400 rounded-full flex items-center justify-center border-2 border-black mb-4">
+                  <div className={`flex-shrink-0 w-16 h-16 bg-green-400 rounded-full flex items-center justify-center border-2 border-black mb-4 transition-all duration-500 cubic-bezier(0.34, 1.56, 0.64, 1) ${hoveredCard === 3 ? 'scale-125 rotate-[-12deg]' : 'scale-100 rotate-0'}`}>
                     <span className="text-3xl">👥</span>
                   </div>
                   <div>
