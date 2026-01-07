@@ -10,7 +10,8 @@ import {
   MaterialShareModal,
   PeerConnectHeader,
   PeerConnectEmptyState,
-  type ChatMode
+  type ChatMode,
+  type UserProfile
 } from "@/components/PeerConnect"
 import { useUserProfile } from "@/components/PeerConnect/hooks/useUserProfile"
 import { useChatRoom } from "@/components/PeerConnect/hooks/useChatRoom"
@@ -61,6 +62,43 @@ export default function PeerConnectPage() {
     sendMaterialMessage: sendPrivateMaterialMessage,
     setSelectedPrivateChat
   } = usePrivateChat(currentUser, loading)
+
+  // Wrapper for startPrivateChat that also switches to private mode
+  const handleStartPrivateChat = async (member: UserProfile) => {
+    if (!currentUser || member.user_id === currentUser.user_id) return
+
+    try {
+      // Get or create chat ID first
+      const { findOrCreatePrivateChat } = await import('@/components/PeerConnect/services/privateChatService')
+      const chatId = await findOrCreatePrivateChat(currentUser.user_id, member.user_id)
+
+      // Create chat object immediately
+      const chatWithUser = {
+        id: chatId,
+        user1_id: currentUser.user_id < member.user_id ? currentUser.user_id : member.user_id,
+        user2_id: currentUser.user_id < member.user_id ? member.user_id : currentUser.user_id,
+        created_at: new Date().toISOString(),
+        last_message_at: new Date().toISOString(),
+        otherUser: {
+          user_id: member.user_id,
+          nama: member.nama,
+          avatar_url: member.avatar_url,
+          role: member.role
+        },
+        lastMessage: 'Start chatting!'
+      }
+
+      // Set selected chat and switch mode immediately
+      setSelectedPrivateChat(chatWithUser)
+      setChatMode('private')
+
+      // Load data in background
+      await startPrivateChat(member)
+    } catch (error) {
+      console.error('Error starting private chat:', error)
+      alert('Gagal memulai private chat')
+    }
+  }
 
   // Wrapper for PrivateChatArea's onSendMessage (which takes no params)
   const handleSendPrivateMessage = () => {
@@ -128,7 +166,7 @@ export default function PeerConnectPage() {
           privateChats={privateChats}
           selectedPrivateChatId={selectedPrivateChat?.id || null}
           onChatModeChange={setChatMode}
-          onStartPrivateChat={startPrivateChat}
+          onStartPrivateChat={handleStartPrivateChat}
           onSelectPrivateChat={handleSelectPrivateChat}
         />
 
@@ -145,7 +183,7 @@ export default function PeerConnectPage() {
               onNewMessageChange={setNewMessage}
               onSendMessage={handleSendGroupMessage}
               onSendMaterialLink={sendMaterialMessage}
-              onStartPrivateChat={startPrivateChat}
+              onStartPrivateChat={handleStartPrivateChat}
               onOpenMaterialShare={() => {
                 setMaterialShareMode('group')
                 setIsMaterialShareOpen(true)

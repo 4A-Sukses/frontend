@@ -15,6 +15,7 @@ export interface ActivityStats {
   totalMaterialsOpened: number
   totalTimeSpent: number // in minutes
   materialsCompleted: number
+  materialsNotStarted: number // NEW: belum dimulai
   averageSessionTime: number // in minutes
   mostViewedMaterials: { material_id: string; title: string; count: number }[]
   recentActivities: MaterialActivity[]
@@ -181,8 +182,16 @@ class ActivityTrackerService {
       if (error) throw error
       if (!activities) return null
 
+      // Get total count of all materials in database
+      const { count: totalMaterialsCount, error: countError } = await supabase
+        .from('materials')
+        .select('*', { count: 'exact', head: true })
+
+      const totalMaterialsInDB = totalMaterialsCount || 0
+
       // Calculate statistics
       const totalMaterialsOpened = new Set(activities.map(a => a.material_id)).size
+      const materialsNotStarted = totalMaterialsInDB - totalMaterialsOpened
       const totalTimeSpent = activities.reduce((sum, a) => sum + (a.duration_seconds || 0), 0) / 60
       const materialsCompleted = activities.filter(a => a.completed).length
       const averageSessionTime = activities.length > 0
@@ -243,6 +252,7 @@ class ActivityTrackerService {
         totalMaterialsOpened,
         totalTimeSpent: Math.round(totalTimeSpent),
         materialsCompleted,
+        materialsNotStarted: Math.max(0, materialsNotStarted), // Ensure non-negative
         averageSessionTime: Math.round(averageSessionTime),
         mostViewedMaterials,
         recentActivities,

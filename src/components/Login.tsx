@@ -50,7 +50,7 @@ export default function Login() {
             text: 'Sign up successful! Logging you in...'
           })
           setTimeout(() => {
-            window.location.href = '/'
+            window.location.href = '/home'
           }, 1000)
         } else {
           setMessage({
@@ -83,7 +83,7 @@ export default function Login() {
           text: 'Login successful!'
         })
         setTimeout(() => {
-          window.location.href = '/'
+          window.location.href = '/home'
         }, 1000)
       }
     } catch (error: any) {

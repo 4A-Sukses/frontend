@@ -189,85 +189,137 @@ export default function LearningPathPage() {
   // Entry Page
   if (mode === 'entry') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-900 flex items-center justify-center px-16 py-6">
-        <div className="w-full">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-indigo-900 px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+        <div className="max-w-7xl mx-auto">
+          {/* Back Button */}
           <Link
-            href="/"
-            className="text-slate-400 hover:text-white mb-8 flex items-center gap-2 transition-colors"
+            href="/home"
+            className="text-slate-400 hover:text-white mb-8 inline-flex items-center gap-2 transition-colors group"
           >
-            ← Kembali ke Home
+            <svg className="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Kembali ke Home
           </Link>
 
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-white mb-4">
-              🎓 Learning Path Builder
+          {/* Hero Section */}
+          <div className="text-center mb-12 lg:mb-16">
+            <div className="inline-block mb-4">
+              <span className="text-7xl lg:text-8xl">🎓</span>
+            </div>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-4 lg:mb-6">
+              Learning Path Builder
             </h1>
-            <p className="text-slate-400 text-lg max-w-xl mx-auto">
+            <p className="text-slate-300 text-lg lg:text-xl max-w-3xl mx-auto leading-relaxed">
               Buat jalur pembelajaran visual dengan validasi AI atau import dari komunitas
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 mx-auto items-start">
-            {/* Create New */}
+          {/* Main Options - Vertical Stack */}
+          <div className="max-w-4xl mx-auto space-y-5">
+            {/* Option 1 - Buat Workflow Baru */}
             <button
               onClick={() => setMode('select-topic')}
-              className="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-3xl p-10
-                text-left hover:scale-[1.02] transition-all shadow-2xl group border border-indigo-500/30
-                w-full aspect-square flex flex-col justify-between"
+              className="group relative w-full bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 rounded-2xl p-6 lg:p-8
+                text-left hover:scale-[1.01] transition-all duration-300 shadow-xl hover:shadow-indigo-500/40
+                border border-indigo-400/30 hover:border-indigo-300/50
+                overflow-hidden"
             >
-              <div>
-                <div className="text-6xl mb-5">🆕</div>
-                <h2 className="text-2xl font-bold text-white mb-2">
-                  Buat Workflow Baru
-                </h2>
-                <p className="text-indigo-200 text-base">
-                  Pilih topik dan mulai membuat learning path dari awal
-                </p>
-              </div>
-              <div className="text-indigo-300 group-hover:text-white transition-colors flex items-center gap-2 text-base">
-                Mulai →
+              {/* Decorative Elements */}
+              <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full -mr-24 -mt-24 group-hover:scale-125 transition-transform duration-500" />
+              <div className="absolute bottom-0 left-0 w-32 h-32 bg-purple-500/20 rounded-full -ml-16 -mb-16 group-hover:scale-110 transition-transform duration-500" />
+
+              <div className="relative z-10 flex items-center justify-between gap-6">
+                <div className="flex items-center gap-5">
+                  <div className="flex-shrink-0 inline-flex items-center justify-center w-16 h-16 lg:w-20 lg:h-20 bg-white/20 backdrop-blur-sm rounded-2xl">
+                    <span className="text-4xl lg:text-5xl">🆕</span>
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <h2 className="text-2xl lg:text-3xl font-bold text-white">
+                        Buat Workflow Baru
+                      </h2>
+                      <span className="px-3 py-0.5 bg-white/20 backdrop-blur-sm text-white text-xs font-bold rounded-full">
+                        RECOMMENDED
+                      </span>
+                    </div>
+                    <p className="text-indigo-100/90 text-sm lg:text-base leading-relaxed">
+                      Pilih topik dan mulai membuat learning path dari awal dengan drag-and-drop editor
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 lg:w-12 lg:h-12 bg-white/20 backdrop-blur-sm rounded-full group-hover:bg-white/30 transition-colors">
+                  <svg className="w-5 h-5 lg:w-6 lg:h-6 text-white group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </div>
               </div>
             </button>
 
-            {/* Import from Community */}
+            {/* Option 2 - Import from Community */}
             <button
               onClick={() => setMode('gallery')}
-              className="bg-gradient-to-br from-emerald-600 to-teal-700 rounded-3xl p-10
-                text-left hover:scale-[1.02] transition-all shadow-2xl group border border-emerald-500/30
-                w-full aspect-square flex flex-col justify-between"
+              className="group relative w-full bg-gradient-to-br from-emerald-600 to-teal-700 rounded-2xl p-6 lg:p-8
+                text-left hover:scale-[1.01] transition-all duration-300 shadow-xl hover:shadow-emerald-500/40
+                border border-emerald-400/30 hover:border-emerald-300/50
+                overflow-hidden"
             >
-              <div>
-                <div className="text-6xl mb-5">📥</div>
-                <h2 className="text-2xl font-bold text-white mb-2">
-                  Import dari Komunitas
-                </h2>
-                <p className="text-emerald-200 text-base">
-                  Jelajahi workflow public dan fork untuk dimodifikasi
-                </p>
-              </div>
-              <div className="text-emerald-300 group-hover:text-white transition-colors flex items-center gap-2 text-base">
-                Jelajahi →
+              <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full -mr-24 -mt-24 group-hover:scale-125 transition-transform duration-500" />
+
+              <div className="relative z-10 flex items-center justify-between gap-6">
+                <div className="flex items-center gap-5">
+                  <div className="flex-shrink-0 inline-flex items-center justify-center w-16 h-16 lg:w-20 lg:h-20 bg-white/20 backdrop-blur-sm rounded-2xl">
+                    <span className="text-4xl lg:text-5xl">📥</span>
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-2xl lg:text-3xl font-bold text-white mb-2">
+                      Import dari Komunitas
+                    </h3>
+                    <p className="text-emerald-100/90 text-sm lg:text-base leading-relaxed">
+                      Jelajahi workflow public dan fork untuk dimodifikasi sesuai kebutuhan Anda
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 lg:w-12 lg:h-12 bg-white/20 backdrop-blur-sm rounded-full group-hover:bg-white/30 transition-colors">
+                  <svg className="w-5 h-5 lg:w-6 lg:h-6 text-white group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </div>
               </div>
             </button>
 
-            {/* Import from Knowledge Base */}
+            {/* Option 3 - Import from Knowledge Base */}
             <button
               onClick={() => setMode('topic-import')}
-              className="bg-gradient-to-br from-amber-600 to-orange-700 rounded-3xl p-10
-                text-left hover:scale-[1.02] transition-all shadow-2xl group border border-amber-500/30
-                w-full aspect-square flex flex-col justify-between"
+              className="group relative w-full bg-gradient-to-br from-amber-600 to-orange-700 rounded-2xl p-6 lg:p-8
+                text-left hover:scale-[1.01] transition-all duration-300 shadow-xl hover:shadow-amber-500/40
+                border border-amber-400/30 hover:border-amber-300/50
+                overflow-hidden"
             >
-              <div>
-                <div className="text-6xl mb-5">🤖</div>
-                <h2 className="text-2xl font-bold text-white mb-2">
-                  Import dari Materi
-                </h2>
-                <p className="text-amber-200 text-base">
-                  AI otomatis membuat workflow dari topik di knowledge base
-                </p>
-              </div>
-              <div className="text-amber-300 group-hover:text-white transition-colors flex items-center gap-2 text-base">
-                Import →
+              <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full -mr-24 -mt-24 group-hover:scale-125 transition-transform duration-500" />
+
+              <div className="relative z-10 flex items-center justify-between gap-6">
+                <div className="flex items-center gap-5">
+                  <div className="flex-shrink-0 inline-flex items-center justify-center w-16 h-16 lg:w-20 lg:h-20 bg-white/20 backdrop-blur-sm rounded-2xl">
+                    <span className="text-4xl lg:text-5xl">🤖</span>
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-2xl lg:text-3xl font-bold text-white mb-2">
+                      Import dari Materi
+                    </h3>
+                    <p className="text-amber-100/90 text-sm lg:text-base leading-relaxed">
+                      AI otomatis membuat workflow dari topik di knowledge base dengan struktur optimal
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 lg:w-12 lg:h-12 bg-white/20 backdrop-blur-sm rounded-full group-hover:bg-white/30 transition-colors">
+                  <svg className="w-5 h-5 lg:w-6 lg:h-6 text-white group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </div>
               </div>
             </button>
           </div>

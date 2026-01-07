@@ -8,6 +8,8 @@ import {
   getCurrentUserDetailProfile,
 } from "@/lib/profile";
 import { getBadgeById } from "@/lib/badges";
+import UserProfileModal from "@/components/UserProfileModal";
+import AuthModal from "@/components/AuthModal";
 import type { Profile, UserProfile, Badge } from "@/types/database";
 
 export default function Navbar() {
@@ -16,6 +18,8 @@ export default function Navbar() {
   const [badge, setBadge] = useState<Badge | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   useEffect(() => {
     async function loadUser() {
@@ -119,7 +123,7 @@ export default function Navbar() {
         >
           {/* Logo/Brand */}
           <div className="flex items-center">
-            <Link href="/" className={`text-2xl font-black transition-colors ${
+            <Link href="/home" className={`text-2xl font-black transition-colors ${
               isScrolled ? 'text-white' : 'text-black'
             }`}>
               SINAUIN
@@ -128,7 +132,7 @@ export default function Navbar() {
 
           {/* Navigation Links */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link href="/" className={`font-semibold transition-colors ${
+            <Link href="/home" className={`font-semibold transition-colors ${
               isScrolled
                 ? 'text-gray-300 hover:text-white'
                 : 'text-black hover:text-gray-700'
@@ -190,12 +194,12 @@ export default function Navbar() {
           {/* User Navigation */}
           <div className="flex items-center gap-3">
             {!user ? (
-              <Link
-                href="/login"
+              <button
+                onClick={() => setShowAuthModal(true)}
                 className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-semibold"
               >
                 Login
-              </Link>
+              </button>
             ) : (
               <>
                 {/* User Avatar */}
@@ -248,12 +252,12 @@ export default function Navbar() {
                     Dashboard
                   </Link>
                 )}
-                <Link
-                  href="/profile"
+                <button
+                  onClick={() => setShowProfileModal(true)}
                   className="px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 transition-colors font-semibold"
                 >
                   Profile
-                </Link>
+                </button>
                 <button
                   onClick={handleSignOut}
                   className="px-4 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition-colors font-semibold"
@@ -265,6 +269,22 @@ export default function Navbar() {
           </div>
         </div>
       </div>
+
+      {/* Profile Modal */}
+      {showProfileModal && user && (
+        <UserProfileModal
+          userId={user.id}
+          onClose={() => setShowProfileModal(false)}
+        />
+      )}
+
+      {/* Auth Modal */}
+      {showAuthModal && (
+        <AuthModal
+          onClose={() => setShowAuthModal(false)}
+          initialMode="login"
+        />
+      )}
     </nav>
   );
 }

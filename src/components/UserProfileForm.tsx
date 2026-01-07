@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
-import type { UserProfile, UserProfileUpdate, Gender } from '@/types/database'
+import { getBadgeById } from '@/lib/badges'
+import type { UserProfile, UserProfileUpdate, Gender, Badge } from '@/types/database'
 
 interface UserProfileFormProps {
   userId?: string
@@ -11,6 +12,7 @@ interface UserProfileFormProps {
 
 export default function UserProfileForm({ userId, onSuccess }: UserProfileFormProps) {
   const [profile, setProfile] = useState<UserProfile | null>(null)
+  const [badge, setBadge] = useState<Badge | null>(null)
   const [loading, setLoading] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [message, setMessage] = useState<{ type: 'error' | 'success', text: string } | null>(null)
@@ -50,6 +52,14 @@ export default function UserProfileForm({ userId, onSuccess }: UserProfileFormPr
           interest: data.interest || '',
           avatar_url: data.avatar_url || '',
         })
+
+        // Fetch badge data if user has a badge
+        if (data.badge_id) {
+          const badgeData = await getBadgeById(data.badge_id)
+          setBadge(badgeData)
+        } else {
+          setBadge(null)
+        }
       }
     } catch (error: any) {
       console.error('Error loading profile:', error)
@@ -280,6 +290,40 @@ export default function UserProfileForm({ userId, onSuccess }: UserProfileFormPr
             <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
               Ceritakan minat atau hobi Anda secara bebas. Ini akan digunakan untuk menghubungkan Anda dengan komunitas yang sesuai.
             </p>
+          </div>
+
+          {/* Badge Display */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+              Badge Saya
+            </label>
+            {badge ? (
+              <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-lg border border-indigo-200 dark:border-indigo-700">
+                {badge.gambar && (
+                  <div className="flex-shrink-0">
+                    <img
+                      src={badge.gambar}
+                      alt={badge.nama}
+                      className="w-16 h-16 object-contain"
+                    />
+                  </div>
+                )}
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    {badge.nama}
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    Badge yang sedang Anda gunakan
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 text-center">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Anda belum memiliki badge. Raih achievement untuk mendapatkan badge!
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Message */}
