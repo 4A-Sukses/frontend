@@ -5,6 +5,14 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import UserProfileForm from '@/components/UserProfileForm'
 
+const fadeInUp = {
+  animation: 'fadeInUp 0.6s ease-out forwards',
+}
+
+const fadeIn = {
+  animation: 'fadeIn 0.5s ease-out forwards',
+}
+
 export function ProfileContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -49,10 +57,10 @@ export function ProfileContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-100 to-blue-200" style={fadeIn}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-black mx-auto"></div>
+          <p className="mt-4 text-black font-black">Loading...</p>
         </div>
       </div>
     )
@@ -63,24 +71,39 @@ export function ProfileContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
+    <div className="min-h-screen bg-gradient-to-b from-blue-100 to-blue-200 py-12" style={fadeInUp}>
+      <style jsx>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+      `}</style>
       {alertMessage && (
-        <div className="max-w-4xl mx-auto px-4 mb-6">
-          <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4 flex items-start gap-3">
-            <svg className="w-6 h-6 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+        <div className="max-w-4xl mx-auto px-4 mb-6" style={fadeIn}>
+          <div className="bg-yellow-400 border-2 border-black rounded-xl p-4 flex items-start gap-3 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
             <div className="flex-1">
-              <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-1">Perhatian</h3>
-              <p className="text-sm text-blue-800 dark:text-blue-200">{alertMessage}</p>
+              <h3 className="text-sm font-black text-black mb-1">Perhatian</h3>
+              <p className="text-sm text-black">{alertMessage}</p>
             </div>
             <button
               onClick={() => setAlertMessage(null)}
-              className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200"
+              className="text-black hover:text-gray-700 font-bold"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              ✕
             </button>
           </div>
         </div>

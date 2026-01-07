@@ -165,7 +165,7 @@ export default function UserProfileModal({ userId, onClose }: UserProfileModalPr
       setFormData({
         nama: profile.nama || '',
         tanggal_lahir: profile.tanggal_lahir || '',
-        gender: profile.gender || 'Pria',
+        gender: (profile.gender || 'Pria') as Gender,
         interest: profile.interest || '',
         avatar_url: profile.avatar_url || '',
       })
@@ -196,10 +196,10 @@ export default function UserProfileModal({ userId, onClose }: UserProfileModalPr
   if (loading) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-8">
+        <div className="bg-white border-2 border-black rounded-2xl p-8 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
           <div className="flex items-center space-x-3">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-            <span className="text-gray-700 dark:text-gray-300">Loading profile...</span>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-4 border-black"></div>
+            <span className="text-black font-black">Loading profile...</span>
           </div>
         </div>
       </div>
@@ -209,11 +209,11 @@ export default function UserProfileModal({ userId, onClose }: UserProfileModalPr
   if (!profile) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={handleBackdropClick}>
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-8 max-w-md mx-4">
-          <p className="text-gray-700 dark:text-gray-300 text-center">Profile not found</p>
+        <div className="bg-white border-2 border-black rounded-2xl p-8 max-w-md mx-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+          <p className="text-black font-black text-center">Profile not found</p>
           <button
             onClick={onClose}
-            className="mt-4 w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 transition-colors"
+            className="mt-4 w-full bg-red-400 border-2 border-black text-black py-2 px-4 rounded-xl hover:bg-red-500 transition-all font-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5"
           >
             Close
           </button>
@@ -227,14 +227,14 @@ export default function UserProfileModal({ userId, onClose }: UserProfileModalPr
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
       onClick={handleBackdropClick}
     >
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white border-2 border-black rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-6 rounded-t-xl">
+        <div className="sticky top-0 bg-gradient-to-r from-purple-400 to-pink-400 border-b-2 border-black text-black p-6 rounded-t-2xl">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold">User Profile</h2>
+            <h2 className="text-2xl font-black">User Profile</h2>
             <button
               onClick={onClose}
-              className="text-white hover:text-gray-200 transition-colors p-1 rounded-lg hover:bg-white/10"
+              className="text-black hover:text-gray-700 transition-colors p-1 rounded-lg hover:bg-white/20 font-bold"
               aria-label="Close modal"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -249,13 +249,13 @@ export default function UserProfileModal({ userId, onClose }: UserProfileModalPr
           {/* Message */}
           {message && (
             <div
-              className={`rounded-md p-4 ${
+              className={`rounded-xl p-4 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] ${
                 message.type === 'error'
-                  ? 'bg-red-50 text-red-800 dark:bg-red-900 dark:text-red-200'
-                  : 'bg-green-50 text-green-800 dark:bg-green-900 dark:text-green-200'
+                  ? 'bg-red-400 text-black'
+                  : 'bg-green-400 text-black'
               }`}
             >
-              <p className="text-sm">{message.text}</p>
+              <p className="text-sm font-black">{message.text}</p>
             </div>
           )}
 
@@ -265,12 +265,12 @@ export default function UserProfileModal({ userId, onClose }: UserProfileModalPr
               <img
                 src={formData.avatar_url}
                 alt={formData.nama}
-                className="w-32 h-32 rounded-full object-cover border-4 border-indigo-200 dark:border-indigo-700 shadow-lg"
+                className="w-32 h-32 rounded-full object-cover border-4 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"
               />
             ) : (
-              <div className="w-32 h-32 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center shadow-lg">
+              <div className="w-32 h-32 rounded-full bg-yellow-400 border-4 border-black flex items-center justify-center shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
                 <svg
-                  className="w-16 h-16 text-white"
+                  className="w-16 h-16 text-black"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
@@ -284,7 +284,7 @@ export default function UserProfileModal({ userId, onClose }: UserProfileModalPr
             )}
 
             {isEditMode && (
-              <label className="cursor-pointer bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors">
+              <label className="cursor-pointer bg-pink-400 border-2 border-black text-black px-4 py-2 rounded-xl hover:bg-pink-500 transition-all font-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5">
                 <span>{uploading ? 'Uploading...' : 'Upload Avatar'}</span>
                 <input
                   type="file"
@@ -298,7 +298,7 @@ export default function UserProfileModal({ userId, onClose }: UserProfileModalPr
 
             {!isEditMode && (
               <div className="text-center">
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
+                <h3 className="text-2xl font-black text-black">
                   {profile?.nama}
                 </h3>
               </div>
@@ -311,7 +311,7 @@ export default function UserProfileModal({ userId, onClose }: UserProfileModalPr
             <div className="space-y-4">
               {/* Nama */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-black text-black mb-2">
                   Nama <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -319,7 +319,7 @@ export default function UserProfileModal({ userId, onClose }: UserProfileModalPr
                   required
                   value={formData.nama}
                   onChange={(e) => setFormData(prev => ({ ...prev, nama: e.target.value }))}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                  className="w-full px-4 py-2 border-2 border-black rounded-xl focus:ring-2 focus:ring-black focus:border-transparent bg-white text-black font-semibold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
                   placeholder="Enter your name"
                 />
               </div>
@@ -327,27 +327,27 @@ export default function UserProfileModal({ userId, onClose }: UserProfileModalPr
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Tanggal Lahir */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-black text-black mb-2">
                     Tanggal Lahir
                   </label>
                   <input
                     type="date"
                     value={formData.tanggal_lahir}
                     onChange={(e) => setFormData(prev => ({ ...prev, tanggal_lahir: e.target.value }))}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                    className="w-full px-4 py-2 border-2 border-black rounded-xl focus:ring-2 focus:ring-black focus:border-transparent bg-white text-black font-semibold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
                   />
                 </div>
 
                 {/* Gender */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-black text-black mb-2">
                     Jenis Kelamin <span className="text-red-500">*</span>
                   </label>
                   <select
                     required
                     value={formData.gender}
                     onChange={(e) => setFormData(prev => ({ ...prev, gender: e.target.value as Gender }))}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                    className="w-full px-4 py-2 border-2 border-black rounded-xl focus:ring-2 focus:ring-black focus:border-transparent bg-white text-black font-semibold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
                   >
                     <option value="Pria">Pria</option>
                     <option value="Wanita">Wanita</option>
@@ -358,17 +358,17 @@ export default function UserProfileModal({ userId, onClose }: UserProfileModalPr
 
               {/* Interest */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-black text-black mb-2">
                   Interest / Minat
                 </label>
                 <textarea
                   value={formData.interest}
                   onChange={(e) => setFormData(prev => ({ ...prev, interest: e.target.value }))}
                   placeholder="Contoh: Saya suka web development, coding, dan teknologi terbaru..."
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white resize-none"
+                  className="w-full px-4 py-3 border-2 border-black rounded-xl focus:ring-2 focus:ring-black focus:border-transparent bg-white text-black font-semibold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] resize-none"
                   rows={3}
                 />
-                <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                <p className="mt-2 text-sm font-bold text-gray-600">
                   Ceritakan minat atau hobi Anda secara bebas.
                 </p>
               </div>
@@ -462,20 +462,20 @@ export default function UserProfileModal({ userId, onClose }: UserProfileModalPr
         </div>
 
         {/* Footer */}
-        <div className="border-t border-gray-200 dark:border-gray-700 p-6 bg-gray-50 dark:bg-gray-800/50 rounded-b-xl">
+        <div className="border-t-2 border-black p-6 bg-blue-100 rounded-b-2xl">
           {isEditMode ? (
             <div className="flex gap-3">
               <button
                 onClick={handleCancel}
                 disabled={saving}
-                className="flex-1 bg-gray-600 text-white py-3 px-4 rounded-lg hover:bg-gray-700 transition-colors font-semibold shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 bg-red-400 border-2 border-black text-black py-3 px-4 rounded-xl hover:bg-red-500 transition-all font-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Batal
               </button>
               <button
                 onClick={handleSave}
                 disabled={saving || !formData.nama}
-                className="flex-1 bg-indigo-600 text-white py-3 px-4 rounded-lg hover:bg-indigo-700 transition-colors font-semibold shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 bg-teal-400 border-2 border-black text-black py-3 px-4 rounded-xl hover:bg-teal-500 transition-all font-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {saving ? 'Menyimpan...' : 'Simpan'}
               </button>
@@ -484,13 +484,13 @@ export default function UserProfileModal({ userId, onClose }: UserProfileModalPr
             <div className="flex gap-3">
               <button
                 onClick={() => setIsEditMode(true)}
-                className="flex-1 bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors font-semibold shadow-md hover:shadow-lg"
+                className="flex-1 bg-green-400 border-2 border-black text-black py-3 px-4 rounded-xl hover:bg-green-500 transition-all font-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5"
               >
                 Edit Profile
               </button>
               <button
                 onClick={onClose}
-                className="flex-1 bg-gray-600 text-white py-3 px-4 rounded-lg hover:bg-gray-700 transition-colors font-semibold shadow-md hover:shadow-lg"
+                className="flex-1 bg-gray-400 border-2 border-black text-black py-3 px-4 rounded-xl hover:bg-gray-500 transition-all font-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5"
               >
                 Tutup
               </button>

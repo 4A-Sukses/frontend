@@ -5,6 +5,11 @@ import { supabase } from '@/lib/supabase'
 import { getBadgeById } from '@/lib/badges'
 import type { UserProfile, UserProfileUpdate, Gender, Badge } from '@/types/database'
 
+const getAnimationStyle = (delay: number) => ({
+  animation: `fadeInUp 0.5s ease-out ${delay}s forwards`,
+  opacity: 0,
+})
+
 interface UserProfileFormProps {
   userId?: string
   onSuccess?: () => void
@@ -177,25 +182,37 @@ export default function UserProfileForm({ userId, onSuccess }: UserProfileFormPr
 
   return (
     <div className="max-w-2xl mx-auto p-6">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+      <style jsx>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
+      <div className="bg-white border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] rounded-2xl p-8" style={getAnimationStyle(0)}>
+        <h2 className="text-3xl font-black text-black mb-6 text-center">
           User Profile
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Avatar Upload */}
-          <div className="flex flex-col items-center space-y-4">
+          <div className="flex flex-col items-center space-y-4" style={getAnimationStyle(0.1)}>
             <div className="relative">
               {formData.avatar_url ? (
                 <img
                   src={formData.avatar_url}
                   alt="Avatar"
-                  className="w-32 h-32 rounded-full object-cover border-4 border-gray-200 dark:border-gray-700"
+                  className="w-32 h-32 rounded-full object-cover border-4 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"
                 />
               ) : (
-                <div className="w-32 h-32 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+                <div className="w-32 h-32 rounded-full bg-yellow-400 border-4 border-black flex items-center justify-center shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
                   <svg
-                    className="w-16 h-16 text-gray-400"
+                    className="w-16 h-16 text-black"
                     fill="currentColor"
                     viewBox="0 0 20 20"
                   >
@@ -209,7 +226,7 @@ export default function UserProfileForm({ userId, onSuccess }: UserProfileFormPr
               )}
             </div>
 
-            <label className="cursor-pointer bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors">
+            <label className="cursor-pointer bg-pink-400 border-2 border-black text-black px-4 py-2 rounded-xl hover:bg-pink-500 transition-all font-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5">
               <span>{uploading ? 'Uploading...' : 'Upload Avatar'}</span>
               <input
                 type="file"
@@ -222,8 +239,8 @@ export default function UserProfileForm({ userId, onSuccess }: UserProfileFormPr
           </div>
 
           {/* Nama */}
-          <div>
-            <label htmlFor="nama" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <div style={getAnimationStyle(0.2)}>
+            <label htmlFor="nama" className="block text-sm font-black text-black mb-2">
               Nama <span className="text-red-500">*</span>
             </label>
             <input
@@ -232,15 +249,15 @@ export default function UserProfileForm({ userId, onSuccess }: UserProfileFormPr
               required
               value={formData.nama}
               onChange={(e) => setFormData(prev => ({ ...prev, nama: e.target.value }))}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+              className="w-full px-4 py-2 border-2 border-black rounded-xl focus:ring-2 focus:ring-black focus:border-transparent bg-white text-black font-semibold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
               placeholder="Enter your name"
               disabled={loading}
             />
           </div>
 
           {/* Tanggal Lahir */}
-          <div>
-            <label htmlFor="tanggal_lahir" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <div style={getAnimationStyle(0.3)}>
+            <label htmlFor="tanggal_lahir" className="block text-sm font-black text-black mb-2">
               Tanggal Lahir
             </label>
             <input
@@ -248,23 +265,22 @@ export default function UserProfileForm({ userId, onSuccess }: UserProfileFormPr
               id="tanggal_lahir"
               value={formData.tanggal_lahir}
               onChange={(e) => setFormData(prev => ({ ...prev, tanggal_lahir: e.target.value }))}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+              className="w-full px-4 py-2 border-2 border-black rounded-xl focus:ring-2 focus:ring-black focus:border-transparent bg-white text-black font-semibold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
               disabled={loading}
             />
           </div>
 
           {/* Gender */}
-          <div>
-            <label htmlFor="gender" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <div style={getAnimationStyle(0.4)}>
+            <label htmlFor="gender" className="block text-sm font-black text-black mb-2">
               Jenis Kelamin <span className="text-red-500">*</span>
             </label>
             <select
               id="gender"
               required
-              
               value={formData.gender}
               onChange={(e) => setFormData(prev => ({ ...prev, gender: e.target.value as Gender }))}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+              className="w-full px-4 py-2 border-2 border-black rounded-xl focus:ring-2 focus:ring-black focus:border-transparent bg-white text-black font-semibold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
               disabled={loading}
             >
               <option value="Pria">Pria</option>
@@ -274,8 +290,8 @@ export default function UserProfileForm({ userId, onSuccess }: UserProfileFormPr
           </div>
 
           {/* Interest */}
-          <div>
-            <label htmlFor="interest" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <div style={getAnimationStyle(0.5)}>
+            <label htmlFor="interest" className="block text-sm font-black text-black mb-2">
               Interest / Minat
             </label>
             <textarea
@@ -283,22 +299,22 @@ export default function UserProfileForm({ userId, onSuccess }: UserProfileFormPr
               value={formData.interest}
               onChange={(e) => setFormData(prev => ({ ...prev, interest: e.target.value }))}
               placeholder="Contoh: Saya suka web development, coding, dan teknologi terbaru..."
-              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white resize-none"
+              className="w-full px-4 py-3 border-2 border-black rounded-xl focus:ring-2 focus:ring-black focus:border-transparent bg-white text-black font-semibold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] resize-none"
               rows={3}
               disabled={loading}
             />
-            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+            <p className="mt-2 text-sm font-bold text-gray-600">
               Ceritakan minat atau hobi Anda secara bebas. Ini akan digunakan untuk menghubungkan Anda dengan komunitas yang sesuai.
             </p>
           </div>
 
           {/* Badge Display */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+          <div style={getAnimationStyle(0.6)}>
+            <label className="block text-sm font-black text-black mb-3">
               Badge Saya
             </label>
             {badge ? (
-              <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-lg border border-indigo-200 dark:border-indigo-700">
+              <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-purple-400 to-pink-400 border-2 border-black rounded-xl shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
                 {badge.gambar && (
                   <div className="flex-shrink-0">
                     <img
@@ -309,17 +325,17 @@ export default function UserProfileForm({ userId, onSuccess }: UserProfileFormPr
                   </div>
                 )}
                 <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  <h3 className="text-lg font-black text-black">
                     {badge.nama}
                   </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  <p className="text-sm font-bold text-black mt-1">
                     Badge yang sedang Anda gunakan
                   </p>
                 </div>
               </div>
             ) : (
-              <div className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 text-center">
-                <p className="text-sm text-gray-500 dark:text-gray-400">
+              <div className="p-4 bg-yellow-400 border-2 border-black rounded-xl text-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                <p className="text-sm font-black text-black">
                   Anda belum memiliki badge. Raih achievement untuk mendapatkan badge!
                 </p>
               </div>
@@ -329,29 +345,30 @@ export default function UserProfileForm({ userId, onSuccess }: UserProfileFormPr
           {/* Message */}
           {message && (
             <div
-              className={`rounded-md p-4 ${
+              style={getAnimationStyle(0.7)}
+              className={`rounded-xl p-4 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] ${
                 message.type === 'error'
-                  ? 'bg-red-50 text-red-800 dark:bg-red-900 dark:text-red-200'
-                  : 'bg-green-50 text-green-800 dark:bg-green-900 dark:text-green-200'
+                  ? 'bg-red-400 text-black'
+                  : 'bg-green-400 text-black'
               }`}
             >
-              <p className="text-sm">{message.text}</p>
+              <p className="text-sm font-black">{message.text}</p>
             </div>
           )}
 
           {/* Submit & Cancel Button */}
-          <div className="flex gap-4">
+          <div className="flex gap-4" style={getAnimationStyle(0.8)}>
             <button
               type="submit"
               disabled={loading || uploading}
-              className="flex-1 bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold"
+              className="flex-1 bg-teal-400 border-2 border-black text-black py-2 px-4 rounded-xl hover:bg-teal-500 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5"
             >
               {loading ? 'Menyimpan...' : profile ? 'Perbarui Profil' : 'Buat Profil'}
             </button>
             <button
               type="button"
               onClick={() => window.location.href = '/'}
-              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors font-semibold"
+              className="px-4 py-2 border-2 border-black rounded-xl text-black hover:bg-gray-200 transition-all font-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5"
             >
               Batal
             </button>
