@@ -1,4 +1,3 @@
-
 import type { ActivityStats } from "./activityTracker";
 
 export interface AIInsight {
