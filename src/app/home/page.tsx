@@ -13,6 +13,7 @@ export default function HomePage() {
   const [openFAQ, setOpenFAQ] = useState<number | null>(null)
   const [hoveredCard, setHoveredCard] = useState<number | null>(null)
   const [visibleCards, setVisibleCards] = useState<Set<number>>(new Set())
+  const [skateVisible, setSkateVisible] = useState(false)
 
   // Animation styles
   const getCardAnimation = (delay: number, isVisible: boolean) => ({
@@ -41,6 +42,22 @@ export default function HomePage() {
       document.querySelectorAll('[id^="feature-card-"]').forEach((card) => {
         observer.observe(card)
       })
+
+      // Observe skate character
+      const skateElement = document.getElementById('skate-character')
+      if (skateElement) {
+        const skateObserver = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                setSkateVisible(true)
+              }
+            })
+          },
+          { threshold: 0.2 }
+        )
+        skateObserver.observe(skateElement)
+      }
     }, 100)
 
     return () => {
@@ -133,9 +150,8 @@ export default function HomePage() {
               {[...Array(100)].map((_, i) => (
                 <div
                   key={`row1-${i}`}
-                  className={`flex-shrink-0 w-7 sm:w-9 md:w-12 h-7 sm:h-9 md:h-12 ${
-                    i % 2 === 0 ? 'bg-black' : 'bg-white'
-                  }`}
+                  className={`flex-shrink-0 w-7 sm:w-9 md:w-12 h-7 sm:h-9 md:h-12 ${i % 2 === 0 ? 'bg-black' : 'bg-white'
+                    }`}
                 />
               ))}
             </div>
@@ -144,9 +160,8 @@ export default function HomePage() {
               {[...Array(100)].map((_, i) => (
                 <div
                   key={`row2-${i}`}
-                  className={`flex-shrink-0 w-7 sm:w-9 md:w-12 h-7 sm:h-9 md:h-12 ${
-                    i % 2 === 0 ? 'bg-white' : 'bg-black'
-                  }`}
+                  className={`flex-shrink-0 w-7 sm:w-9 md:w-12 h-7 sm:h-9 md:h-12 ${i % 2 === 0 ? 'bg-white' : 'bg-black'
+                    }`}
                 />
               ))}
             </div>
@@ -155,9 +170,8 @@ export default function HomePage() {
               {[...Array(100)].map((_, i) => (
                 <div
                   key={`row3-${i}`}
-                  className={`flex-shrink-0 w-7 sm:w-9 md:w-12 h-7 sm:h-9 md:h-12 ${
-                    i % 2 === 0 ? 'bg-black' : 'bg-white'
-                  }`}
+                  className={`flex-shrink-0 w-7 sm:w-9 md:w-12 h-7 sm:h-9 md:h-12 ${i % 2 === 0 ? 'bg-black' : 'bg-white'
+                    }`}
                 />
               ))}
             </div>
@@ -185,6 +199,20 @@ export default function HomePage() {
                 transform: scale(1.05) translateY(-8px);
               }
             }
+            @keyframes float {
+              0%, 100% {
+                transform: translateY(0px);
+              }
+              50% {
+                transform: translateY(-8px);
+              }
+            }
+            .animate-float {
+              animation: float 3s ease-in-out infinite;
+            }
+            .animate-float:hover {
+              animation: none;
+            }
           `}</style>
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             {/* Epic Features Section */}
@@ -203,100 +231,166 @@ export default function HomePage() {
             {/* Features Grid - Bento Grid Layout */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-20 max-w-5xl mx-auto">
               {/* Feature 1 - AI Task Integrator */}
-              <div className="relative group" style={{ paddingBottom: '12px', paddingRight: '12px' }}>
-                {/* Stacked layers effect - positioned behind */}
-                <div className="absolute top-[4px] left-[4px] right-[-4px] bottom-[-4px] bg-pink-200 border-2 border-black -z-10 transition-all duration-300 group-hover:translate-x-2 group-hover:translate-y-2"></div>
-                <div className="absolute top-[8px] left-[8px] right-[-8px] bottom-[-8px] bg-pink-100 border-2 border-black -z-20 transition-all duration-300 group-hover:translate-x-4 group-hover:translate-y-4"></div>
+              <div className="relative group" style={{ marginLeft: '12px', marginBottom: '16px' }}>
+                {/* Decorative colored bar on left - hidden by default, show on hover */}
+                <div className="absolute left-[-12px] top-0 bottom-[-16px] w-3 bg-emerald-400 z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+                {/* Multiple stacked layers effect - always visible, move more on hover */}
+                <div className="absolute inset-0 bg-blue-500 border-[3px] border-black z-0 translate-x-3 translate-y-3 group-hover:translate-x-4 group-hover:translate-y-4 transition-all duration-300" style={{ transitionDelay: '0ms' }}></div>
+                <div className="absolute inset-0 bg-blue-400 border-[3px] border-black z-[1] translate-x-1.5 translate-y-1.5 group-hover:translate-x-2 group-hover:translate-y-2 transition-all duration-300" style={{ transitionDelay: '50ms' }}></div>
 
                 <div
                   id="feature-card-0"
-                  className="relative bg-pink-300 border-2 border-black p-8 transition-all duration-300 hover:shadow-[12px_12px_0_0_rgba(0,0,0,1)] hover:-translate-y-2 z-10"
-                  style={getCardAnimation(0.1, visibleCards.has(0))}
+                  className="relative bg-blue-300 border-[3px] border-black p-8 transition-all duration-300 group-hover:-translate-x-1 group-hover:-translate-y-1 z-10 overflow-visible"
+                  style={{ ...getCardAnimation(0.1, visibleCards.has(0)), transitionDelay: '100ms' }}
                   onMouseEnter={() => setHoveredCard(0)}
                   onMouseLeave={() => setHoveredCard(null)}
                 >
-                <div className="font-bold tracking-wide mb-4 flex items-center gap-2">
-                  <span className="text-2xl">🤖</span>
-                  <span>AI TASK INTEGRATOR</span>
-                </div>
-                <p className="text-sm leading-relaxed mb-12">
-                  Let our friendly AI plan your day! It organizes homework, study time, and play into a fun schedule so you never miss a beat.
-                </p>
-                <button className="absolute bottom-4 left-4 right-4 border-2 border-black py-2 text-sm font-bold hover:bg-black hover:text-white transition-colors bg-white">
-                  LET&apos;S GO
-                </button>
+                  {/* Curved "LEARN MORE" text in corner - hidden by default, show on hover */}
+                  <div className="absolute top-2 right-2 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <svg width="80" height="80" viewBox="0 0 80 80" style={{ overflow: 'visible' }}>
+                      <defs>
+                        <path id="curve1" d="M 70,40 A 30,30 0 0,0 40,10" fill="none" />
+                      </defs>
+                      <text style={{ fontSize: '9px', fontWeight: 900, fill: 'black', letterSpacing: '0.05em' }}>
+                        <textPath xlinkHref="#curve1">LEARN MORE</textPath>
+                      </text>
+                    </svg>
+                  </div>
+
+                  <div className="font-black tracking-wide mb-4 flex items-center gap-3 text-lg">
+                    <span className="text-xl">→</span>
+                    <span>AI TASK INTEGRATOR</span>
+                  </div>
+                  <p className="text-sm leading-relaxed mb-14 text-black/80">
+                    Let our friendly AI plan your day! It organizes homework, study time, and play into a fun schedule so you never miss a beat.
+                  </p>
+                  <button className="absolute bottom-6 left-6 right-6 border-[3px] border-black py-3 text-sm font-black hover:bg-black hover:text-white transition-colors bg-white tracking-wider">
+                    LET&apos;S GO
+                  </button>
                 </div>
               </div>
 
               {/* Feature 2 - AI Adaptive Material */}
-              <div className="relative group" style={{ paddingBottom: '12px', paddingRight: '12px' }}>
-                {/* Stacked layers effect */}
-                <div className="absolute top-[4px] left-[4px] right-[-4px] bottom-[-4px] bg-teal-200 border-2 border-black -z-10 transition-all duration-300 group-hover:translate-x-2 group-hover:translate-y-2"></div>
-                <div className="absolute top-[8px] left-[8px] right-[-8px] bottom-[-8px] bg-teal-100 border-2 border-black -z-20 transition-all duration-300 group-hover:translate-x-4 group-hover:translate-y-4"></div>
+              <div className="relative group" style={{ marginLeft: '12px', marginBottom: '16px' }}>
+                {/* Decorative colored bar on left - hidden by default, show on hover */}
+                <div className="absolute left-[-12px] top-0 bottom-[-16px] w-3 bg-pink-400 z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+                {/* Multiple stacked layers effect - always visible, move more on hover */}
+                <div className="absolute inset-0 bg-teal-500 border-[3px] border-black z-0 translate-x-3 translate-y-3 group-hover:translate-x-4 group-hover:translate-y-4 transition-all duration-300" style={{ transitionDelay: '0ms' }}></div>
+                <div className="absolute inset-0 bg-teal-400 border-[3px] border-black z-[1] translate-x-1.5 translate-y-1.5 group-hover:translate-x-2 group-hover:translate-y-2 transition-all duration-300" style={{ transitionDelay: '50ms' }}></div>
 
                 <div
                   id="feature-card-1"
-                  className="relative bg-teal-300 border-2 border-black p-8 transition-all duration-300 hover:shadow-[12px_12px_0_0_rgba(0,0,0,1)] hover:-translate-y-2 z-10"
-                  style={getCardAnimation(0.2, visibleCards.has(1))}
+                  className="relative bg-teal-300 border-[3px] border-black p-8 transition-all duration-300 group-hover:-translate-x-1 group-hover:-translate-y-1 z-10 overflow-visible"
+                  style={{ ...getCardAnimation(0.2, visibleCards.has(1)), transitionDelay: '100ms' }}
                   onMouseEnter={() => setHoveredCard(1)}
                   onMouseLeave={() => setHoveredCard(null)}
                 >
-                  <div className="font-bold tracking-wide mb-4 flex items-center gap-2">
-                    <span className="text-2xl">📖</span>
+                  {/* Curved "LEARN MORE" text in corner - hidden by default, show on hover */}
+                  <div className="absolute top-2 right-2 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <svg width="80" height="80" viewBox="0 0 80 80" style={{ overflow: 'visible' }}>
+                      <defs>
+                        <path id="curve2" d="M 70,40 A 30,30 0 0,0 40,10" fill="none" />
+                      </defs>
+                      <text style={{ fontSize: '9px', fontWeight: 900, fill: 'black', letterSpacing: '0.05em' }}>
+                        <textPath xlinkHref="#curve2">LEARN MORE</textPath>
+                      </text>
+                    </svg>
+                  </div>
+
+                  <div className="font-black tracking-wide mb-4 flex items-center gap-3 text-lg">
+                    <span className="text-xl">→</span>
                     <span>AI ADAPTIVE MATERIAL</span>
                   </div>
-                  <p className="text-sm leading-relaxed mb-12">
-                    Lessons that magically change just for you! If it&apos;s too hard, we make it simpler; if it&apos;s too easy, get ready for a challenge.
+                  <p className="text-sm leading-relaxed mb-14 text-black/80">
+                      Lessons that magically change just for you! If it&apos;s too hard, we make it simpler; if it&apos;s too easy, get ready for a challenge.
                   </p>
-                  <button className="absolute bottom-4 left-4 right-4 border-2 border-black py-2 text-sm font-bold hover:bg-black hover:text-white transition-colors bg-white">
+                  <button className="absolute bottom-6 left-6 right-6 border-[3px] border-black py-3 text-sm font-black hover:bg-black hover:text-white transition-colors bg-white tracking-wider">
                     LET&apos;S GO
                   </button>
                 </div>
               </div>
 
               {/* Feature 3 - AI Multi-Source */}
-              <div className="relative group" style={{ paddingBottom: '12px', paddingRight: '12px' }}>
-                {/* Stacked layers effect */}
-                <div className="absolute top-[4px] left-[4px] right-[-4px] bottom-[-4px] bg-yellow-200 border-2 border-black -z-10 transition-all duration-300 group-hover:translate-x-2 group-hover:translate-y-2"></div>
-                <div className="absolute top-[8px] left-[8px] right-[-8px] bottom-[-8px] bg-yellow-100 border-2 border-black -z-20 transition-all duration-300 group-hover:translate-x-4 group-hover:translate-y-4"></div>
+              <div className="relative group" style={{ marginLeft: '12px', marginBottom: '16px' }}>
+                {/* Decorative colored bar on left - hidden by default, show on hover */}
+                <div className="absolute left-[-12px] top-0 bottom-[-16px] w-3 bg-orange-400 z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+                {/* Multiple stacked layers effect - always visible, move more on hover */}
+                <div className="absolute inset-0 bg-yellow-500 border-[3px] border-black z-0 translate-x-3 translate-y-3 group-hover:translate-x-4 group-hover:translate-y-4 transition-all duration-300" style={{ transitionDelay: '0ms' }}></div>
+                <div className="absolute inset-0 bg-yellow-400 border-[3px] border-black z-[1] translate-x-1.5 translate-y-1.5 group-hover:translate-x-2 group-hover:translate-y-2 transition-all duration-300" style={{ transitionDelay: '50ms' }}></div>
 
                 <div
                   id="feature-card-2"
-                  className="relative bg-yellow-300 border-2 border-black p-8 transition-all duration-300 hover:shadow-[12px_12px_0_0_rgba(0,0,0,1)] hover:-translate-y-2 z-10"
-                  style={getCardAnimation(0.3, visibleCards.has(2))}
+                  className="relative bg-yellow-300 border-[3px] border-black p-8 transition-all duration-300 group-hover:-translate-x-1 group-hover:-translate-y-1 z-10 overflow-visible"
+                  style={{ ...getCardAnimation(0.3, visibleCards.has(2)), transitionDelay: '100ms' }}
                   onMouseEnter={() => setHoveredCard(2)}
                   onMouseLeave={() => setHoveredCard(null)}
                 >
-                  <div className="font-bold tracking-wide mb-4 flex items-center gap-2">
-                    <span className="text-2xl">🔗</span>
+                  {/* Curved "LEARN MORE" text in corner - hidden by default, show on hover */}
+                  <div className="absolute top-2 right-2 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <svg width="80" height="80" viewBox="0 0 80 80" style={{ overflow: 'visible' }}>
+                      <defs>
+                        <path id="curve3" d="M 70,40 A 30,30 0 0,0 40,10" fill="none" />
+                      </defs>
+                      <text style={{ fontSize: '9px', fontWeight: 900, fill: 'black', letterSpacing: '0.05em' }}>
+                        <textPath xlinkHref="#curve3">LEARN MORE</textPath>
+                      </text>
+                    </svg>
+                  </div>
+
+                  <div className="font-black tracking-wide mb-4 flex items-center gap-3 text-lg">
+                    <span className="text-xl">→</span>
                     <span>MULTI-SOURCE KNOWLEDGE</span>
                   </div>
-                  <p className="text-sm leading-relaxed">
+                  <p className="text-sm leading-relaxed mb-14 text-black/80">
                     Connect the dots! See how math links to music and science links to stories in a giant, interactive web of fun facts.
                   </p>
+                  <button className="absolute bottom-6 left-6 right-6 border-[3px] border-black py-3 text-sm font-black hover:bg-black hover:text-white transition-colors bg-white tracking-wider">
+                     LET&apos;S GO
+                  </button>
                 </div>
               </div>
 
               {/* Feature 4 - Peer Connect */}
-              <div className="relative group" style={{ paddingBottom: '12px', paddingRight: '12px' }}>
-                {/* Stacked layers effect */}
-                <div className="absolute top-[4px] left-[4px] right-[-4px] bottom-[-4px] bg-green-200 border-2 border-black -z-10 transition-all duration-300 group-hover:translate-x-2 group-hover:translate-y-2"></div>
-                <div className="absolute top-[8px] left-[8px] right-[-8px] bottom-[-8px] bg-green-100 border-2 border-black -z-20 transition-all duration-300 group-hover:translate-x-4 group-hover:translate-y-4"></div>
+              <div className="relative group" style={{ marginLeft: '12px', marginBottom: '16px' }}>
+                {/* Decorative colored bar on left - hidden by default, show on hover */}
+                <div className="absolute left-[-12px] top-0 bottom-[-16px] w-3 bg-purple-400 z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+                {/* Multiple stacked layers effect - always visible, move more on hover */}
+                <div className="absolute inset-0 bg-green-500 border-[3px] border-black z-0 translate-x-3 translate-y-3 group-hover:translate-x-4 group-hover:translate-y-4 transition-all duration-300" style={{ transitionDelay: '0ms' }}></div>
+                <div className="absolute inset-0 bg-green-400 border-[3px] border-black z-[1] translate-x-1.5 translate-y-1.5 group-hover:translate-x-2 group-hover:translate-y-2 transition-all duration-300" style={{ transitionDelay: '50ms' }}></div>
 
                 <div
                   id="feature-card-3"
-                  className="relative bg-green-300 border-2 border-black p-8 transition-all duration-300 hover:shadow-[12px_12px_0_0_rgba(0,0,0,1)] hover:-translate-y-2 z-10"
-                  style={getCardAnimation(0.4, visibleCards.has(3))}
+                  className="relative bg-green-300 border-[3px] border-black p-8 transition-all duration-300 group-hover:-translate-x-1 group-hover:-translate-y-1 z-10 overflow-visible"
+                  style={{ ...getCardAnimation(0.4, visibleCards.has(3)), transitionDelay: '100ms' }}
                   onMouseEnter={() => setHoveredCard(3)}
                   onMouseLeave={() => setHoveredCard(null)}
                 >
-                  <div className="font-bold tracking-wide mb-4 flex items-center gap-2">
-                    <span className="text-2xl">👥</span>
+                  {/* Curved "LEARN MORE" text in corner - hidden by default, show on hover */}
+                  <div className="absolute top-2 right-2 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <svg width="80" height="80" viewBox="0 0 80 80" style={{ overflow: 'visible' }}>
+                      <defs>
+                        <path id="curve4" d="M 70,40 A 30,30 0 0,0 40,10" fill="none" />
+                      </defs>
+                      <text style={{ fontSize: '9px', fontWeight: 900, fill: 'black', letterSpacing: '0.05em' }}>
+                        <textPath xlinkHref="#curve4">LEARN MORE</textPath>
+                      </text>
+                    </svg>
+                  </div>
+
+                  <div className="font-black tracking-wide mb-4 flex items-center gap-3 text-lg">
+                    <span className="text-xl">→</span>
                     <span>PEER CONNECT & GROUPS</span>
                   </div>
-                  <p className="text-sm leading-relaxed">
+                  <p className="text-sm leading-relaxed mb-14 text-black/80">
                     Join clubs, video call friends to study together, and make new buddies who love what you love in a safe space!
                   </p>
+                  <button className="absolute bottom-6 left-6 right-6 border-[3px] border-black py-3 text-sm font-black hover:bg-black hover:text-white transition-colors bg-white tracking-wider">
+                     LET&apos;S GO
+                  </button>
                 </div>
               </div>
             </div>

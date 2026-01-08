@@ -82,60 +82,14 @@ export default function MultiSourceKnowledgePage() {
           <h1 className="text-5xl md:text-6xl font-black text-black mb-4">
             Multi-Source Knowledge
           </h1>
-          
+
           {/* Description */}
           <p className="text-gray-700 text-lg max-w-2xl leading-relaxed">
             Connect the dots! See how math links to music and science links to stories in a giant, interactive web of fun facts.
           </p>
         </div>
 
-        {/* Info Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          {/* Card 1 */}
-          <div className="relative bg-white rounded-2xl p-6 border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
-            <div className="flex flex-col items-center text-center">
-              <div className="w-14 h-14 bg-pink-400 rounded-full flex items-center justify-center border-2 border-black mb-4">
-                <span className="text-2xl">📚</span>
-              </div>
-              <h3 className="text-lg font-black text-black mb-2">
-                Multiple Sources
-              </h3>
-              <p className="text-sm text-gray-600">
-                Access materials from various sources all in one place
-              </p>
-            </div>
-          </div>
-
-          {/* Card 2 */}
-          <div className="relative bg-white rounded-2xl p-6 border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
-            <div className="flex flex-col items-center text-center">
-              <div className="w-14 h-14 bg-teal-400 rounded-full flex items-center justify-center border-2 border-black mb-4">
-                <span className="text-2xl">🔍</span>
-              </div>
-              <h3 className="text-lg font-black text-black mb-2">
-                Smart Search
-              </h3>
-              <p className="text-sm text-gray-600">
-                Find exactly what you need with powerful search
-              </p>
-            </div>
-          </div>
-
-          {/* Card 3 */}
-          <div className="relative bg-white rounded-2xl p-6 border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
-            <div className="flex flex-col items-center text-center">
-              <div className="w-14 h-14 bg-yellow-400 rounded-full flex items-center justify-center border-2 border-black mb-4">
-                <span className="text-2xl">🎯</span>
-              </div>
-              <h3 className="text-lg font-black text-black mb-2">
-                Organized Learning
-              </h3>
-              <p className="text-sm text-gray-600">
-                Keep your study materials perfectly organized
-              </p>
-            </div>
-          </div>
-        </div>
+       
 
         {/* Material List Component */}
         <div className="bg-white rounded-2xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] p-6 md:p-8">

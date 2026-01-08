@@ -27,6 +27,18 @@ export default function UserProfileModal({ userId, onClose }: UserProfileModalPr
     avatar_url: '',
   })
 
+  // State for email and password change
+  const [userEmail, setUserEmail] = useState('')
+  const [emailFormData, setEmailFormData] = useState({
+    newEmail: '',
+  })
+  const [passwordFormData, setPasswordFormData] = useState({
+    newPassword: '',
+    confirmPassword: '',
+  })
+  const [showPasswordSection, setShowPasswordSection] = useState(false)
+  const [showEmailSection, setShowEmailSection] = useState(false)
+
   useEffect(() => {
     loadProfile()
 
@@ -77,6 +89,19 @@ export default function UserProfileModal({ userId, onClose }: UserProfileModalPr
       setLoading(false)
     }
   }
+
+  // Load current user email
+  const loadUserEmail = async () => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user?.email) {
+      setUserEmail(user.email)
+      setEmailFormData({ newEmail: user.email })
+    }
+  }
+
+  useEffect(() => {
+    loadUserEmail()
+  }, [])
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     try {
@@ -159,6 +184,79 @@ export default function UserProfileModal({ userId, onClose }: UserProfileModalPr
     }
   }
 
+  const handleEmailChange = async () => {
+    try {
+      setSaving(true)
+      setMessage(null)
+
+      if (!emailFormData.newEmail || emailFormData.newEmail === userEmail) {
+        setMessage({ type: 'error', text: 'Please enter a new email address' })
+        return
+      }
+
+      const { error } = await supabase.auth.updateUser({
+        email: emailFormData.newEmail
+      })
+
+      if (error) throw error
+
+      setMessage({
+        type: 'success',
+        text: 'Email update request sent! Please check your new email to confirm.'
+      })
+      setShowEmailSection(false)
+    } catch (error: any) {
+      setMessage({
+        type: 'error',
+        text: error.message || 'Failed to update email'
+      })
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handlePasswordChange = async () => {
+    try {
+      setSaving(true)
+      setMessage(null)
+
+      if (!passwordFormData.newPassword) {
+        setMessage({ type: 'error', text: 'Please enter a new password' })
+        return
+      }
+
+      if (passwordFormData.newPassword.length < 6) {
+        setMessage({ type: 'error', text: 'Password must be at least 6 characters' })
+        return
+      }
+
+      if (passwordFormData.newPassword !== passwordFormData.confirmPassword) {
+        setMessage({ type: 'error', text: 'Passwords do not match' })
+        return
+      }
+
+      const { error } = await supabase.auth.updateUser({
+        password: passwordFormData.newPassword
+      })
+
+      if (error) throw error
+
+      setMessage({
+        type: 'success',
+        text: 'Password updated successfully!'
+      })
+      setPasswordFormData({ newPassword: '', confirmPassword: '' })
+      setShowPasswordSection(false)
+    } catch (error: any) {
+      setMessage({
+        type: 'error',
+        text: error.message || 'Failed to update password'
+      })
+    } finally {
+      setSaving(false)
+    }
+  }
+
   const handleCancel = () => {
     // Reset form data to original profile data
     if (profile) {
@@ -170,6 +268,10 @@ export default function UserProfileModal({ userId, onClose }: UserProfileModalPr
         avatar_url: profile.avatar_url || '',
       })
     }
+    setEmailFormData({ newEmail: userEmail })
+    setPasswordFormData({ newPassword: '', confirmPassword: '' })
+    setShowEmailSection(false)
+    setShowPasswordSection(false)
     setIsEditMode(false)
     setMessage(null)
   }
