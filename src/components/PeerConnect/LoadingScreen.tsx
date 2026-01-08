@@ -29,63 +29,61 @@ export default function LoadingScreen({
   const { title, desc } = getStepMessage()
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 max-w-lg mx-auto">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-100 to-blue-200 p-4">
+      <div className="bg-white rounded-2xl border-2 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-8 max-w-lg mx-auto">
         {/* Icon Animation */}
         <div className="flex justify-center mb-6">
           {categorizationStep === 3 ? (
-            <div className="w-20 h-20 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center animate-bounce">
-              <svg className="w-10 h-10 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            <div className="w-20 h-20 bg-green-400 rounded-full border-2 border-black flex items-center justify-center animate-bounce shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+              <svg className="w-10 h-10 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
               </svg>
             </div>
           ) : (
-            <div className="w-20 h-20 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-3 border-blue-600"></div>
+            <div className="w-20 h-20 bg-yellow-300 rounded-full border-2 border-black flex items-center justify-center shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-black"></div>
             </div>
           )}
         </div>
 
         {/* Title */}
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 text-center">
+        <h2 className="text-2xl font-black text-black mb-2 text-center">
           {title}
         </h2>
 
         {/* Description */}
-        <p className="text-gray-600 dark:text-gray-400 mb-6 text-center">
+        <p className="text-gray-700 font-semibold mb-6 text-center">
           {desc}
         </p>
 
         {/* Progress Steps */}
         <div className="space-y-3 mb-6">
           {[
-            { step: 1, label: 'Analisis Interest', icon: '🔍' },
-            { step: 2, label: 'AI Processing', icon: '🤖' },
-            { step: 3, label: 'Kategori Terdeteksi', icon: '✨' },
-            { step: 4, label: 'Join Community', icon: '👥' }
-          ].map(({ step, label, icon }) => (
+            { step: 1, label: 'Analisis Interest', icon: '🔍', color: 'bg-pink-400' },
+            { step: 2, label: 'AI Processing', icon: '🤖', color: 'bg-teal-400' },
+            { step: 3, label: 'Kategori Terdeteksi', icon: '✨', color: 'bg-yellow-400' },
+            { step: 4, label: 'Join Community', icon: '👥', color: 'bg-green-400' }
+          ].map(({ step, label, icon, color }) => (
             <div key={step} className="flex items-center gap-3">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm ${
-                categorizationStep >= step
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 dark:bg-gray-700 text-gray-400'
-              }`}>
+              <div className={`w-10 h-10 rounded-lg border-2 border-black flex items-center justify-center text-sm font-black ${categorizationStep >= step
+                  ? `${color} shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]`
+                  : 'bg-gray-100 text-gray-400'
+                }`}>
                 {categorizationStep > step ? '✓' : icon}
               </div>
               <div className="flex-1">
-                <div className={`text-sm font-medium ${
-                  categorizationStep >= step
-                    ? 'text-gray-900 dark:text-white'
-                    : 'text-gray-400 dark:text-gray-500'
-                }`}>
+                <div className={`text-sm font-bold ${categorizationStep >= step
+                    ? 'text-black'
+                    : 'text-gray-400'
+                  }`}>
                   {label}
                 </div>
               </div>
               {categorizationStep === step && (
                 <div className="flex gap-1">
-                  <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"></div>
-                  <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                  <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                  <div className="w-2 h-2 bg-black rounded-full animate-bounce"></div>
+                  <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                  <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                 </div>
               )}
             </div>
@@ -93,16 +91,16 @@ export default function LoadingScreen({
         </div>
 
         {/* Interest Box */}
-        <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-700 dark:to-gray-600 rounded-lg border border-blue-200 dark:border-gray-600">
-          <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Your Interest:</p>
-          <p className="text-sm font-semibold text-gray-900 dark:text-white">
+        <div className="p-4 bg-blue-100 rounded-xl border-2 border-black">
+          <p className="text-xs text-gray-700 font-bold mb-1">Your Interest:</p>
+          <p className="text-sm font-black text-black">
             {userInterest}
           </p>
           {detectedCategory && (
             <>
-              <div className="my-2 border-t border-blue-200 dark:border-gray-600"></div>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">AI Category:</p>
-              <p className="text-sm font-semibold text-blue-600 dark:text-blue-400">
+              <div className="my-2 border-t-2 border-black"></div>
+              <p className="text-xs text-gray-700 font-bold mb-1">AI Category:</p>
+              <p className="text-sm font-black text-teal-600">
                 {detectedCategory}
               </p>
             </>
@@ -112,3 +110,4 @@ export default function LoadingScreen({
     </div>
   )
 }
+

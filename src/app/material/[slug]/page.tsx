@@ -12,7 +12,7 @@ export default function MaterialDetailPage() {
     const params = useParams()
     const router = useRouter()
     const searchParams = useSearchParams()
-    
+
     // Decode material ID from base64 encoded 'ref' parameter
     const encodedRef = searchParams.get('ref')
     const materialId = encodedRef ? atob(encodedRef) : null
@@ -338,92 +338,94 @@ export default function MaterialDetailPage() {
                 {/* Material Header */}
                 <div className="bg-white rounded-2xl border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] overflow-hidden mb-8">
                     <div className="bg-gradient-to-r from-blue-400 to-blue-500 px-8 py-6 border-b-2 border-black">
-                        <div className="flex items-center gap-3 mb-4">
-                            <span className={`px-4 py-1.5 rounded-full text-sm font-bold uppercase tracking-wide border-2 border-black ${material.material_type === 'video' ? 'bg-red-400 text-black' :
-                                material.material_type === 'article' ? 'bg-blue-400 text-black' :
-                                    'bg-yellow-400 text-black'
-                                }`}>
-                                {material.material_type}
-                            </span>
-                            {material.status === 'draft' && (
-                                <span className="px-3 py-1 bg-yellow-400 text-black rounded-full text-sm font-bold border-2 border-black">
-                                    Draft
-                                </span>
-                            )}
-                            {isMultiPage && (
-                                <span className="px-3 py-1 bg-white text-black rounded-full text-sm font-bold border-2 border-black">
-                                    📄 {totalPages} Halaman
-                                </span>
-                            )}
-                        </div>
-                        <h1 className="text-3xl md:text-4xl font-black text-black mb-2">
-                            {material.title}
-                        </h1>
-                        {topic && (
-                            <p className="text-black font-semibold">
-                                Topik: {topic.title}
-                            </p>
-                        )}
-                    </div>
-
-                    {/* Meta info */}
-                    <div className="px-8 py-4 bg-gray-50 border-b border-gray-200">
-                        <div className="flex flex-wrap items-center gap-6 mb-4">
-                            <Link
-                                href={currentUserId === material.created_by ? '/mentor/dashboard' : `/mentor/${material.created_by}`}
-                                className="flex items-center gap-3 hover:opacity-80 transition-opacity"
-                            >
-                                {author?.avatar_url ? (
-                                    <img src={author.avatar_url} alt={author.nama || 'Author'} className="w-10 h-10 rounded-full object-cover border-2 border-black" />
-                                ) : (
-                                    <div className="w-10 h-10 rounded-full bg-yellow-400 flex items-center justify-center text-black font-bold border-2 border-black">
-                                        {(author?.nama || 'M').charAt(0).toUpperCase()}
-                                    </div>
-                                )}
-                                <div>
-                                    <p className="font-bold text-black">
-                                        {currentUserId === material.created_by ? 'Anda' : (author?.nama || 'Mentor')}
-                                    </p>
-                                    <p className="text-sm text-black font-semibold">Penulis</p>
+                        <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <span className={`px-4 py-1.5 rounded-full text-sm font-bold uppercase tracking-wide border-2 border-black ${material.material_type === 'video' ? 'bg-red-400 text-black' :
+                                        material.material_type === 'article' ? 'bg-blue-400 text-black' :
+                                            'bg-yellow-400 text-black'
+                                        }`}>
+                                        {material.material_type}
+                                    </span>
+                                    {material.status === 'draft' && (
+                                        <span className="px-3 py-1 bg-yellow-400 text-black rounded-full text-sm font-bold border-2 border-black">
+                                            Draft
+                                        </span>
+                                    )}
+                                    {isMultiPage && (
+                                        <span className="px-3 py-1 bg-white text-black rounded-full text-sm font-bold border-2 border-black">
+                                            📄 {totalPages} Halaman
+                                        </span>
+                                    )}
                                 </div>
-                            </Link>
+                                <h1 className="text-3xl md:text-4xl font-black text-black mb-2">
+                                    {material.title}
+                                </h1>
+                                {topic && (
+                                    <p className="text-black font-semibold">
+                                        Topik: {topic.title}
+                                    </p>
+                                )}
+                            </div>
 
-                            <div className="flex items-center gap-2 text-gray-700 font-semibold">
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                                <span>{new Date(material.created_at).toLocaleDateString('id-ID', { dateStyle: 'long' })}</span>
+                            {/* Author & Date - Top Right */}
+                            <div className="flex items-center gap-4 bg-white/90 px-4 py-3 rounded-xl border-2 border-black">
+                                <Link
+                                    href={currentUserId === material.created_by ? '/mentor/dashboard' : `/mentor/${material.created_by}`}
+                                    className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+                                >
+                                    <div>
+                                        <p className="font-bold text-black text-sm">
+                                            {currentUserId === material.created_by ? 'Anda' : (author?.nama || 'Mentor')}
+                                        </p>
+                                        <p className="text-xs text-gray-600 font-semibold">Penulis</p>
+                                    </div>
+                                    {author?.avatar_url ? (
+                                        <img src={author.avatar_url} alt={author.nama || 'Author'} className="w-10 h-10 rounded-full object-cover border-2 border-black" />
+                                    ) : (
+                                        <div className="w-10 h-10 rounded-full bg-yellow-400 flex items-center justify-center text-black font-bold border-2 border-black">
+                                            {(author?.nama || 'M').charAt(0).toUpperCase()}
+                                        </div>
+                                    )}
+                                </Link>
+                                <div className="h-8 w-px bg-gray-300"></div>
+                                <div className="flex items-center gap-2 text-gray-700">
+                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    <span className="font-bold text-sm">{new Date(material.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                                </div>
                             </div>
                         </div>
+                    </div>
 
-                        {/* Translation and Audio Controls */}
+                    {/* Translation and Audio Controls */}
+                    <div className="px-8 py-4 bg-gray-50 border-b border-gray-200">
                         <div className="grid md:grid-cols-2 gap-4">
                             {/* Translation */}
-                            <div className="flex items-center gap-2">
-                                <div className="flex items-center gap-2 text-purple-600 dark:text-purple-400">
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
-                                    </svg>
-                                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Terjemahkan</span>
+                            <div className="flex items-center gap-2 bg-yellow-300 p-3 rounded-xl border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+                                <div className="flex items-center gap-2 text-black">
+                                    <span className="text-lg">🌍</span>
+                                    <span className="text-sm font-black text-black">Terjemahkan</span>
                                 </div>
                                 <input
                                     type="text"
                                     value={targetLanguage}
                                     onChange={(e) => setTargetLanguage(e.target.value)}
                                     placeholder="English, Jepang, dll"
-                                    className="flex-1 px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                                    className="flex-1 px-3 py-1.5 text-sm border-2 border-black rounded-lg bg-white text-black font-medium"
                                 />
                                 <button
                                     onClick={handleTranslate}
                                     disabled={translating || !targetLanguage.trim()}
-                                    className="px-4 py-1.5 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700 disabled:opacity-50 font-medium"
+                                    className="px-4 py-1.5 bg-green-400 text-black text-sm rounded-lg border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 transition-all disabled:opacity-50 font-black"
                                 >
                                     {translating ? '...' : 'Go'}
                                 </button>
                                 {showTranslation && (
                                     <button
                                         onClick={() => setShowTranslation(false)}
-                                        className="text-xs text-gray-500 hover:text-gray-700 underline"
+                                        className="text-xs text-black font-bold hover:underline"
                                     >
                                         Reset
                                     </button>
@@ -431,19 +433,19 @@ export default function MaterialDetailPage() {
                             </div>
 
                             {/* Audio */}
-                            <div className="flex items-center gap-2">
-                                <div className="flex items-center gap-2 text-green-600 dark:text-green-400">
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
-                                    </svg>
-                                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Dengarkan</span>
+                            <div className="flex items-center gap-2 bg-pink-300 p-3 rounded-xl border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+                                <div className="flex items-center gap-2 text-black">
+                                    <span className="text-lg">🎧</span>
+                                    <span className="text-sm font-black text-black">Dengarkan</span>
                                 </div>
                                 <div className="flex gap-1">
                                     {[0.75, 1, 1.5, 2].map((rate) => (
                                         <button
                                             key={rate}
                                             onClick={() => setSpeechRate(rate)}
-                                            className={`px-2 py-1 text-xs rounded font-medium ${speechRate === rate ? 'bg-green-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'}`}
+                                            className={`px-2 py-1 text-xs rounded-lg border-2 border-black font-bold transition-all ${speechRate === rate
+                                                ? 'bg-purple-500 text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+                                                : 'bg-white text-black hover:bg-gray-100'}`}
                                         >
                                             {rate}x
                                         </button>
@@ -451,7 +453,9 @@ export default function MaterialDetailPage() {
                                 </div>
                                 <button
                                     onClick={handleSpeak}
-                                    className={`px-4 py-1.5 rounded-lg text-sm font-medium text-white ${isSpeaking ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'}`}
+                                    className={`px-4 py-1.5 rounded-lg text-sm font-black border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 transition-all ${isSpeaking
+                                        ? 'bg-red-400 text-black'
+                                        : 'bg-purple-500 text-white'}`}
                                 >
                                     {isSpeaking ? 'Stop' : 'Putar'}
                                 </button>
@@ -464,11 +468,10 @@ export default function MaterialDetailPage() {
                         <div className="px-8 py-4 border-b border-gray-200">
                             <div className="flex flex-wrap gap-2">
                                 {material.tags.map((tag, index) => (
-                                    <span key={index} className={`px-3 py-1 text-black text-sm font-bold rounded-full border-2 border-black ${
-                                        index % 4 === 0 ? 'bg-pink-400' :
+                                    <span key={index} className={`px-3 py-1 text-black text-sm font-bold rounded-full border-2 border-black ${index % 4 === 0 ? 'bg-pink-400' :
                                         index % 4 === 1 ? 'bg-teal-400' :
-                                        index % 4 === 2 ? 'bg-yellow-400' : 'bg-green-400'
-                                    }`}>
+                                            index % 4 === 2 ? 'bg-yellow-400' : 'bg-green-400'
+                                        }`}>
                                         #{tag}
                                     </span>
                                 ))}
@@ -490,45 +493,43 @@ export default function MaterialDetailPage() {
                             onTouchMove={onTouchMove}
                             onTouchEnd={onTouchEnd}
                         >
-                            {/* Page Indicator (Top) */}
-                            {isMultiPage && (
-                                <div className="flex items-center justify-between py-3">
-                                    <button
-                                        onClick={goToPrev}
-                                        disabled={currentPageIndex === 0}
-                                        className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                                    >
-                                        <svg className="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                                        </svg>
-                                    </button>
-                                    <span className="font-bold text-black dark:text-white">
-                                        Halaman {currentPageIndex + 1} dari {totalPages}
-                                    </span>
-                                    <button
-                                        onClick={goToNext}
-                                        disabled={currentPageIndex === totalPages - 1 || !isCurrentPageQuizCompleted}
-                                        className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-                                        title={!isCurrentPageQuizCompleted ? 'Jawab quiz terlebih dahulu' : ''}
-                                    >
-                                        <svg className="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            )}
-
                             {/* Content */}
-                            <div className="max-h-[calc(100vh-200px)] overflow-y-auto">
+                            <div className="max-h-[calc(100vh-200px)] overflow-y-auto material-content-scroll">
                                 <div
                                     className="prose prose-lg max-w-none text-zinc-800 leading-relaxed material-content"
                                     dangerouslySetInnerHTML={{ __html: showTranslation ? translatedText : currentPageContent }}
                                 />
                             </div>
 
-                            {/* Navigation Section */}
+                            {/* Navigation Section - Combined Page Indicator and Dots */}
                             {isMultiPage && (
-                                <div className="py-4">
+                                <div className="py-4 space-y-3">
+                                    {/* Page Indicator with Arrows */}
+                                    <div className="flex items-center justify-center gap-6 py-2">
+                                        <button
+                                            onClick={goToPrev}
+                                            disabled={currentPageIndex === 0}
+                                            className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                                        >
+                                            <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                                            </svg>
+                                        </button>
+                                        <span className="font-bold text-black">
+                                            Halaman {currentPageIndex + 1} dari {totalPages}
+                                        </span>
+                                        <button
+                                            onClick={goToNext}
+                                            disabled={currentPageIndex === totalPages - 1 || !isCurrentPageQuizCompleted}
+                                            className="p-2 rounded-lg hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                                            title={!isCurrentPageQuizCompleted ? 'Jawab quiz terlebih dahulu' : ''}
+                                        >
+                                            <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                            </svg>
+                                        </button>
+                                    </div>
+
                                     {/* Dots Indicator */}
                                     <div className="flex justify-center gap-2">
                                         {pages.map((_, index) => {

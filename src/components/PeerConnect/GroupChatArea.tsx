@@ -44,18 +44,20 @@ export default function GroupChatArea({
   return (
     <>
       {/* Chat Header */}
-      <div className="bg-white dark:bg-gray-800 border-b dark:border-gray-700 px-6 py-4 flex items-center justify-between">
+      <div className="bg-green-300 border-b-2 border-black px-6 py-4 flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-bold text-gray-900 dark:text-white">{chatRoom.name}</h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400">{groupMembers.length} members</p>
+          <h2 className="text-lg font-black text-black">💬 {chatRoom.name}</h2>
+          <p className="text-sm text-gray-800 font-semibold">{groupMembers.length} members</p>
         </div>
       </div>
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-6 space-y-4">
         {messages.length === 0 ? (
-          <div className="text-center text-gray-500 dark:text-gray-400 mt-8">
-            <p>Belum ada pesan. Mulai percakapan!</p>
+          <div className="text-center mt-8">
+            <div className="inline-block bg-yellow-300 px-6 py-3 rounded-xl border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
+              <p className="text-black font-bold">Belum ada pesan. Mulai percakapan! 💬</p>
+            </div>
           </div>
         ) : (
           messages.map((msg) => (
@@ -72,13 +74,13 @@ export default function GroupChatArea({
       </div>
 
       {/* Input */}
-      <div className="bg-white dark:bg-gray-800 border-t dark:border-gray-700 p-4">
+      <div className="bg-white border-t-2 border-black p-4">
         <div className="flex gap-3">
           {/* Share Material Button - Only for mentors */}
           {currentUserRole === 'mentor' && (
             <button
               onClick={onOpenMaterialShare}
-              className="p-3 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-full transition-colors"
+              className="p-3 bg-purple-400 text-black border-2 border-black rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 transition-all"
               title="Share learning material"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -93,12 +95,12 @@ export default function GroupChatArea({
             onChange={(e) => onNewMessageChange(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Type a message..."
-            className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-full focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+            className="flex-1 px-4 py-3 border-2 border-black rounded-xl focus:ring-2 focus:ring-black bg-white text-black font-medium"
           />
           <button
             onClick={onSendMessage}
             disabled={!newMessage.trim()}
-            className="px-6 py-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-medium"
+            className="px-6 py-3 bg-teal-400 text-black rounded-xl border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 disabled:bg-gray-300 disabled:shadow-none disabled:cursor-not-allowed transition-all font-black"
           >
             Send
           </button>
@@ -107,3 +109,4 @@ export default function GroupChatArea({
     </>
   )
 }
+

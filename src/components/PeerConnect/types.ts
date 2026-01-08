@@ -51,6 +51,7 @@ export interface PrivateChatWithUser extends PrivateChat {
     nama: string
     avatar_url: string | null
     role?: string
+    badge_id?: number | null
   }
   lastMessage?: string
 }

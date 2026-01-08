@@ -18,7 +18,7 @@ export const loadPrivateChats = async (currentUserId: string): Promise<PrivateCh
 
           const { data: profile } = await supabase
             .from('user_profiles')
-            .select('user_id, nama, avatar_url')
+            .select('user_id, nama, avatar_url, badge_id')
             .eq('user_id', otherUserId)
             .single()
 
@@ -42,7 +42,8 @@ export const loadPrivateChats = async (currentUserId: string): Promise<PrivateCh
               user_id: profile?.user_id || otherUserId,
               nama: profile?.nama || 'Unknown',
               avatar_url: profile?.avatar_url || null,
-              role: user?.role
+              role: user?.role,
+              badge_id: profile?.badge_id || null
             },
             lastMessage: lastMsg?.message || 'No messages yet'
           } as PrivateChatWithUser

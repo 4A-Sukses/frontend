@@ -120,10 +120,10 @@ export default function PeerConnectPage() {
 
   if (initialLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-100 to-blue-200">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Memuat...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-black mx-auto mb-4"></div>
+          <p className="text-black font-bold">Memuat...</p>
         </div>
       </div>
     )
@@ -131,9 +131,9 @@ export default function PeerConnectPage() {
 
   if (!currentUser) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-100 to-blue-200">
         <div className="text-center">
-          <p className="text-gray-600 dark:text-gray-400">Loading...</p>
+          <p className="text-black font-bold">Loading...</p>
         </div>
       </div>
     )
@@ -150,7 +150,7 @@ export default function PeerConnectPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
+    <div className="min-h-screen bg-gradient-to-b from-blue-100 to-blue-200">
       {/* Top Header Bar */}
       <PeerConnectHeader currentUser={currentUser} />
 
@@ -171,7 +171,7 @@ export default function PeerConnectPage() {
         />
 
         {/* Right Side - Chat Area */}
-        <div className="flex-1 flex flex-col bg-gray-50 dark:bg-gray-900">
+        <div className="flex-1 flex flex-col bg-blue-50">
           {chatMode === 'group' && chatRoom ? (
             <GroupChatArea
               chatRoom={chatRoom}

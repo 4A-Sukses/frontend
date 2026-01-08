@@ -223,7 +223,7 @@ export default function Quiz({ materialId, pageNumber, userId, onQuizCompleted }
                     disabled={selectedAnswer === null || submitting}
                     className={`w-full py-3 rounded-xl font-black transition-all border-2 border-black ${selectedAnswer === null
                         ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                        : 'bg-blue-500 text-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5'
+                        : 'bg-[#62beaf] text-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5'
                         }`}
                 >
                     {submitting ? (

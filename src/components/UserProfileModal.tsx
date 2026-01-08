@@ -249,11 +249,10 @@ export default function UserProfileModal({ userId, onClose }: UserProfileModalPr
           {/* Message */}
           {message && (
             <div
-              className={`rounded-xl p-4 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] ${
-                message.type === 'error'
-                  ? 'bg-red-400 text-black'
-                  : 'bg-green-400 text-black'
-              }`}
+              className={`rounded-xl p-4 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] ${message.type === 'error'
+                ? 'bg-red-400 text-black'
+                : 'bg-green-400 text-black'
+                }`}
             >
               <p className="text-sm font-black">{message.text}</p>
             </div>
@@ -379,9 +378,9 @@ export default function UserProfileModal({ userId, onClose }: UserProfileModalPr
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Tanggal Lahir */}
                 {profile?.tanggal_lahir && (
-                  <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Tanggal Lahir</p>
-                    <p className="text-gray-900 dark:text-white font-medium">
+                  <div className="bg-white border-2 border-black rounded-xl p-4 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                    <p className="text-sm font-black text-black mb-1">Tanggal Lahir</p>
+                    <p className="text-black font-semibold">
                       {new Date(profile.tanggal_lahir).toLocaleDateString('id-ID', {
                         day: 'numeric',
                         month: 'long',
@@ -392,17 +391,17 @@ export default function UserProfileModal({ userId, onClose }: UserProfileModalPr
                 )}
 
                 {/* Gender */}
-                <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Jenis Kelamin</p>
-                  <p className="text-gray-900 dark:text-white font-medium">{profile?.gender}</p>
+                <div className="bg-white border-2 border-black rounded-xl p-4 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                  <p className="text-sm font-black text-black mb-1">Jenis Kelamin</p>
+                  <p className="text-black font-semibold">{profile?.gender}</p>
                 </div>
               </div>
 
               {/* Interest */}
               {profile?.interest && (
-                <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-2 font-medium">Interest / Minat</p>
-                  <p className="text-gray-900 dark:text-white leading-relaxed">
+                <div className="bg-white border-2 border-black rounded-xl p-4 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                  <p className="text-sm font-black text-black mb-2">Interest / Minat</p>
+                  <p className="text-black font-medium leading-relaxed">
                     {profile.interest}
                   </p>
                 </div>
@@ -412,11 +411,11 @@ export default function UserProfileModal({ userId, onClose }: UserProfileModalPr
 
           {/* Badge Display */}
           <div>
-            <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+            <h4 className="text-lg font-black text-black mb-3">
               Badge
             </h4>
             {badge ? (
-              <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-lg border-2 border-indigo-200 dark:border-indigo-700">
+              <div className="flex items-center gap-4 p-4 bg-white border-2 border-black rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
                 {badge.gambar && (
                   <div className="flex-shrink-0">
                     <img
@@ -427,18 +426,18 @@ export default function UserProfileModal({ userId, onClose }: UserProfileModalPr
                   </div>
                 )}
                 <div className="flex-1">
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                  <h3 className="text-xl font-black text-black">
                     {badge.nama}
                   </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  <p className="text-sm font-semibold text-gray-700 mt-1">
                     Badge yang sedang digunakan
                   </p>
                 </div>
               </div>
             ) : (
-              <div className="p-6 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 text-center">
+              <div className="p-6 bg-white border-2 border-black rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] text-center">
                 <svg
-                  className="w-12 h-12 text-gray-400 mx-auto mb-2"
+                  className="w-12 h-12 text-gray-500 mx-auto mb-2"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -450,10 +449,10 @@ export default function UserProfileModal({ userId, onClose }: UserProfileModalPr
                     d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
                   />
                 </svg>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
+                <p className="text-sm font-bold text-gray-700">
                   Belum memiliki badge
                 </p>
-                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                <p className="text-xs font-semibold text-gray-600 mt-1">
                   Raih achievement untuk mendapatkan badge!
                 </p>
               </div>

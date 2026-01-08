@@ -262,21 +262,21 @@ export default function MaterialDetailModal({ material, onClose }: MaterialDetai
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-6 flex justify-between items-start">
+    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[60] p-4">
+      <div className="bg-white rounded-xl border-2 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="sticky top-0 bg-gradient-to-r from-teal-300 to-teal-400 border-b-2 border-black p-6 flex justify-between items-start">
           <div className="flex-1 pr-4">
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-12 h-12 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center">
-                <span className="text-indigo-600 dark:text-indigo-400 font-semibold">
+              <div className="w-12 h-12 rounded-xl bg-white border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center">
+                <span className="text-black font-black">
                   {material.material_type.substring(0, 3).toUpperCase()}
                 </span>
               </div>
               <div>
-                <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                <span className="inline-block px-2 py-1 bg-yellow-300 border border-black text-xs font-bold text-black uppercase tracking-wide rounded">
                   {material.material_type}
                 </span>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                <h2 className="text-2xl font-black text-black mt-1">
                   {material.title}
                 </h2>
               </div>
@@ -284,17 +284,17 @@ export default function MaterialDetailModal({ material, onClose }: MaterialDetai
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 transition-colors"
+            className="w-10 h-10 bg-white border-2 border-black rounded-lg shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center hover:bg-red-400 hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 transition-all"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
-        <div className="p-6 space-y-6">
-          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">
-            Isi Materi
+        <div className="p-6 space-y-6 bg-white">
+          <h3 className="text-sm font-black text-black mb-2 uppercase tracking-wide">
+            📚 Isi Materi
           </h3>
           <div
             className="prose prose-sm sm:prose dark:prose-invert max-w-none material-content"
@@ -325,12 +325,12 @@ export default function MaterialDetailModal({ material, onClose }: MaterialDetai
 
           {material.tags && material.tags.length > 0 && (
             <div className="mt-4">
-              <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wide">
+              <h3 className="text-sm font-black text-black mb-2 uppercase tracking-wide">
                 Tags
               </h3>
               <div className="flex flex-wrap gap-2">
                 {material.tags.map((tag, index) => (
-                  <span key={index} className="px-3 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 text-sm font-medium rounded-full border border-indigo-100 dark:border-indigo-800">
+                  <span key={index} className="px-3 py-1 bg-pink-300 text-black text-sm font-bold rounded-lg border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
                     #{tag}
                   </span>
                 ))}
@@ -338,26 +338,26 @@ export default function MaterialDetailModal({ material, onClose }: MaterialDetai
             </div>
           )}
 
-          <div className="mt-6 p-4 bg-gradient-to-r from-green-50 to-teal-50 dark:from-green-900/20 dark:to-teal-900/20 rounded-lg border border-green-200 dark:border-green-700">
+          <div className="mt-6 p-4 bg-yellow-300 rounded-xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
             <div className="space-y-3">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-green-600 flex items-center justify-center">
-                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-10 h-10 rounded-lg bg-white border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center">
+                  <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
                   </svg>
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                    Terjemahkan Materi
+                  <p className="text-sm font-black text-black">
+                    🌍 Terjemahkan Materi
                   </p>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">
+                  <p className="text-xs text-gray-800 font-medium">
                     Terjemahkan ke bahasa apapun menggunakan AI
                   </p>
                 </div>
                 {showTranslation && (
                   <button
                     onClick={() => setShowTranslation(false)}
-                    className="px-3 py-1 text-xs bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
+                    className="px-3 py-1 text-xs bg-white text-black font-bold rounded-lg border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 transition-all"
                   >
                     Lihat Asli
                   </button>
@@ -369,103 +369,95 @@ export default function MaterialDetailModal({ material, onClose }: MaterialDetai
                   type="text"
                   value={targetLanguage}
                   onChange={(e) => setTargetLanguage(e.target.value)}
-                  placeholder="Contoh: English, Jepang, Spanyol, dll"
-                  className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500"
+                  placeholder="English, Jepang, dll"
+                  className="flex-1 px-4 py-2 border-2 border-black rounded-lg bg-white text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-black font-medium"
                   disabled={isTranslating}
                 />
                 <button
                   onClick={handleTranslate}
                   disabled={isTranslating || !targetLanguage.trim()}
-                  className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold flex items-center gap-2 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-6 py-2 bg-green-400 text-black rounded-lg border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 transition-all font-black flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isTranslating ? (
                     <>
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                      Menerjemahkan...
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-black"></div>
+                      Translating...
                     </>
                   ) : (
-                    <>
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                      </svg>
-                      Terjemahkan
-                    </>
+                    'Go'
                   )}
                 </button>
               </div>
 
               {translationError && (
-                <div className="flex items-center gap-2 px-3 py-2 bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 rounded-lg">
-                  <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="flex items-center gap-2 px-3 py-2 bg-red-300 border-2 border-black rounded-lg">
+                  <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  <span className="text-sm text-red-600 dark:text-red-400">{translationError}</span>
+                  <span className="text-sm text-black font-bold">{translationError}</span>
                 </div>
               )}
 
               {showTranslation && (
-                <div className="flex items-center gap-2 px-3 py-2 bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 rounded-lg">
-                  <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="flex items-center gap-2 px-3 py-2 bg-green-300 border-2 border-black rounded-lg">
+                  <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
-                  <span className="text-sm text-green-600 dark:text-green-400">
-                    Berhasil diterjemahkan ke {targetLanguage}
+                  <span className="text-sm text-black font-bold">
+                    ✅ Berhasil diterjemahkan ke {targetLanguage}
                   </span>
                 </div>
               )}
             </div>
           </div>
 
-          <div className="mt-6 p-4 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-lg border border-indigo-200 dark:border-indigo-700">
+          <div className="mt-6 p-4 bg-pink-300 rounded-xl border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center">
-                    <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <div className="w-10 h-10 rounded-lg bg-white border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center">
+                    <svg className="w-5 h-5 text-black" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z" />
                     </svg>
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                      Dengarkan Materi
+                    <p className="text-sm font-black text-black">
+                      🎧 Dengarkan
                     </p>
-                    <p className="text-xs text-gray-600 dark:text-gray-400">
-                      {isLoadingTTS ? 'Mempersiapkan audio...' : isPlaying ? 'Sedang diputar' : 'Siap diputar'}
+                    <p className="text-xs text-gray-800 font-medium">
+                      {isLoadingTTS ? 'Mempersiapkan...' : isPlaying ? 'Sedang diputar' : 'Siap diputar'}
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1 bg-white dark:bg-gray-700 px-2 py-1 rounded-lg">
-                    {[0.5, 0.75, 1, 1.25, 1.5, 2].map((rate) => (
-                      <button
-                        key={rate}
-                        onClick={() => handleRateChange(rate)}
-                        className={`px-2 py-1 text-xs rounded transition-colors ${
-                          playbackRate === rate
-                            ? 'bg-indigo-600 text-white font-semibold'
-                            : 'text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                          }`}
-                      >
-                        {rate}x
-                      </button>
-                    ))}
-                  </div>
+                <div className="flex items-center gap-1">
+                  {[0.75, 1, 1.5, 2].map((rate) => (
+                    <button
+                      key={rate}
+                      onClick={() => handleRateChange(rate)}
+                      className={`px-2 py-1 text-xs rounded-lg border-2 border-black font-bold transition-all ${playbackRate === rate
+                          ? 'bg-purple-500 text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]'
+                          : 'bg-white text-black hover:bg-gray-100'
+                        }`}
+                    >
+                      {rate}x
+                    </button>
+                  ))}
                 </div>
               </div>
 
               <div className="space-y-2">
                 <div className="flex items-center gap-3">
-                  <span className="text-xs font-mono text-gray-600 dark:text-gray-400 w-12 text-right">
+                  <span className="text-xs font-mono text-black font-bold w-12 text-right">
                     {formatTime(currentTime)}
                   </span>
-                  <div className="flex-1 h-2 bg-gray-300 dark:bg-gray-600 rounded-lg overflow-hidden">
+                  <div className="flex-1 h-3 bg-white border-2 border-black rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-indigo-600 transition-all duration-100"
+                      className="h-full bg-purple-500 transition-all duration-100"
                       style={{ width: `${(currentTime / duration) * 100}%` }}
                     />
                   </div>
-                  <span className="text-xs font-mono text-gray-600 dark:text-gray-400 w-12">
+                  <span className="text-xs font-mono text-black font-bold w-12">
                     {formatTime(duration)}
                   </span>
                 </div>
@@ -474,23 +466,23 @@ export default function MaterialDetailModal({ material, onClose }: MaterialDetai
               <div className="flex items-center gap-2 justify-center">
                 {isLoadingTTS ? (
                   <div className="flex items-center gap-2 px-4 py-2">
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-indigo-600"></div>
-                    <span className="text-sm text-gray-600 dark:text-gray-400">Loading...</span>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-black"></div>
+                    <span className="text-sm text-black font-bold">Loading...</span>
                   </div>
                 ) : error ? (
                   <div className="flex flex-col items-start gap-1 px-4 py-2">
                     <div className="flex items-center gap-2">
-                      <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
-                      <span className="text-sm text-red-600 dark:text-red-400">{error}</span>
+                      <span className="text-sm text-black font-bold">{error}</span>
                     </div>
                     <button
                       onClick={() => {
                         setError(null)
                         setIsLoadingTTS(false)
                       }}
-                      className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline"
+                      className="text-xs text-black font-bold hover:underline"
                     >
                       Coba lagi
                     </button>
@@ -499,7 +491,7 @@ export default function MaterialDetailModal({ material, onClose }: MaterialDetai
                   <>
                     <button
                       onClick={handlePlayPause}
-                      className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-semibold flex items-center gap-2 shadow-md"
+                      className="px-6 py-2 bg-purple-500 text-white rounded-lg border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 transition-all font-black flex items-center gap-2"
                     >
                       {isPlaying ? (
                         <>
@@ -509,22 +501,14 @@ export default function MaterialDetailModal({ material, onClose }: MaterialDetai
                           Pause
                         </>
                       ) : (
-                        <>
-                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
-                          </svg>
-                          Play
-                        </>
+                        'Putar'
                       )}
                     </button>
                     {(isPlaying || currentTime > 0) && (
                       <button
                         onClick={handleStop}
-                        className="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-white rounded-lg hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors font-semibold flex items-center gap-2 shadow-md"
+                        className="px-4 py-2 bg-white text-black rounded-lg border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 transition-all font-black flex items-center gap-2"
                       >
-                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1 1v4a1 1 0 001 1h4a1 1 0 001-1V8a1 1 0 00-1-1H8z" clipRule="evenodd" />
-                        </svg>
                         Reset
                       </button>
                     )}
@@ -553,11 +537,11 @@ export default function MaterialDetailModal({ material, onClose }: MaterialDetai
             </div>
           )}
 
-          <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="pt-4 border-t-2 border-black mt-4">
             <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="text-gray-500 dark:text-gray-400">Tanggal dibuat</span>
-                <p className="text-gray-900 dark:text-white font-medium">
+              <div className="bg-gray-100 p-3 rounded-lg border-2 border-black">
+                <span className="text-gray-600 font-bold">📅 Tanggal dibuat</span>
+                <p className="text-black font-bold">
                   {new Date(material.created_at).toLocaleDateString('id-ID', {
                     day: 'numeric',
                     month: 'long',
@@ -567,9 +551,9 @@ export default function MaterialDetailModal({ material, onClose }: MaterialDetai
                   })}
                 </p>
               </div>
-              <div>
-                <span className="text-gray-500 dark:text-gray-400">Terakhir diupdate</span>
-                <p className="text-gray-900 dark:text-white font-medium">
+              <div className="bg-gray-100 p-3 rounded-lg border-2 border-black">
+                <span className="text-gray-600 font-bold">🔄 Terakhir diupdate</span>
+                <p className="text-black font-bold">
                   {new Date(material.updated_at).toLocaleDateString('id-ID', {
                     day: 'numeric',
                     month: 'long',
@@ -583,20 +567,20 @@ export default function MaterialDetailModal({ material, onClose }: MaterialDetai
           </div>
         </div>
 
-        <div className="sticky bottom-0 bg-gray-50 dark:bg-gray-700 px-6 py-4 flex justify-end gap-3 border-t border-gray-200 dark:border-gray-600">
+        <div className="sticky bottom-0 bg-teal-200 px-6 py-4 flex justify-end gap-3 border-t-2 border-black">
           {material.url && (
             <a
               href={material.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-semibold"
+              className="px-4 py-2 bg-green-400 text-black rounded-lg border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 transition-all font-black"
             >
-              Buka Sumber
+              🔗 Buka Sumber
             </a>
           )}
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-white rounded-lg hover:bg-gray-400 dark:hover:bg-gray-500 transition-colors font-semibold"
+            className="px-4 py-2 bg-white text-black rounded-lg border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 transition-all font-black"
           >
             Tutup
           </button>

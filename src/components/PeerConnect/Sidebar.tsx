@@ -28,20 +28,20 @@ export default function Sidebar({
   onSelectPrivateChat
 }: SidebarProps) {
   return (
-    <div className="w-96 bg-white dark:bg-gray-800 border-r dark:border-gray-700 flex flex-col">
+    <div className="w-96 bg-white border-r-2 border-black flex flex-col">
       {/* Sidebar Header */}
-      <div className="p-4 border-b dark:border-gray-700">
+      <div className="p-4 border-b-2 border-black bg-pink-100">
         <div className="flex items-center gap-3 mb-4">
           {currentUser.avatar_url ? (
-            <img src={currentUser.avatar_url} alt="Avatar" className="w-12 h-12 rounded-full object-cover" />
+            <img src={currentUser.avatar_url} alt="Avatar" className="w-12 h-12 rounded-full object-cover border-2 border-black" />
           ) : (
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-white text-lg font-bold">
+            <div className="w-12 h-12 rounded-full bg-yellow-400 border-2 border-black flex items-center justify-center text-black text-lg font-black">
               {currentUser.nama?.[0]?.toUpperCase() || 'U'}
             </div>
           )}
           <div className="flex-1">
-            <h2 className="font-semibold text-gray-900 dark:text-white">{currentUser.nama}</h2>
-            <p className="text-xs text-gray-500 dark:text-gray-400">{currentUser.interest}</p>
+            <h2 className="font-black text-black">{currentUser.nama}</h2>
+            <p className="text-xs text-gray-700 font-semibold">{currentUser.interest}</p>
           </div>
         </div>
 
@@ -49,21 +49,19 @@ export default function Sidebar({
         <div className="flex gap-2">
           <button
             onClick={() => onChatModeChange('group')}
-            className={`flex-1 px-4 py-2 rounded-lg font-medium transition-colors ${
-              chatMode === 'group'
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-            }`}
+            className={`flex-1 px-4 py-2 rounded-lg font-black transition-all border-2 border-black ${chatMode === 'group'
+                ? 'bg-green-400 text-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]'
+                : 'bg-white text-black hover:bg-gray-100'
+              }`}
           >
             Group Chat
           </button>
           <button
             onClick={() => onChatModeChange('private')}
-            className={`flex-1 px-4 py-2 rounded-lg font-medium transition-colors ${
-              chatMode === 'private'
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-            }`}
+            className={`flex-1 px-4 py-2 rounded-lg font-black transition-all border-2 border-black ${chatMode === 'private'
+                ? 'bg-purple-400 text-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]'
+                : 'bg-white text-black hover:bg-gray-100'
+              }`}
           >
             Private Chats
           </button>
@@ -71,7 +69,7 @@ export default function Sidebar({
       </div>
 
       {/* Chat List */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto bg-white">
         {chatMode === 'group' ? (
           <GroupMembersList
             chatRoom={chatRoom}
@@ -91,3 +89,4 @@ export default function Sidebar({
     </div>
   )
 }
+
