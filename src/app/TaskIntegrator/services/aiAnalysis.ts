@@ -78,7 +78,7 @@ class AIAnalysisService {
         materialSummary: stats.materialSummary,
       });
 
-      const response = await fetch("/api/AI/analyze", {
+      const response = await fetch("/api/ai/analyze", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

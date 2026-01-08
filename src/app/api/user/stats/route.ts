@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
 
     const totalQuizzes = allProgress?.length || 0;
     const completedQuizzes = allProgress?.filter(p => p.is_completed).length || 0;
-    const totalQuestionsAnswered = allProgress?.reduce((sum, p) => sum + (p.questions_answered || 0), 0) || 0;
+    const totalQuestionsAnswered = allProgress?.reduce((sum, p) => sum + (p.total_questions || 0), 0) || 0;
     const totalCorrectAnswers = allProgress?.reduce((sum, p) => sum + (p.correct_answers || 0), 0) || 0;
 
     return NextResponse.json({

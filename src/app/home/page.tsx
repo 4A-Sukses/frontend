@@ -223,7 +223,7 @@ export default function HomePage() {
                   Let our friendly AI plan your day! It organizes homework, study time, and play into a fun schedule so you never miss a beat.
                 </p>
                 <button className="absolute bottom-4 left-4 right-4 border-2 border-black py-2 text-sm font-bold hover:bg-black hover:text-white transition-colors bg-white">
-                  LET'S GO
+                  LET&apos;S GO
                 </button>
                 </div>
               </div>
@@ -246,10 +246,10 @@ export default function HomePage() {
                     <span>AI ADAPTIVE MATERIAL</span>
                   </div>
                   <p className="text-sm leading-relaxed mb-12">
-                    Lessons that magically change just for you! If it's too hard, we make it simpler; if it's too easy, get ready for a challenge.
+                    Lessons that magically change just for you! If it&apos;s too hard, we make it simpler; if it&apos;s too easy, get ready for a challenge.
                   </p>
                   <button className="absolute bottom-4 left-4 right-4 border-2 border-black py-2 text-sm font-bold hover:bg-black hover:text-white transition-colors bg-white">
-                    LET'S GO
+                    LET&apos;S GO
                   </button>
                 </div>
               </div>
@@ -625,7 +625,7 @@ export default function HomePage() {
                   style={{ maxHeight: openFAQ === 7 ? '200px' : '0' }}
                 >
                   <div className="p-5 pt-0 text-sm text-gray-700 leading-relaxed">
-                    Klik tombol "Mulai Gratis" di atas, isi informasi dasar, dan langsung mulai belajar! Proses registrasi hanya 2 menit.
+                    Klik tombol &quot;Mulai Gratis&quot; di atas, isi informasi dasar, dan langsung mulai belajar! Proses registrasi hanya 2 menit.
                   </div>
                 </div>
               </div>
