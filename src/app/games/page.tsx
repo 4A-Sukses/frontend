@@ -8,6 +8,7 @@ import QuizGame from './components/QuizGame';
 import MaterialSelector from './components/MaterialSelector';
 import TopicSelector from './components/TopicSelector';
 import LevelDisplay from './components/LevelDisplay';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 interface Material {
   id: number;
@@ -80,10 +81,7 @@ export default function GamesPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-blue-100">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-4 border-black border-t-transparent mx-auto mb-4"></div>
-          <p className="text-black font-bold">Loading...</p>
-        </div>
+        <LoadingSpinner text="Loading..." />
       </div>
     );
   }
@@ -95,25 +93,18 @@ export default function GamesPage() {
   return (
     <div className="min-h-screen bg-blue-100 p-8">
       <div className="max-w-6xl mx-auto">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 px-4 py-2 bg-white text-black font-black border-2 border-black rounded-lg shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 transition-all mb-8"
-        >
-          <span>←</span> Back to Home
-        </Link>
-
         <div className="mb-8 text-center">
           <h1 className="text-5xl font-black text-black mb-3">
             Quiz Game
           </h1>
           <p className="text-black/70 text-lg font-bold">
-            Test your knowledge and earn XP! 🎮
+            Test your knowledge and earn XP!
           </p>
         </div>
 
         {/* Level Display - Only show when not in quiz */}
         {!selectedMaterial && (
-          <div className="mb-8">
+          <div className="mb-8 max-w-5xl mx-auto">
             <LevelDisplay userId={userId} compact />
           </div>
         )}

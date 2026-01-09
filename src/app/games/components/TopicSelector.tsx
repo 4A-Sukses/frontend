@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import LoadingSpinner from '@/components/LoadingSpinner';
 
 interface Topic {
   id: number;
@@ -70,10 +71,7 @@ export default function TopicSelector({
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading topics...</p>
-        </div>
+        <LoadingSpinner text="Loading topics..." />
       </div>
     );
   }
@@ -116,16 +114,16 @@ export default function TopicSelector({
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
               onClick={() => onSelectTopic(topic.id, topic.title)}
-              className="bg-white rounded-xl shadow-md hover:shadow-2xl transition-all cursor-pointer overflow-hidden border border-gray-100 hover:border-blue-300 group"
+              className="bg-white rounded-xl border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all cursor-pointer overflow-hidden group"
             >
               <div className="p-6">
                 {/* Header */}
                 <div className="mb-4">
-                  <h3 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-blue-600 transition">
-                    {topic.title}
+                  <h3 className="text-xl font-black text-black mb-2">
+                    {topic.title.length > 20 ? `${topic.title.substring(0, 20)}...` : topic.title}
                   </h3>
                   {topic.description && (
-                    <p className="text-gray-600 text-sm line-clamp-2">
+                    <p className="text-black/70 text-sm line-clamp-2 font-bold">
                       {topic.description}
                     </p>
                   )}
@@ -134,10 +132,10 @@ export default function TopicSelector({
                 {/* Stats */}
                 <div className="space-y-3 mb-4">
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600 flex items-center gap-1">
+                    <span className="text-black font-bold flex items-center gap-1">
                       📚 Materials
                     </span>
-                    <span className="font-semibold text-gray-800">
+                    <span className="font-black text-black">
                       {topic.materialsCount}
                     </span>
                   </div>
@@ -145,20 +143,11 @@ export default function TopicSelector({
                   {topic.completedCount > 0 && (
                     <>
                       <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-600 flex items-center gap-1">
-                          ✓ Completed
+                        <span className="text-black font-bold flex items-center gap-1">
+                          Progress
                         </span>
-                        <span className="font-semibold text-green-600">
+                        <span className="font-black text-black">
                           {topic.completedCount}/{topic.materialsCount}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-gray-600 flex items-center gap-1">
-                          ⭐ Total XP
-                        </span>
-                        <span className="font-semibold text-blue-600">
-                          {topic.totalXP}
                         </span>
                       </div>
                     </>
@@ -168,24 +157,24 @@ export default function TopicSelector({
                 {/* Progress bar */}
                 {topic.materialsCount > 0 && (
                   <div className="mb-4">
-                    <div className="flex items-center justify-between text-xs text-gray-600 mb-1">
+                    <div className="flex items-center justify-between text-xs text-black font-bold mb-2">
                       <span>Progress</span>
                       <span>{progressPercentage}%</span>
                     </div>
-                    <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="h-3 bg-white border-2 border-black rounded-full overflow-hidden">
                       <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${progressPercentage}%` }}
                         transition={{ duration: 0.8, delay: index * 0.1 }}
-                        className="h-full bg-gradient-to-r from-blue-500 to-purple-500"
+                        className="h-full bg-yellow-400"
                       />
                     </div>
                   </div>
                 )}
 
                 {/* Button */}
-                <div className="pt-3 border-t border-gray-100">
-                  <div className="flex items-center justify-between text-blue-600 font-semibold group-hover:text-blue-700 transition">
+                <div className="pt-3 border-t-2 border-black">
+                  <div className="flex items-center justify-between text-black font-black">
                     <span>View Materials</span>
                     <span className="transform group-hover:translate-x-1 transition">→</span>
                   </div>
@@ -197,25 +186,25 @@ export default function TopicSelector({
       </div>
 
       {/* Summary Stats */}
-      <div className="mt-12 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6">
+      <div className="mt-12 bg-pink-200 rounded-xl border-[3px] border-black shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] p-6">
         <div className="grid grid-cols-3 gap-4 text-center">
           <div>
-            <div className="text-3xl font-bold text-blue-600">
+            <div className="text-3xl font-black text-black">
               {topics.length}
             </div>
-            <div className="text-sm text-gray-600">Total Topics</div>
+            <div className="text-sm text-black/70 font-bold">Total Topics</div>
           </div>
           <div>
-            <div className="text-3xl font-bold text-green-600">
+            <div className="text-3xl font-black text-black">
               {topics.reduce((sum, t) => sum + t.completedCount, 0)}
             </div>
-            <div className="text-sm text-gray-600">Quizzes Completed</div>
+            <div className="text-sm text-black/70 font-bold">Quizzes Completed</div>
           </div>
           <div>
-            <div className="text-3xl font-bold text-purple-600">
+            <div className="text-3xl font-black text-black">
               {topics.reduce((sum, t) => sum + t.totalXP, 0)}
             </div>
-            <div className="text-sm text-gray-600">Total XP Earned</div>
+            <div className="text-sm text-black/70 font-bold">Total XP Earned</div>
           </div>
         </div>
       </div>

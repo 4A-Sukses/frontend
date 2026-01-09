@@ -158,12 +158,11 @@ export default function Navbar() {
           </div>
 
           {/* Desktop Navigation Links */}
-          <div className="hidden md:flex items-center space-x-8">
-            <Link href="/home" className={`font-black transition-colors ${
-              isScrolled
-                ? 'text-black hover:text-gray-700'
-                : 'text-black hover:text-gray-700'
-            }`}>
+          <div className="hidden md:flex items-center space-x-4">
+            <Link
+              href="/home"
+              className="px-4 py-2 bg-blue-400 text-black font-black border-2 border-black rounded-lg hover:bg-blue-500 transition-colors"
+            >
               Home
             </Link>
 
@@ -171,11 +170,7 @@ export default function Navbar() {
             <div className="relative dropdown-container">
               <button
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className={`flex items-center gap-1 font-black transition-colors ${
-                  isScrolled
-                    ? 'text-black hover:text-gray-700'
-                    : 'text-black hover:text-gray-700'
-                }`}
+                className="px-4 py-2 bg-blue-400 text-black font-black border-2 border-black rounded-lg hover:bg-blue-500 transition-colors flex items-center gap-2"
               >
                 Features
                 <svg
@@ -197,20 +192,17 @@ export default function Navbar() {
 
               {/* Dropdown Menu */}
               {isDropdownOpen && (
-                <div className="absolute top-full mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50">
-                  {features.map((feature) => (
+                <div className="absolute top-full mt-2 w-48 bg-blue-400 border-2 border-black rounded-lg overflow-hidden z-50">
+                  {features.map((feature, index) => (
                     <Link
                       key={feature.path}
                       href={feature.path}
                       onClick={() => setIsDropdownOpen(false)}
-                      className="block px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                      className={`block px-4 py-2 text-black font-bold hover:bg-blue-500 transition-colors ${
+                        index !== features.length - 1 ? 'border-b border-black' : ''
+                      }`}
                     >
-                      <div className="font-semibold text-gray-900 dark:text-white">
-                        {feature.title}
-                      </div>
-                      <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-                        {feature.description}
-                      </div>
+                      {feature.title}
                     </Link>
                   ))}
                 </div>
@@ -321,53 +313,55 @@ export default function Navbar() {
 
         {/* Mobile Menu (Slide-Down) */}
         <div
-          className={`mobile-menu-container md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
-            isMobileMenuOpen ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"
+          className={`mobile-menu-container md:hidden overflow-y-auto transition-all duration-300 ease-in-out ${
+            isMobileMenuOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0"
           }`}
         >
           <div className="bg-gradient-to-b from-blue-100 to-blue-200 border-2 border-t-0 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
             {/* Mobile Navigation Links */}
-            <div className="px-4 py-4 space-y-2">
+            <div className="px-4 py-4 space-y-3">
               <Link
                 href="/home"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="block px-4 py-3 bg-white border-2 border-black rounded-xl font-black text-black hover:bg-yellow-400 transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5"
+                className="block px-4 py-3 bg-blue-400 border-2 border-black rounded-lg font-black text-black hover:bg-blue-500 transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5"
               >
                 Home
               </Link>
 
               {/* Features Section */}
-              <div className="pt-2">
-                <p className="px-4 py-2 text-sm font-bold text-gray-700">Features:</p>
-                {features.map((feature) => (
-                  <Link
-                    key={feature.path}
-                    href={feature.path}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="block px-4 py-3 bg-white border-2 border-black rounded-xl font-black text-black hover:bg-pink-400 transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5"
-                  >
-                    {feature.title}
-                  </Link>
-                ))}
+              <div>
+                <p className="px-2 py-1 text-sm font-bold text-black mb-2">Features:</p>
+                <div className="space-y-2">
+                  {features.map((feature) => (
+                    <Link
+                      key={feature.path}
+                      href={feature.path}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block px-4 py-2.5 bg-blue-400 border-2 border-black rounded-lg font-bold text-black hover:bg-blue-500 transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5"
+                    >
+                      {feature.title}
+                    </Link>
+                  ))}
+                </div>
               </div>
             </div>
 
             {/* Mobile User Navigation */}
-            <div className="px-4 pb-4 space-y-2">
+            <div className="px-4 pb-4 space-y-3">
               {!user ? (
                 <button
                   onClick={() => {
                     setShowAuthModal(true);
                     setIsMobileMenuOpen(false);
                   }}
-                  className="w-full px-4 py-3 bg-teal-400 border-2 border-black rounded-xl font-black text-black hover:bg-teal-500 transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5"
+                  className="w-full px-4 py-3 bg-teal-400 border-2 border-black rounded-lg font-black text-black hover:bg-teal-500 transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5"
                 >
                   Login
                 </button>
               ) : (
                 <>
                   {/* User Info */}
-                  <div className="flex items-center gap-3 px-4 py-3 bg-white border-2 border-black rounded-xl">
+                  <div className="flex items-center gap-3 px-4 py-3 bg-white border-2 border-black rounded-lg">
                     {userProfile?.avatar_url ? (
                       <img
                         src={userProfile.avatar_url}
@@ -390,7 +384,7 @@ export default function Navbar() {
                     <Link
                       href="/admin/dashboard"
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="block px-4 py-3 bg-purple-400 border-2 border-black rounded-xl font-black text-black hover:bg-purple-500 transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5"
+                      className="block px-4 py-3 bg-purple-400 border-2 border-black rounded-lg font-black text-black hover:bg-purple-500 transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5"
                     >
                       Admin Dashboard
                     </Link>
@@ -399,7 +393,7 @@ export default function Navbar() {
                     <Link
                       href="/mentor/dashboard"
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="block px-4 py-3 bg-green-400 border-2 border-black rounded-xl font-black text-black hover:bg-green-500 transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5"
+                      className="block px-4 py-3 bg-green-400 border-2 border-black rounded-lg font-black text-black hover:bg-green-500 transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5"
                     >
                       Mentor Dashboard
                     </Link>
@@ -411,7 +405,7 @@ export default function Navbar() {
                       setShowProfileModal(true);
                       setIsMobileMenuOpen(false);
                     }}
-                    className="w-full px-4 py-3 bg-indigo-400 border-2 border-black rounded-xl font-black text-black hover:bg-indigo-500 transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5"
+                    className="w-full px-4 py-3 bg-indigo-400 border-2 border-black rounded-lg font-black text-black hover:bg-indigo-500 transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5"
                   >
                     Profile
                   </button>
@@ -419,7 +413,7 @@ export default function Navbar() {
                   {/* Logout Button */}
                   <button
                     onClick={handleSignOut}
-                    className="w-full px-4 py-3 bg-red-400 border-2 border-black rounded-xl font-black text-black hover:bg-red-500 transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5"
+                    className="w-full px-4 py-3 bg-red-400 border-2 border-black rounded-lg font-black text-black hover:bg-red-500 transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5"
                   >
                     Logout
                   </button>

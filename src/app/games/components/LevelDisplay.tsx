@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { Progress } from '@/components/ui/progress';
 import BadgeDisplay from './BadgeDisplay';
 
 interface Badge {
@@ -109,14 +109,7 @@ export default function LevelDisplay({ userId, compact = false }: LevelDisplayPr
               <span>{stats.currentLevelXP} XP</span>
               <span>{stats.xpForNextLevel} XP</span>
             </div>
-            <div className="h-2 bg-white border-2 border-black rounded-full overflow-hidden">
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: `${stats.progressPercentage}%` }}
-                transition={{ duration: 1, ease: 'easeOut' }}
-                className="h-full bg-yellow-400"
-              />
-            </div>
+            <Progress value={stats.progressPercentage} className="h-4 max-w-sm mx-auto" />
           </div>
         )}
       </div>
@@ -158,14 +151,7 @@ export default function LevelDisplay({ userId, compact = false }: LevelDisplayPr
               <span>Level {stats.level}</span>
               <span>Level {stats.level + 1}</span>
             </div>
-            <div className="h-3 bg-white border-2 border-black rounded-full overflow-hidden">
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: `${stats.progressPercentage}%` }}
-                transition={{ duration: 1, ease: 'easeOut' }}
-                className="h-full bg-yellow-400"
-              />
-            </div>
+            <Progress value={stats.progressPercentage} className="h-5 max-w-xl mx-auto" />
             <div className="text-sm mt-2 text-center font-bold">
               {stats.currentLevelXP} / {stats.xpNeeded} XP ({stats.progressPercentage}%)
             </div>
