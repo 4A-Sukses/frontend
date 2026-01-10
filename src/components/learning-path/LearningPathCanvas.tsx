@@ -424,10 +424,10 @@ function LearningPathCanvasInner({ topic, workflowId, userId, onSave, initialDat
             </ReactFlow>
 
             <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
-                <div className="bg-gray-800 rounded-lg px-6 py-3 border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                <div className="bg-white rounded-lg px-6 py-3 border-[3px] border-black">
                     <div className="text-center">
-                        <div className="text-xs text-yellow-300 mb-1 font-black">Topik</div>
-                        <div className="font-black text-white">
+                        <div className="text-xs text-gray-500 mb-1 font-black">Topik</div>
+                        <div className="font-black text-black">
                             {topic.title.length > 40
                                 ? topic.title.substring(0, 40) + '...'
                                 : topic.title}
@@ -436,7 +436,15 @@ function LearningPathCanvasInner({ topic, workflowId, userId, onSave, initialDat
                 </div>
             </div>
 
-            <div className="absolute top-4 right-4 z-10 flex gap-2 pointer-events-auto">
+            <div className="absolute top-4 right-20 z-10 flex gap-2 pointer-events-auto">
+                <button
+                    onClick={() => window.location.href = '/n8n-workflow'}
+                    className="bg-gray-100 hover:bg-gray-200 text-black px-4 py-2 rounded-lg
+                        font-black border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 transition-all flex items-center gap-2"
+                >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                    Kembali
+                </button>
                 {isReadOnly && !isEditing && (
                     <button
                         onClick={() => setIsEditing(true)}
@@ -481,9 +489,9 @@ function LearningPathCanvasInner({ topic, workflowId, userId, onSave, initialDat
             </div>
 
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
-                <div className="bg-gray-800 rounded-lg px-4 py-2 border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-                    <span className="text-xs text-white font-bold">
-                        Drag node dari sidebar - Hubungkan untuk validasi AI - Nodes: <span className="text-yellow-300 font-black">{nodes.length}</span> - Edges: <span className="text-yellow-300 font-black">{edges.length}</span>
+                <div className="bg-white rounded-lg px-4 py-2 border-[3px] border-black">
+                    <span className="text-xs text-black font-bold">
+                        Drag node dari sidebar - Hubungkan untuk validasi AI - Nodes: <span className="text-blue-600 font-black">{nodes.length}</span> - Edges: <span className="text-blue-600 font-black">{edges.length}</span>
                     </span>
                 </div>
             </div>

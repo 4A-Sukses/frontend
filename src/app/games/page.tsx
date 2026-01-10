@@ -93,10 +93,24 @@ export default function GamesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-blue-100 p-8">
+    <div className="min-h-screen bg-blue-100 relative">
       <FeatureHamburgerOnly />
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-8 text-center">
+      <div className="px-8 pt-20 pb-8">
+        <div className="max-w-6xl mx-auto relative z-10">
+          {/* Back Button - Show when on topic selection */}
+          {!selectedTopic && !selectedMaterial && (
+            <button
+              onClick={() => router.back()}
+              className="mb-6 flex items-center gap-2 px-4 py-2 bg-white text-black font-black border-2 border-black rounded-lg shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 transition-all"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              Kembali
+            </button>
+          )}
+
+          <div className="mb-8 text-center">
           <h1 className="text-5xl font-black text-black mb-3">
             Quiz Game
           </h1>
@@ -141,6 +155,7 @@ export default function GamesPage() {
             onSelectTopic={handleSelectTopic}
           />
         )}
+        </div>
       </div>
     </div>
   );

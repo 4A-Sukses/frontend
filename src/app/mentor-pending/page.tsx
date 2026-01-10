@@ -12,7 +12,7 @@ export default function MentorPending() {
   useEffect(() => {
     async function checkStatus() {
       const user = await getCurrentUserProfile()
-      
+
       if (!user) {
         router.push('/login')
         return
@@ -56,31 +56,41 @@ export default function MentorPending() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="max-w-md w-full bg-white shadow-lg rounded-lg p-8 text-center">
-        <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-yellow-100 mb-6">
-          <svg className="h-8 w-8 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-100 to-blue-200 px-4">
+      <style jsx>{`
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
+
+      <div
+        className="max-w-md w-full bg-white border-2 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] rounded-2xl p-8 text-center"
+        style={{ animation: 'fadeInUp 0.5s ease-out forwards' }}
+      >
+        <div className="mx-auto flex items-center justify-center h-20 w-20 rounded-full bg-yellow-400 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] mb-6">
+          <svg className="h-10 w-10 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </div>
-        
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Application Pending</h2>
-        <p className="text-gray-600 mb-8">
-          Your application to become a mentor is currently under review by our administrators. 
+
+        <h2 className="text-3xl font-black text-black mb-4 uppercase tracking-tight">Application Pending</h2>
+        <p className="text-gray-700 font-bold mb-8 text-lg leading-relaxed">
+          Your application to become a mentor is currently under review by our administrators.
           You will be notified once your account is approved.
         </p>
 
         <div className="space-y-4">
           <button
             onClick={() => window.location.reload()}
-            className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            className="w-full inline-flex justify-center py-3 px-4 border-2 border-black rounded-xl text-lg font-black text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]"
           >
             Check Status
           </button>
-          
+
           <button
             onClick={handleLogout}
-            className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            className="w-full inline-flex justify-center py-3 px-4 border-2 border-black rounded-xl text-lg font-black text-black bg-white hover:bg-red-50 hover:text-red-600 hover:border-red-600 focus:outline-none transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px]"
           >
             Sign Out
           </button>

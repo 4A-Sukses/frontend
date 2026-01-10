@@ -50,9 +50,8 @@ export default function FeatureNavbar() {
     <nav className="sticky top-0 z-50 bg-white border-b-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Hamburger Menu + Logo */}
+          {/* Logo */}
           <div className="flex items-center gap-4">
-            <HamburgerMenu />
             <Link href="/home">
               <Image
                 src="/SINAUIN.png"
@@ -129,6 +128,7 @@ export default function FeatureNavbar() {
                 </button>
               </>
             )}
+            <HamburgerMenu />
           </div>
         </div>
       </div>

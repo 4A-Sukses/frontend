@@ -9,8 +9,8 @@ import type { UploadResult } from '@/lib/storage'
 const RichTextEditor = dynamic(() => import('./RichTextEditor'), {
     ssr: false,
     loading: () => (
-        <div className="border border-gray-300 dark:border-gray-600 rounded-lg p-4 min-h-[300px] flex items-center justify-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500"></div>
+        <div className="border-2 border-black rounded-xl p-4 min-h-[300px] flex items-center justify-center bg-white">
+            <div className="animate-spin rounded-full h-8 w-8 border-4 border-black border-t-transparent"></div>
         </div>
     )
 })
@@ -160,21 +160,21 @@ export default function MultiPageMaterialEditor({
     const totalPages = pages.length
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-6">
             {/* Cache restored notification */}
             {showCacheRestored && (
-                <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-3 flex items-center gap-2">
-                    <svg className="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="bg-blue-100 border-2 border-black rounded-xl p-3 flex items-center gap-2 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                    <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <span className="text-sm text-blue-700 dark:text-blue-300">
+                    <span className="text-sm font-bold text-black">
                         Draft sebelumnya berhasil dipulihkan dari cache lokal
                     </span>
                 </div>
             )}
 
             {/* Page Navigation Header */}
-            <div className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-lg p-4">
+            <div className="bg-purple-100 border-2 border-black rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
                 <div className="flex items-center justify-between">
                     {/* Left: Navigation */}
                     <div className="flex items-center gap-3">
@@ -182,16 +182,16 @@ export default function MultiPageMaterialEditor({
                             type="button"
                             onClick={goToPrev}
                             disabled={currentPageIndex === 0 || disabled}
-                            className="p-2 rounded-full hover:bg-indigo-100 dark:hover:bg-indigo-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                            className="p-2 rounded-lg border-2 border-black bg-white hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
                         >
-                            <svg className="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7" />
+                            <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M15 19l-7-7 7-7" />
                             </svg>
                         </button>
 
-                        <div className="text-center min-w-[120px]">
-                            <span className="font-semibold text-indigo-700 dark:text-indigo-300">
-                                Halaman {currentPageIndex + 1} dari {totalPages}
+                        <div className="text-center min-w-[140px]">
+                            <span className="font-black text-black text-lg">
+                                Halaman {currentPageIndex + 1} / {totalPages}
                             </span>
                         </div>
 
@@ -199,10 +199,10 @@ export default function MultiPageMaterialEditor({
                             type="button"
                             onClick={goToNext}
                             disabled={currentPageIndex === totalPages - 1 || disabled}
-                            className="p-2 rounded-full hover:bg-indigo-100 dark:hover:bg-indigo-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                            className="p-2 rounded-lg border-2 border-black bg-white hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
                         >
-                            <svg className="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7" />
+                            <svg className="w-5 h-5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
                             </svg>
                         </button>
                     </div>
@@ -214,7 +214,7 @@ export default function MultiPageMaterialEditor({
                                 type="button"
                                 onClick={deletePage}
                                 disabled={disabled}
-                                className="px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors flex items-center gap-1"
+                                className="px-3 py-2 text-sm font-black bg-red-400 border-2 border-black text-black hover:bg-red-500 rounded-lg transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none flex items-center gap-1"
                             >
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 011.995 1.858L5 7m5 4v6m0-6L5 7m5 4v6" />
@@ -226,28 +226,28 @@ export default function MultiPageMaterialEditor({
                             type="button"
                             onClick={addPage}
                             disabled={disabled}
-                            className="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg transition-colors flex items-center gap-1"
+                            className="px-3 py-2 bg-green-400 hover:bg-green-500 border-2 border-black text-black text-sm font-black rounded-lg transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none flex items-center gap-1"
                         >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4m0 0l4 4m0 0116.138 21H7.862a2 2 0 011.995 1.858L5 7m5 4v6m0-6L5 7m5 4v6" />
-                                Tambah Halaman
                             </svg>
+                            Tambah Halaman
                         </button>
                     </div>
                 </div>
 
                 {/* Dots Indicator */}
                 {totalPages > 1 && (
-                    <div className="flex justify-center gap-2 mt-3">
+                    <div className="flex justify-center gap-2 mt-4">
                         {pages.map((_, index) => (
                             <button
                                 key={index}
                                 type="button"
                                 onClick={() => goToPage(index)}
                                 disabled={disabled}
-                                className={`w-3 h-3 rounded-full transition-all ${index === currentPageIndex
-                                    ? 'bg-indigo-600 scale-125'
-                                    : 'bg-gray-300 dark:bg-gray-600 hover:bg-indigo-400'
+                                className={`w-3 h-3 rounded-full border border-black transition-all ${index === currentPageIndex
+                                    ? 'bg-black scale-125'
+                                    : 'bg-white hover:bg-gray-300'
                                     }`}
                                 aria-label={`Go to page ${index + 1}`}
                             />
@@ -257,22 +257,22 @@ export default function MultiPageMaterialEditor({
             </div>
 
             {/* Media Upload Section */}
-            <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4">
+            <div className="bg-white border-2 border-black rounded-xl p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
                 <div className="flex items-center justify-between mb-3">
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <span className="text-sm font-black text-black uppercase tracking-wide">
                         📷 Upload Media (Halaman {currentPageIndex + 1})
                     </span>
                     <button
                         type="button"
                         onClick={() => setShowMediaUploader(!showMediaUploader)}
-                        className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline"
+                        className="text-sm font-bold text-indigo-600 hover:text-indigo-800 underline"
                     >
                         {showMediaUploader ? 'Sembunyikan' : 'Tampilkan'}
                     </button>
                 </div>
 
                 {showMediaUploader && (
-                    <div className="space-y-4 border border-gray-200 dark:border-gray-700 rounded-lg p-4 bg-white dark:bg-gray-800">
+                    <div className="space-y-4 border-2 border-black border-dashed rounded-xl p-4 bg-gray-50">
                         <MediaUploader
                             userId={userId}
                             onUpload={handleMediaUpload}
@@ -298,7 +298,7 @@ export default function MultiPageMaterialEditor({
             </div>
 
             {/* Page indicator bottom */}
-            <div className="text-center text-sm text-gray-500 dark:text-gray-400">
+            <div className="text-center text-sm font-bold text-gray-500">
                 💡 Konten disimpan otomatis. Anda bisa menambah halaman dan melanjutkan nanti.
             </div>
         </div>

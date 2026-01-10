@@ -58,9 +58,12 @@ export default function TopicImportModal({ onImport, onBack, userId }: TopicImpo
           <div>
             <button
               onClick={onBack}
-              className="text-gray-800 hover:text-black font-bold mb-4 flex items-center gap-2 transition-all duration-300 hover:scale-105"
+              className="mb-4 flex items-center gap-2 px-4 py-2 bg-white text-black font-black border-2 border-black rounded-lg shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 transition-all"
             >
-              ← Kembali
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              Kembali
             </button>
             <h1 className="text-3xl md:text-4xl font-black text-black mb-2">
               🤖 Import dari Multi-Source Knowledge

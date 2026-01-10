@@ -11,7 +11,6 @@ import { stripHtml } from '@/lib/htmlUtils'
 import AddMaterialModal from '@/components/AddMaterialModal'
 import AddTopicModal from '@/components/AddTopicModal'
 import MaterialDetailModal from '@/components/MaterialDetailModal'
-import Navbar from '@/components/Navbar'
 
 export default function MentorDashboardPage() {
   const router = useRouter()
@@ -191,58 +190,42 @@ export default function MentorDashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-400"></div>
+      <div className="min-h-screen bg-blue-100 flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-black">
-      {/* Navbar */}
-      <Navbar />
-
-      <div className="relative flex-1 overflow-hidden">
-        {/* Decorative curved lines */}
-        <div className="absolute inset-0 opacity-20 pointer-events-none">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full">
-            {[...Array(12)].map((_, i) => (
-              <div
-                key={i}
-                className="absolute border-2 border-gray-600 rounded-full"
-                style={{
-                  top: '50%',
-                  left: '50%',
-                  transform: 'translate(-50%, -50%)',
-                  width: `${(i + 1) * 150}px`,
-                  height: `${(i + 1) * 100}px`,
-                }}
-              />
-            ))}
-          </div>
-        </div>
-
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-100 to-blue-200">
+      <div className="relative flex-1">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           {/* Header */}
           <div className="mb-12 flex flex-col md:flex-row md:items-end md:justify-between gap-6">
             <div>
-              <Link href="/" className="text-yellow-400 hover:text-yellow-300 mb-4 inline-block font-bold text-sm uppercase tracking-wider">
-                ← Kembali ke Home
+              <Link
+                href="/"
+                className="mb-4 inline-flex items-center gap-2 px-4 py-2 bg-white text-black font-black border-2 border-black rounded-lg shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 transition-all"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Kembali ke Home
               </Link>
-              <h1 className="text-4xl md:text-5xl font-black text-white mb-2">
+              <h1 className="text-4xl md:text-5xl font-black text-black mb-2">
                 MENTOR{' '}
-                <span className="bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-600 bg-clip-text text-transparent">
+                <span className="text-yellow-400" style={{ textShadow: '3px 3px 0px rgba(0,0,0,1)' }}>
                   DASHBOARD
                 </span>
               </h1>
-              <p className="text-gray-400 text-lg">
+              <p className="text-black/80 text-lg font-bold">
                 Kelola materi pembelajaran dan topik Anda
               </p>
             </div>
             <div className="flex flex-wrap gap-4">
               <button
                 onClick={() => setIsTopicModalOpen(true)}
-                className="px-6 py-3 bg-gray-800 border-2 border-gray-700 text-white rounded-xl hover:bg-gray-700 hover:border-gray-600 transition-all font-bold flex items-center gap-2"
+                className="px-6 py-3 bg-white border-[3px] border-black text-black rounded-xl hover:shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all font-black flex items-center gap-2 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -251,7 +234,7 @@ export default function MentorDashboardPage() {
               </button>
               <button
                 onClick={handleCreateClick}
-                className="px-6 py-3 bg-yellow-400 text-black rounded-xl hover:bg-yellow-300 transition-all font-black flex items-center gap-2 shadow-lg hover:scale-105"
+                className="px-6 py-3 bg-yellow-400 text-black border-[3px] border-black rounded-xl hover:shadow-[5px_5px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all font-black flex items-center gap-2 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -263,28 +246,30 @@ export default function MentorDashboardPage() {
 
           {/* Tabs */}
           <div className="mb-8">
-            <div className="flex gap-2 p-1 bg-gray-900 rounded-xl inline-flex border border-gray-800">
+            <div className="inline-flex gap-4 p-2 bg-white border-2 border-black rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
               <button
                 onClick={() => setActiveTab('published')}
-                className={`px-6 py-2.5 text-sm font-bold rounded-lg transition-all ${activeTab === 'published'
-                  ? 'bg-purple-600 text-white shadow-lg'
-                  : 'text-gray-400 hover:text-white hover:bg-gray-800'
+                className={`px-6 py-2.5 text-sm font-black rounded-lg transition-all border-2 ${activeTab === 'published'
+                  ? 'bg-purple-400 border-black text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] translate-x-[-1px] translate-y-[-1px]'
+                  : 'bg-transparent border-transparent text-gray-500 hover:bg-gray-100 hover:text-black'
                   }`}
               >
                 Published
-                <span className="ml-2 bg-black/20 text-white py-0.5 px-2 rounded-full text-xs">
+                <span className={`ml-2 py-0.5 px-2 rounded-full text-xs border border-black ${activeTab === 'published' ? 'bg-white text-black' : 'bg-gray-200 text-gray-600'
+                  }`}>
                   {materials.filter(m => (m.status || 'published') === 'published').length}
                 </span>
               </button>
               <button
                 onClick={() => setActiveTab('draft')}
-                className={`px-6 py-2.5 text-sm font-bold rounded-lg transition-all ${activeTab === 'draft'
-                  ? 'bg-yellow-500 text-black shadow-lg'
-                  : 'text-gray-400 hover:text-white hover:bg-gray-800'
+                className={`px-6 py-2.5 text-sm font-black rounded-lg transition-all border-2 ${activeTab === 'draft'
+                  ? 'bg-yellow-400 border-black text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] translate-x-[-1px] translate-y-[-1px]'
+                  : 'bg-transparent border-transparent text-gray-500 hover:bg-gray-100 hover:text-black'
                   }`}
               >
                 Drafts
-                <span className="ml-2 bg-black/20 text-current py-0.5 px-2 rounded-full text-xs">
+                <span className={`ml-2 py-0.5 px-2 rounded-full text-xs border border-black ${activeTab === 'draft' ? 'bg-white text-black' : 'bg-gray-200 text-gray-600'
+                  }`}>
                   {materials.filter(m => m.status === 'draft').length}
                 </span>
               </button>
@@ -292,17 +277,17 @@ export default function MentorDashboardPage() {
           </div>
 
           {/* Content List */}
-          <div className="grid gap-4">
+          <div className="grid gap-6">
             {filteredMaterials.length > 0 ? (
               filteredMaterials.map((material) => (
                 <div
                   key={material.id}
-                  className="group bg-gray-900 border border-gray-800 rounded-2xl p-6 hover:border-gray-600 transition-all hover:-translate-y-1 relative overflow-hidden"
+                  className="group bg-white border-[3px] border-black rounded-2xl p-6 shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[10px_10px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all relative overflow-visible"
                 >
-                  <div className="absolute top-0 right-0 p-6 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+                  <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2 z-10">
                     <button
                       onClick={() => handlePreviewClick(material)}
-                      className="p-2 bg-gray-800 text-white rounded-lg hover:bg-green-600 transition-colors"
+                      className="p-2 bg-green-400 text-black border-2 border-black rounded-lg hover:bg-green-300 transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
                       title="Preview"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -312,7 +297,7 @@ export default function MentorDashboardPage() {
                     </button>
                     <button
                       onClick={() => handleEditClick(material)}
-                      className="p-2 bg-gray-800 text-white rounded-lg hover:bg-indigo-600 transition-colors"
+                      className="p-2 bg-blue-400 text-black border-2 border-black rounded-lg hover:bg-blue-300 transition-colors shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
                       title="Edit"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -322,11 +307,11 @@ export default function MentorDashboardPage() {
                     <button
                       onClick={() => handleDeleteClick(material)}
                       disabled={deletingId === material.id}
-                      className="p-2 bg-gray-800 text-white rounded-lg hover:bg-red-600 transition-colors disabled:opacity-50"
+                      className="p-2 bg-red-400 text-black border-2 border-black rounded-lg hover:bg-red-300 transition-colors disabled:opacity-50 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
                       title="Hapus"
                     >
                       {deletingId === material.id ? (
-                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
                       ) : (
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -337,32 +322,32 @@ export default function MentorDashboardPage() {
 
                   <div className="flex items-start gap-6">
                     {/* Icon */}
-                    <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-xl font-black shadow-lg transform group-hover:rotate-3 transition-transform ${material.status === 'draft'
-                      ? 'bg-gradient-to-br from-yellow-400 to-yellow-600 text-black'
-                      : 'bg-gradient-to-br from-purple-500 to-indigo-600 text-white'
+                    <div className={`w-20 h-20 rounded-xl border-2 border-black flex items-center justify-center text-2xl font-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transform group-hover:rotate-3 transition-transform ${material.status === 'draft'
+                      ? 'bg-yellow-300 text-black'
+                      : 'bg-purple-300 text-black'
                       }`}>
                       {material.material_type.substring(0, 3).toUpperCase()}
                     </div>
 
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1 min-w-0 pt-1">
                       {material.tags && material.tags.length > 0 && (
                         <div className="flex flex-wrap gap-2 mb-3">
                           {material.tags.map((tag, index) => (
-                            <span key={index} className="px-2 py-0.5 bg-gray-800 text-yellow-400 text-xs font-bold rounded-full border border-gray-700">
+                            <span key={index} className="px-2 py-0.5 bg-blue-100 text-blue-800 border border-black text-xs font-bold rounded-lg shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
                               #{tag}
                             </span>
                           ))}
                         </div>
                       )}
                       <div className="flex items-center gap-3 mb-2">
-                        <span className="px-3 py-1 rounded-full bg-gray-800 text-gray-300 text-xs font-bold uppercase tracking-wide border border-gray-700">
+                        <span className="px-3 py-1 rounded-lg bg-pink-200 text-black border border-black text-xs font-black uppercase tracking-wide shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">
                           {getTopicTitle(material.topic_id)}
                         </span>
-                        <span className="text-xs text-gray-500 font-mono">
+                        <span className="text-xs text-black/60 font-mono font-bold">
                           {new Date(material.created_at).toLocaleDateString('id-ID', { dateStyle: 'long' })}
                         </span>
                       </div>
-                      <h3 className="text-xl font-bold text-white mb-2 truncate group-hover:text-yellow-400 transition-colors">
+                      <h3 className="text-2xl font-black text-black mb-2 truncate group-hover:text-purple-600 transition-colors">
                         {material.title}
                       </h3>
                       {material.url && (
@@ -370,7 +355,7 @@ export default function MentorDashboardPage() {
                           href={material.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-sm font-semibold text-indigo-400 hover:text-indigo-300 hover:underline flex items-center gap-1"
+                          className="text-sm font-bold text-blue-600 hover:text-blue-500 hover:underline flex items-center gap-1"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -383,16 +368,16 @@ export default function MentorDashboardPage() {
                 </div>
               ))
             ) : (
-              <div className="flex flex-col items-center justify-center py-20 text-center border-2 border-dashed border-gray-800 rounded-2xl bg-gray-900/50">
-                <div className="w-20 h-20 bg-gray-800 rounded-full flex items-center justify-center mb-6">
-                  <svg className="w-10 h-10 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="flex flex-col items-center justify-center py-20 text-center border-4 border-dashed border-black/20 rounded-3xl bg-white/50">
+                <div className="w-24 h-24 bg-gray-100 rounded-full border-4 border-black/10 flex items-center justify-center mb-6">
+                  <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2">
+                <h3 className="text-2xl font-black text-black mb-2">
                   Belum ada materi {activeTab === 'published' ? 'terpublish' : 'draft'}
                 </h3>
-                <p className="text-gray-500 max-w-sm mb-8">
+                <p className="text-black/60 max-w-sm mb-8 font-medium">
                   {activeTab === 'published'
                     ? 'Mulai berbagi pengetahuan Anda dengan membuat materi pembelajaran baru.'
                     : 'Draft materi yang Anda buat akan muncul di sini sebelum dipublish.'}
@@ -400,7 +385,7 @@ export default function MentorDashboardPage() {
                 {activeTab === 'published' && (
                   <button
                     onClick={handleCreateClick}
-                    className="px-6 py-3 bg-yellow-400 text-black rounded-xl hover:bg-yellow-300 transition-all font-black"
+                    className="px-8 py-4 bg-yellow-400 text-black border-4 border-black rounded-2xl hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-3px] hover:translate-y-[-3px] transition-all font-black text-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
                   >
                     Buat Materi Pertama
                   </button>

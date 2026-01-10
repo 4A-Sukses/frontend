@@ -11,8 +11,8 @@ import { clearCachedPages } from './MultiPageMaterialEditor'
 const MultiPageMaterialEditor = dynamic(() => import('./MultiPageMaterialEditor'), {
   ssr: false,
   loading: () => (
-    <div className="border border-gray-300 dark:border-gray-600 rounded-lg p-4 min-h-[300px] flex items-center justify-center">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500"></div>
+    <div className="border-2 border-black rounded-xl p-8 min-h-[300px] flex items-center justify-center bg-white">
+      <div className="animate-spin rounded-full h-12 w-12 border-4 border-black border-t-transparent"></div>
     </div>
   )
 })
@@ -189,26 +189,26 @@ export default function MaterialForm({ userId, initialMaterial, initialTopicId, 
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+    <div className="bg-white rounded-2xl border-2 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
       {/* Header */}
-      <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+      <div className="p-6 border-b-2 border-black bg-gray-50">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+            <h2 className="text-2xl font-black text-black">
               {initialMaterial ? 'Edit Materi' : 'Buat Materi Baru'}
             </h2>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+            <p className="text-sm font-bold text-gray-600 mt-1">
               {step === 1 ? 'Langkah 1: Informasi Materi' : 'Langkah 2: Konten Multi-Halaman'}
             </p>
           </div>
 
           {/* Step Indicator */}
           <div className="flex items-center gap-2">
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${step === 1 ? 'bg-indigo-600 text-white' : 'bg-indigo-100 text-indigo-600'}`}>
+            <div className={`w-10 h-10 rounded-full border-2 border-black flex items-center justify-center font-black transition-all ${step === 1 ? 'bg-indigo-500 text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]' : 'bg-gray-100 text-gray-500'}`}>
               1
             </div>
-            <div className="w-8 h-1 bg-gray-200 dark:bg-gray-700"></div>
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${step === 2 ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-400'}`}>
+            <div className="w-10 h-1 bg-black rounded-full"></div>
+            <div className={`w-10 h-10 rounded-full border-2 border-black flex items-center justify-center font-black transition-all ${step === 2 ? 'bg-indigo-500 text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]' : 'bg-gray-100 text-gray-500'}`}>
               2
             </div>
           </div>
@@ -216,13 +216,13 @@ export default function MaterialForm({ userId, initialMaterial, initialTopicId, 
       </div>
 
       {/* Form Content */}
-      <div className="p-6 space-y-6">
+      <div className="p-8 space-y-8">
         {/* STEP 1: Metadata */}
         {step === 1 && (
           <>
             {/* Topic Selection */}
             <div>
-              <label htmlFor="topic_id" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="topic_id" className="block text-base font-black text-black mb-2">
                 Pilih Topik <span className="text-red-500">*</span>
               </label>
               <select
@@ -230,19 +230,21 @@ export default function MaterialForm({ userId, initialMaterial, initialTopicId, 
                 required
                 value={selectedTopicId}
                 onChange={(e) => setSelectedTopicId(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                className="w-full px-4 py-3 border-2 border-black rounded-xl text-black bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all font-bold"
                 disabled={loading}
               >
                 <option value="">-- Pilih Topik --</option>
                 {topics.map(t => (
-                  <option key={t.id} value={t.id}>{t.title}</option>
+                  <option key={t.id} value={t.id}>
+                    {t.title.length > 30 ? t.title.slice(0, 30) + '...' : t.title}
+                  </option>
                 ))}
               </select>
             </div>
 
             {/* Title */}
             <div>
-              <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="title" className="block text-base font-black text-black mb-2">
                 Judul Materi <span className="text-red-500">*</span>
               </label>
               <input
@@ -251,7 +253,7 @@ export default function MaterialForm({ userId, initialMaterial, initialTopicId, 
                 required
                 value={formData.title}
                 onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                className="w-full px-4 py-3 border-2 border-black rounded-xl text-black bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all font-bold placeholder:font-medium placeholder:text-gray-400"
                 placeholder="Masukkan judul materi"
                 disabled={loading}
               />
@@ -259,17 +261,17 @@ export default function MaterialForm({ userId, initialMaterial, initialTopicId, 
 
             {/* Material Type */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-base font-black text-black mb-2">
                 Tipe Materi <span className="text-red-500">*</span>
               </label>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {['article', 'video', 'pdf', 'slides', 'book', 'other'].map((type) => (
                   <label
                     key={type}
-                    className={`relative flex items-center justify-center px-4 py-3 rounded-lg border cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-all
+                    className={`relative flex items-center justify-center px-4 py-3 rounded-xl border-2 cursor-pointer transition-all font-bold
                       ${formData.material_type === type
-                        ? 'border-indigo-500 ring-2 ring-indigo-500 ring-opacity-50 bg-indigo-50 dark:bg-indigo-900/20'
-                        : 'border-gray-300 dark:border-gray-600'
+                        ? 'border-black bg-indigo-200 text-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] translate-x-[-1px] translate-y-[-1px]'
+                        : 'border-black bg-white text-gray-600 hover:bg-gray-50'
                       }`}
                   >
                     <input
@@ -281,7 +283,7 @@ export default function MaterialForm({ userId, initialMaterial, initialTopicId, 
                       className="sr-only"
                       disabled={loading}
                     />
-                    <span className="capitalize font-medium text-sm text-gray-900 dark:text-gray-200">{type}</span>
+                    <span className="capitalize">{type}</span>
                   </label>
                 ))}
               </div>
@@ -289,7 +291,7 @@ export default function MaterialForm({ userId, initialMaterial, initialTopicId, 
 
             {/* URL */}
             <div>
-              <label htmlFor="url" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="url" className="block text-base font-black text-black mb-2">
                 URL Sumber (Opsional)
               </label>
               <input
@@ -297,7 +299,7 @@ export default function MaterialForm({ userId, initialMaterial, initialTopicId, 
                 id="url"
                 value={formData.url}
                 onChange={(e) => setFormData(prev => ({ ...prev, url: e.target.value }))}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                className="w-full px-4 py-3 border-2 border-black rounded-xl text-black bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all font-bold placeholder:font-medium placeholder:text-gray-400"
                 placeholder="https://example.com/sumber"
                 disabled={loading}
               />
@@ -305,7 +307,7 @@ export default function MaterialForm({ userId, initialMaterial, initialTopicId, 
 
             {/* Tags */}
             <div>
-              <label htmlFor="tags" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="tags" className="block text-base font-black text-black mb-2">
                 Tags (Pisahkan dengan koma)
               </label>
               <input
@@ -313,7 +315,7 @@ export default function MaterialForm({ userId, initialMaterial, initialTopicId, 
                 id="tags"
                 value={formData.tags}
                 onChange={(e) => setFormData(prev => ({ ...prev, tags: e.target.value }))}
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                className="w-full px-4 py-3 border-2 border-black rounded-xl text-black bg-white focus:outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all font-bold placeholder:font-medium placeholder:text-gray-400"
                 placeholder="Contoh: fisika, matematika, dasar"
                 disabled={loading}
               />
@@ -325,25 +327,25 @@ export default function MaterialForm({ userId, initialMaterial, initialTopicId, 
         {step === 2 && (
           <>
             {/* Material Info Summary */}
-            <div className="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4 mb-4">
+            <div className="bg-yellow-100 border-2 border-black rounded-xl p-4 mb-4 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white">{formData.title}</h3>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <h3 className="font-black text-lg text-black">{formData.title}</h3>
+                  <p className="text-sm font-bold text-black/70">
                     {topics.find(t => t.id === Number(selectedTopicId))?.title} • {formData.material_type}
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={goToStep1}
-                  className="text-sm text-indigo-600 hover:text-indigo-700 dark:text-indigo-400"
+                  className="px-3 py-1 bg-white border-2 border-black rounded-lg text-sm font-bold hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all"
                 >
                   Edit Info
                 </button>
               </div>
             </div>
 
-            {/* Multi-Page Editor (includes media upload) */}
+            {/* Multi-Page Editor */}
             <MultiPageMaterialEditor
               pages={pages}
               onChange={handlePagesChange}
@@ -357,33 +359,33 @@ export default function MaterialForm({ userId, initialMaterial, initialTopicId, 
         {/* Message */}
         {message && (
           <div
-            className={`rounded-lg p-4 flex items-start gap-3 ${message.type === 'error'
-              ? 'bg-red-50 text-red-800 dark:bg-red-900/30 dark:text-red-200 border border-red-200 dark:border-red-800'
-              : 'bg-green-50 text-green-800 dark:bg-green-900/30 dark:text-green-200 border border-green-200 dark:border-green-800'
+            className={`rounded-xl p-4 flex items-start gap-3 border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] ${message.type === 'error'
+              ? 'bg-red-200 text-red-900'
+              : 'bg-green-200 text-green-900'
               }`}
           >
             {message.type === 'success' ? (
               <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
               </svg>
             ) : (
               <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             )}
-            <p className="text-sm font-medium">{message.text}</p>
+            <p className="font-bold">{message.text}</p>
           </div>
         )}
 
         {/* Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t-2 border-black">
           {step === 1 ? (
             <>
               <button
                 type="button"
                 onClick={() => onCancel ? onCancel() : router.back()}
                 disabled={loading}
-                className="flex-1 px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-semibold disabled:opacity-50"
+                className="flex-1 px-6 py-3 bg-white border-2 border-black text-black rounded-xl hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all font-black disabled:opacity-50"
               >
                 Batal
               </button>
@@ -391,11 +393,11 @@ export default function MaterialForm({ userId, initialMaterial, initialTopicId, 
                 type="button"
                 onClick={goToStep2}
                 disabled={loading}
-                className="flex-1 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors font-semibold shadow-sm hover:shadow disabled:opacity-50 flex items-center justify-center gap-2"
+                className="flex-1 px-6 py-3 bg-indigo-500 border-2 border-black text-white rounded-xl hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all font-black disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 Lanjut ke Konten
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
                 </svg>
               </button>
             </>
@@ -405,10 +407,10 @@ export default function MaterialForm({ userId, initialMaterial, initialTopicId, 
                 type="button"
                 onClick={goToStep1}
                 disabled={loading}
-                className="flex-1 px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors font-semibold disabled:opacity-50 flex items-center justify-center gap-2"
+                className="flex-1 px-6 py-3 bg-white border-2 border-black text-black rounded-xl hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all font-black disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M15 19l-7-7 7-7" />
                 </svg>
                 Kembali
               </button>
@@ -416,7 +418,7 @@ export default function MaterialForm({ userId, initialMaterial, initialTopicId, 
                 type="button"
                 onClick={() => handleSubmit('draft')}
                 disabled={loading}
-                className="flex-1 px-6 py-3 bg-yellow-500 hover:bg-yellow-600 text-white rounded-lg transition-colors font-semibold shadow-sm hover:shadow disabled:opacity-50"
+                className="flex-1 px-6 py-3 bg-yellow-400 border-2 border-black text-black rounded-xl hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all font-black disabled:opacity-50"
               >
                 Simpan Draft
               </button>
@@ -424,7 +426,7 @@ export default function MaterialForm({ userId, initialMaterial, initialTopicId, 
                 type="button"
                 onClick={() => handleSubmit('published')}
                 disabled={loading}
-                className="flex-1 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors font-semibold shadow-sm hover:shadow disabled:opacity-50"
+                className="flex-1 px-6 py-3 bg-green-500 border-2 border-black text-white rounded-xl hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all font-black disabled:opacity-50"
               >
                 {loading ? 'Menyimpan...' : (initialMaterial ? 'Publish Perubahan' : 'Publish Sekarang')}
               </button>

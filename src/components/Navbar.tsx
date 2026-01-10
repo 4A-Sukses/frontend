@@ -128,21 +128,18 @@ export default function Navbar() {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? "pt-4" : ""
-      }`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? "pt-4" : ""
+        }`}
     >
       <div
-        className={`max-w-7xl mx-auto transition-all duration-300 ${
-          isScrolled ? "px-4 sm:px-6 lg:px-8" : "px-0"
-        }`}
+        className={`max-w-7xl mx-auto transition-all duration-300 ${isScrolled ? "px-4 sm:px-6 lg:px-8" : "px-0"
+          }`}
       >
         <div
-          className={`flex justify-between items-center h-16 transition-all duration-300 ${
-            isScrolled
-              ? "bg-white border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] rounded-full px-8"
-              : "bg-transparent px-4 sm:px-6 lg:px-8"
-          }`}
+          className={`flex justify-between items-center h-16 transition-all duration-300 ${isScrolled
+            ? "bg-white border-2 border-black rounded-full px-8"
+            : "bg-transparent px-4 sm:px-6 lg:px-8"
+            }`}
         >
           {/* Logo/Brand */}
           <div className="flex items-center">
@@ -174,9 +171,8 @@ export default function Navbar() {
               >
                 Features
                 <svg
-                  className={`w-4 h-4 transition-transform ${
-                    isDropdownOpen ? "rotate-180" : ""
-                  }`}
+                  className={`w-4 h-4 transition-transform ${isDropdownOpen ? "rotate-180" : ""
+                    }`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -198,9 +194,8 @@ export default function Navbar() {
                       key={feature.path}
                       href={feature.path}
                       onClick={() => setIsDropdownOpen(false)}
-                      className={`block px-4 py-2 text-black font-bold hover:bg-blue-500 transition-colors ${
-                        index !== features.length - 1 ? 'border-b border-black' : ''
-                      }`}
+                      className={`block px-4 py-2 text-black font-bold hover:bg-blue-500 transition-colors ${index !== features.length - 1 ? 'border-b border-black' : ''
+                        }`}
                     >
                       {feature.title}
                     </Link>
@@ -215,7 +210,7 @@ export default function Navbar() {
             {!user ? (
               <button
                 onClick={() => setShowAuthModal(true)}
-                className="px-6 py-2 bg-teal-400 border-2 border-black text-black rounded-xl hover:bg-teal-500 transition-all font-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5"
+                className="px-6 py-2 bg-teal-400 border-2 border-black text-black rounded-xl hover:bg-teal-500 transition-all font-black"
               >
                 Login
               </button>
@@ -234,9 +229,8 @@ export default function Navbar() {
                   </div>
                 )}
                 <div className="text-right">
-                  <p className={`text-sm font-black ${
-                    isScrolled ? 'text-black' : 'text-black'
-                  }`}>
+                  <p className={`text-sm font-black ${isScrolled ? 'text-black' : 'text-black'
+                    }`}>
                     {userProfile?.nama || user.username}
                   </p>
                   <p className="text-xs font-bold text-gray-600">{user.role}</p>
@@ -249,7 +243,7 @@ export default function Navbar() {
                           className="w-4 h-4 object-contain"
                         />
                       )}
-                      
+
                     </div>
                   ) : (
                     <p className="text-xs font-bold text-gray-600">No Badge</p>
@@ -258,7 +252,7 @@ export default function Navbar() {
                 {user.role === "superadmin" && (
                   <Link
                     href="/admin/dashboard"
-                    className="px-4 py-2 bg-purple-400 border-2 border-black text-black text-sm rounded-xl hover:bg-purple-500 transition-all font-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5"
+                    className="px-4 py-2 bg-purple-400 border-2 border-black text-black text-sm rounded-xl hover:bg-purple-500 transition-all font-black"
                   >
                     Admin
                   </Link>
@@ -266,20 +260,20 @@ export default function Navbar() {
                 {user.role === "mentor" && (
                   <Link
                     href="/mentor/dashboard"
-                    className="px-4 py-2 bg-green-400 border-2 border-black text-black text-sm rounded-xl hover:bg-green-500 transition-all font-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5"
+                    className="px-4 py-2 bg-green-400 border-2 border-black text-black text-sm rounded-xl hover:bg-green-500 transition-all font-black"
                   >
                     Dashboard
                   </Link>
                 )}
                 <button
                   onClick={() => setShowProfileModal(true)}
-                  className="px-4 py-2 bg-indigo-400 border-2 border-black text-black text-sm rounded-xl hover:bg-indigo-500 transition-all font-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5"
+                  className="px-4 py-2 bg-indigo-400 border-2 border-black text-black text-sm rounded-xl hover:bg-indigo-500 transition-all font-black"
                 >
                   Profile
                 </button>
                 <button
                   onClick={handleSignOut}
-                  className="px-4 py-2 bg-red-400 border-2 border-black text-black text-sm rounded-xl hover:bg-red-500 transition-all font-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5"
+                  className="px-4 py-2 bg-red-400 border-2 border-black text-black text-sm rounded-xl hover:bg-red-500 transition-all font-black"
                 >
                   Logout
                 </button>
@@ -294,28 +288,24 @@ export default function Navbar() {
             aria-label="Toggle menu"
           >
             <span
-              className={`block w-6 h-0.5 bg-black transition-all duration-300 ${
-                isScrolled ? "bg-black" : "bg-black"
-              } ${isMobileMenuOpen ? "rotate-45 translate-y-2" : ""}`}
+              className={`block w-6 h-0.5 bg-black transition-all duration-300 ${isScrolled ? "bg-black" : "bg-black"
+                } ${isMobileMenuOpen ? "rotate-45 translate-y-2" : ""}`}
             ></span>
             <span
-              className={`block w-6 h-0.5 bg-black transition-all duration-300 ${
-                isScrolled ? "bg-black" : "bg-black"
-              } ${isMobileMenuOpen ? "opacity-0" : ""}`}
+              className={`block w-6 h-0.5 bg-black transition-all duration-300 ${isScrolled ? "bg-black" : "bg-black"
+                } ${isMobileMenuOpen ? "opacity-0" : ""}`}
             ></span>
             <span
-              className={`block w-6 h-0.5 bg-black transition-all duration-300 ${
-                isScrolled ? "bg-black" : "bg-black"
-              } ${isMobileMenuOpen ? "-rotate-45 -translate-y-2" : ""}`}
+              className={`block w-6 h-0.5 bg-black transition-all duration-300 ${isScrolled ? "bg-black" : "bg-black"
+                } ${isMobileMenuOpen ? "-rotate-45 -translate-y-2" : ""}`}
             ></span>
           </button>
         </div>
 
         {/* Mobile Menu (Slide-Down) */}
         <div
-          className={`mobile-menu-container md:hidden overflow-y-auto transition-all duration-300 ease-in-out ${
-            isMobileMenuOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0"
-          }`}
+          className={`mobile-menu-container md:hidden overflow-y-auto transition-all duration-300 ease-in-out ${isMobileMenuOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0"
+            }`}
         >
           <div className="bg-gradient-to-b from-blue-100 to-blue-200 border-2 border-t-0 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)]">
             {/* Mobile Navigation Links */}

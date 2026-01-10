@@ -346,11 +346,10 @@ export default function UserProfileForm({ userId, onSuccess }: UserProfileFormPr
           {message && (
             <div
               style={getAnimationStyle(0.7)}
-              className={`rounded-xl p-4 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] ${
-                message.type === 'error'
+              className={`rounded-xl p-4 border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] ${message.type === 'error'
                   ? 'bg-red-400 text-black'
                   : 'bg-green-400 text-black'
-              }`}
+                }`}
             >
               <p className="text-sm font-black">{message.text}</p>
             </div>

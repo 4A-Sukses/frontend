@@ -6,7 +6,6 @@ import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { getCurrentUserProfile } from '@/lib/profile'
 import MaterialForm from '@/components/MaterialForm'
-import Navbar from '@/components/Navbar'
 
 function CreateMaterialContent() {
   const router = useRouter()
@@ -20,7 +19,7 @@ function CreateMaterialContent() {
   const checkAuth = useCallback(async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser()
-      
+
       if (!user) {
         router.push('/login')
         return
@@ -51,8 +50,8 @@ function CreateMaterialContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-400"></div>
+      <div className="min-h-screen bg-blue-100 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-black border-t-transparent"></div>
       </div>
     )
   }
@@ -60,50 +59,32 @@ function CreateMaterialContent() {
   if (!userId) return null
 
   return (
-    <div className="min-h-screen flex flex-col bg-black">
-      {/* Navbar */}
-      <Navbar />
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-100 to-blue-200">
 
-      <div className="relative flex-1 overflow-hidden">
-         {/* Decorative curved lines */}
-         <div className="absolute inset-0 opacity-20 pointer-events-none">
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full">
-              {[...Array(12)].map((_, i) => (
-                <div
-                  key={i}
-                  className="absolute border-2 border-gray-600 rounded-full"
-                  style={{
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    width: `${(i + 1) * 150}px`,
-                    height: `${(i + 1) * 100}px`,
-                  }}
-                />
-              ))}
-            </div>
-          </div>
-
+      <div className="relative flex-1 overflow-visible">
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           {/* Header */}
           <div className="mb-8">
-            <Link href="/mentor/dashboard" className="text-yellow-400 hover:text-yellow-300 mb-4 inline-block font-bold text-sm uppercase tracking-wider flex items-center gap-2">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <Link
+              href="/mentor/dashboard"
+              className="mb-4 inline-flex items-center gap-2 px-4 py-2 bg-white text-black font-black border-2 border-black rounded-lg shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 transition-all"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
               Kembali ke Dashboard
             </Link>
-            <h1 className="text-3xl md:text-4xl font-black text-white mb-2">
-              Buat Materi <span className="text-yellow-400">Baru</span>
+            <h1 className="text-4xl md:text-5xl font-black text-black mb-2">
+              Buat Materi <span className="text-yellow-400" style={{ textShadow: '3px 3px 0px rgba(0,0,0,1)' }}>Baru</span>
             </h1>
-            <p className="text-gray-400 text-lg">
+            <p className="text-black/80 text-lg font-bold">
               Bagikan pengetahuan Anda dengan membuat materi pembelajaran berkualitas.
             </p>
           </div>
 
           {/* Form Component */}
-          <MaterialForm 
-            userId={userId} 
+          <MaterialForm
+            userId={userId}
             initialTopicId={initialTopicId}
             onSuccess={handleSuccess}
             onCancel={() => router.back()}
@@ -117,8 +98,8 @@ function CreateMaterialContent() {
 export default function CreateMaterialPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-400"></div>
+      <div className="min-h-screen bg-blue-100 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-black border-t-transparent"></div>
       </div>
     }>
       <CreateMaterialContent />
