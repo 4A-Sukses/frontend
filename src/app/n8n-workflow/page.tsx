@@ -214,8 +214,12 @@ export default function LearningPathPage() {
             >
               <div className="relative z-10 flex items-center justify-between gap-6">
                 <div className="flex items-center gap-5">
-                  <div className="flex-shrink-0 w-16 h-16 lg:w-20 lg:h-20 bg-white rounded-full flex items-center justify-center border-[3px] border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-                    <span className="text-4xl lg:text-5xl">🆕</span>
+                  <div className="flex-shrink-0 w-20 h-20 lg:w-20 lg:h-20 flex items-center justify-center">
+                    <img
+                    src="/newmat.png"
+                    alt="New Workflow"
+                    className="w-70 h-70 lg:w-15 lg:h-15 object-contain"
+                    />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
@@ -248,8 +252,12 @@ export default function LearningPathPage() {
             >
               <div className="relative z-10 flex items-center justify-between gap-6">
                 <div className="flex items-center gap-5">
-                  <div className="flex-shrink-0 w-16 h-16 lg:w-20 lg:h-20 bg-white rounded-full flex items-center justify-center border-[3px] border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-                    <span className="text-4xl lg:text-5xl">📥</span>
+                  <div className="flex-shrink-0 w-20 h-20 lg:w-20 lg:h-20 flex items-center justify-center">
+                    <img
+                    src="/imkomu.png"
+                    alt="Import from Community"
+                    className="w-70 h-70 lg:w-15 lg:h-15 object-contain"
+                    />
                   </div>
                   <div className="flex-1">
                     <h3 className="text-2xl lg:text-3xl font-black text-black mb-2">
@@ -277,8 +285,12 @@ export default function LearningPathPage() {
             >
               <div className="relative z-10 flex items-center justify-between gap-6">
                 <div className="flex items-center gap-5">
-                  <div className="flex-shrink-0 w-16 h-16 lg:w-20 lg:h-20 bg-white rounded-full flex items-center justify-center border-[3px] border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-                    <span className="text-4xl lg:text-5xl">🤖</span>
+                  <div className="flex-shrink-0 w-20 h-20 lg:w-20 lg:h-20 flex items-center justify-center">
+                    <img
+                    src="/immat.png"
+                    alt="Import from Knowledge Base"
+                    className="w-70 h-70 lg:w-15 lg:h-15 object-contain"
+                    />
                   </div>
                   <div className="flex-1">
                     <h3 className="text-2xl lg:text-3xl font-black text-black mb-2">
