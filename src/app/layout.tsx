@@ -7,6 +7,7 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "SINAUIN",
   description: "Next.js application with multiple features",
+  icons: "/happy.svg",
 };
 
 export default function RootLayout({
