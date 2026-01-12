@@ -39,7 +39,7 @@ export default function ImplementModal({ isOpen, onClose, workflowId, workflowTi
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [isGoogleConnected, setIsGoogleConnected] = useState(false);
-    const [supabaseToken, setSupabaseToken] = useState<string | null>(null);
+    const [googleAccessToken, setGoogleAccessToken] = useState<string | null>(null);
     const [startDate, setStartDate] = useState(() => {
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
@@ -48,7 +48,7 @@ export default function ImplementModal({ isOpen, onClose, workflowId, workflowTi
     const [dailyHours, setDailyHours] = useState(2);
 
     useEffect(() => {
-        // Check if user is logged in with Google provider
+        // Check if user is logged in with Google provider and extract provider token
         const checkGoogleAuth = async () => {
             const { data: { session } } = await supabase.auth.getSession();
 
@@ -56,8 +56,12 @@ export default function ImplementModal({ isOpen, onClose, workflowId, workflowTi
                 // Check if user logged in with Google provider
                 const provider = session.user.app_metadata?.provider;
                 if (provider === 'google') {
-                    setIsGoogleConnected(true);
-                    setSupabaseToken(session.access_token);
+                    // Extract Google provider token from session
+                    const providerToken = session.provider_token;
+                    if (providerToken) {
+                        setIsGoogleConnected(true);
+                        setGoogleAccessToken(providerToken);
+                    }
                 }
             }
         };
@@ -69,8 +73,12 @@ export default function ImplementModal({ isOpen, onClose, workflowId, workflowTi
             if (event === 'SIGNED_IN' && session) {
                 const provider = session.user.app_metadata?.provider;
                 if (provider === 'google') {
-                    setIsGoogleConnected(true);
-                    setSupabaseToken(session.access_token);
+                    // Extract Google provider token from session
+                    const providerToken = session.provider_token;
+                    if (providerToken) {
+                        setIsGoogleConnected(true);
+                        setGoogleAccessToken(providerToken);
+                    }
                 }
             }
         });
@@ -173,7 +181,7 @@ export default function ImplementModal({ isOpen, onClose, workflowId, workflowTi
     };
 
     const handleImplement = async () => {
-        if (!supabaseToken) {
+        if (!googleAccessToken) {
             setError('Hubungkan Google Calendar terlebih dahulu');
             return;
         }
@@ -185,7 +193,7 @@ export default function ImplementModal({ isOpen, onClose, workflowId, workflowTi
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    supabase_token: supabaseToken,
+                    access_token: googleAccessToken,
                     start_date: startDate,
                     daily_hours: dailyHours
                 })
