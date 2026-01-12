@@ -117,7 +117,7 @@ export default function Navbar() {
     },
     {
       path: "/TaskIntegrator",
-      title: "Task Integrator",
+      title: "AI Learning Analytics",
       description: "Task Integration & Management",
     },
   ];

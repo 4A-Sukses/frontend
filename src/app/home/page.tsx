@@ -569,13 +569,13 @@ export default function HomePage() {
         </div>
 
         {/* Thinking Character Divider */}
-        <div className="relative w-full" style={{ height: '400px' }}>
+        <div className="relative w-full">
           {/* Smooth gradient transition from blue-200 to blue-200 */}
           <div className="absolute inset-0 bg-gradient-to-b from-blue-200 to-blue-200"></div>
 
           {/* Character Image - Right side */}
           <motion.div
-            className="absolute bottom-0 right-0 z-10"
+            className="relative z-10 ml-auto w-fit"
             initial={{ opacity: 0, scale: 0.8 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: false, amount: 0.3 }}
@@ -584,7 +584,7 @@ export default function HomePage() {
             <img
               src="/mikir.png"
               alt="SINAUIN Thinking Character"
-              className="h-[600px] w-auto object-contain"
+              className="h-[500px] w-auto object-contain"
             />
           </motion.div>
         </div>
@@ -988,7 +988,7 @@ export default function HomePage() {
         </footer>
       </div>
     </div>
-    
+
   );
 }
 
