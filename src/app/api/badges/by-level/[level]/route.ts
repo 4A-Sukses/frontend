@@ -3,10 +3,11 @@ import { getBadgeByLevel } from "@/lib/badges";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { level: string } }
+  { params }: { params: Promise<{ level: string }> }
 ) {
   try {
-    const level = parseInt(params.level);
+    const { level: levelStr } = await params;
+    const level = parseInt(levelStr);
 
     if (isNaN(level) || level < 1) {
       return NextResponse.json({ error: "Invalid level" }, { status: 400 });

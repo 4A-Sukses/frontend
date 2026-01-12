@@ -5,7 +5,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Lomba Web App",
+  title: "SINAUIN",
   description: "Next.js application with multiple features",
 };
 
