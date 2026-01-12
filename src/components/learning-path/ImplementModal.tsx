@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
+import { generateLearningSchedule, createCalendarEvents } from '@/lib/googleCalendar';
 
 interface NodeEstimate {
     nodeId: string;
@@ -46,25 +47,54 @@ export default function ImplementModal({ isOpen, onClose, workflowId, workflowTi
         return tomorrow.toISOString().split('T')[0];
     });
     const [dailyHours, setDailyHours] = useState(2);
+    const [createdEventCount, setCreatedEventCount] = useState(0);
 
     useEffect(() => {
         const checkGoogleAuth = async () => {
             const { data: { session } } = await supabase.auth.getSession();
-            
+
+            console.log('🔍 Checking Google Auth...');
+            console.log('Session exists:', !!session);
+            console.log('Provider:', session?.user?.app_metadata?.provider);
+            console.log('Provider token exists:', !!session?.provider_token);
+
             if (session?.user) {
                 const provider = session.user.app_metadata?.provider;
-                // Just check if user signed in with Google
-                // Backend will handle token extraction
-                setIsGoogleConnected(provider === 'google');
+
+                if (provider === 'google') {
+                    // Extract Google provider token from Supabase session
+                    const providerToken = session.provider_token;
+
+                    if (providerToken) {
+                        console.log('✅ Google access token found');
+                        setIsGoogleConnected(true);
+                        setGoogleAccessToken(providerToken);
+                    } else {
+                        console.warn('⚠️ Signed in with Google but no provider_token found');
+                        setIsGoogleConnected(false);
+                        setGoogleAccessToken(null);
+                    }
+                }
             }
         };
 
         checkGoogleAuth();
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+            console.log('🔄 Auth state changed:', event);
+
             if (event === 'SIGNED_IN' && session) {
                 const provider = session.user.app_metadata?.provider;
-                setIsGoogleConnected(provider === 'google');
+
+                if (provider === 'google') {
+                    const providerToken = session.provider_token;
+
+                    if (providerToken) {
+                        console.log('✅ Google access token obtained after sign-in');
+                        setIsGoogleConnected(true);
+                        setGoogleAccessToken(providerToken);
+                    }
+                }
             }
         });
 
@@ -166,41 +196,68 @@ export default function ImplementModal({ isOpen, onClose, workflowId, workflowTi
     };
 
     const handleImplement = async () => {
-        // Get Supabase session
-        const { data: { session } } = await supabase.auth.getSession();
-        
-        if (!session) {
-            setError('Please sign in to continue');
+        if (!googleAccessToken) {
+            setError('Token Google Calendar tidak tersedia. Silakan hubungkan ulang.');
+            return;
+        }
+
+        if (!schedule) {
+            setError('Estimasi jadwal tidak tersedia');
             return;
         }
 
         setLoading(true);
         setError(null);
+
         try {
-            // SECURITY: Send only Supabase access token via Authorization header
-            // Backend will securely extract Google token from Supabase
-            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/workflows/${workflowId}/implement`, {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${session.access_token}` // Supabase token, NOT Google token
-                },
-                body: JSON.stringify({
-                    // Remove access_token from body - it's now in Authorization header
-                    start_date: startDate,
-                    daily_hours: dailyHours
-                })
-            });
-            const data = await response.json();
-            if (data.success) {
-                setStep('success');
-            } else {
-                setError(data.error || 'Gagal membuat jadwal');
+            console.log('📅 Creating calendar events...');
+            console.log('Start date:', startDate);
+            console.log('Daily hours:', dailyHours);
+            console.log('Total nodes:', schedule.nodes.length);
+
+            // Generate learning schedule from nodes
+            const start = new Date(startDate);
+            start.setHours(9, 0, 0, 0); // Start at 9 AM
+
+            const calendarEvents = generateLearningSchedule(
+                schedule.nodes,
+                start,
+                dailyHours
+            );
+
+            console.log(`Generated ${calendarEvents.length} calendar events`);
+
+            // Create events in Google Calendar directly from frontend
+            const result = await createCalendarEvents(googleAccessToken, calendarEvents);
+
+            console.log(`✅ Successfully created ${result.eventIds.length} events`);
+
+            setCreatedEventCount(result.eventIds.length);
+
+            if (result.failedCount > 0) {
+                setError(`Berhasil membuat ${result.eventIds.length} dari ${calendarEvents.length} event. ${result.failedCount} event gagal.`);
             }
-        } catch (err) {
-            setError('Gagal membuat jadwal');
+
+            setStep('success');
+        } catch (err: any) {
+            console.error('❌ Failed to create calendar events:', err);
+
+            let errorMessage = 'Gagal membuat jadwal di Google Calendar';
+
+            if (err.message) {
+                if (err.message.includes('session expired')) {
+                    errorMessage = 'Sesi Google Anda telah kadaluarsa. Silakan hubungkan ulang.';
+                } else if (err.message.includes('access denied')) {
+                    errorMessage = 'Akses Google Calendar ditolak. Silakan berikan izin Calendar.';
+                } else {
+                    errorMessage = err.message;
+                }
+            }
+
+            setError(errorMessage);
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
 
 
@@ -240,7 +297,7 @@ export default function ImplementModal({ isOpen, onClose, workflowId, workflowTi
                                 Jadwal Berhasil Dibuat!
                             </h3>
                             <p className="text-gray-700 text-base font-bold mb-8">
-                                {schedule?.nodes.length} topik telah dijadwalkan di Google Calendar
+                                {createdEventCount} event telah dijadwalkan di Google Calendar
                             </p>
                             <button
                                 onClick={onClose}
