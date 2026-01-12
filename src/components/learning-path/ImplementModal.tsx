@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { supabase } from '@/lib/supabase';
 
 interface NodeEstimate {
     nodeId: string;
@@ -37,7 +38,8 @@ export default function ImplementModal({ isOpen, onClose, workflowId, workflowTi
     const [schedule, setSchedule] = useState<Schedule | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [googleToken, setGoogleToken] = useState<string | null>(null);
+    const [isGoogleConnected, setIsGoogleConnected] = useState(false);
+    const [supabaseToken, setSupabaseToken] = useState<string | null>(null);
     const [startDate, setStartDate] = useState(() => {
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
@@ -46,14 +48,21 @@ export default function ImplementModal({ isOpen, onClose, workflowId, workflowTi
     const [dailyHours, setDailyHours] = useState(2);
 
     useEffect(() => {
-        // Check for Google token in URL (from OAuth callback)
-        const params = new URLSearchParams(window.location.search);
-        const token = params.get('google_token');
-        if (token) {
-            setGoogleToken(token);
-            // Clean up URL
-            window.history.replaceState({}, '', window.location.pathname);
-        }
+        // Check if user is logged in with Google provider
+        const checkGoogleAuth = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+
+            if (session?.user) {
+                // Check if user logged in with Google provider
+                const provider = session.user.app_metadata?.provider;
+                if (provider === 'google') {
+                    setIsGoogleConnected(true);
+                    setSupabaseToken(session.access_token);
+                }
+            }
+        };
+
+        checkGoogleAuth();
     }, []);
 
     const fetchEstimate = useCallback(async () => {
@@ -110,21 +119,34 @@ export default function ImplementModal({ isOpen, onClose, workflowId, workflowTi
     }, [isOpen, schedule, fetchEstimate]);
 
     const handleConnectGoogle = async () => {
+        setLoading(true);
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/google/url`);
-            const data = await response.json();
-            if (data.success) {
-                window.location.href = data.url;
-            } else {
-                setError('Google Calendar belum dikonfigurasi di server');
+            // Sign in with Google via Supabase with Calendar scope
+            const { error } = await supabase.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: `${window.location.origin}/n8n-workflow`,
+                    scopes: 'https://www.googleapis.com/auth/calendar.events',
+                    queryParams: {
+                        access_type: 'offline',
+                        prompt: 'consent'
+                    }
+                }
+            });
+
+            if (error) {
+                setError('Gagal terhubung ke Google Calendar');
+                setLoading(false);
             }
+            // User will be redirected to Google, then back here
         } catch (err) {
             setError('Gagal terhubung ke Google');
+            setLoading(false);
         }
     };
 
     const handleImplement = async () => {
-        if (!googleToken) {
+        if (!supabaseToken) {
             setError('Hubungkan Google Calendar terlebih dahulu');
             return;
         }
@@ -136,7 +158,7 @@ export default function ImplementModal({ isOpen, onClose, workflowId, workflowTi
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    access_token: googleToken,
+                    supabase_token: supabaseToken,
                     start_date: startDate,
                     daily_hours: dailyHours
                 })
@@ -145,7 +167,7 @@ export default function ImplementModal({ isOpen, onClose, workflowId, workflowTi
             if (data.success) {
                 setStep('success');
             } else {
-                setError(data.error);
+                setError(data.error || 'Gagal membuat jadwal');
             }
         } catch (err) {
             setError('Gagal membuat jadwal');
@@ -261,7 +283,7 @@ export default function ImplementModal({ isOpen, onClose, workflowId, workflowTi
                             </div>
 
                             {/* Google Connection */}
-                            {googleToken ? (
+                            {isGoogleConnected ? (
                                 <div className="bg-green-200 border-[3px] border-green-600 p-4 mb-6 flex items-center gap-3">
                                     <span className="text-green-800 text-xl font-black">✓</span>
                                     <span className="text-green-900 font-bold text-base">Google Calendar terhubung</span>
@@ -269,10 +291,11 @@ export default function ImplementModal({ isOpen, onClose, workflowId, workflowTi
                             ) : (
                                 <button
                                     onClick={handleConnectGoogle}
+                                    disabled={loading}
                                     className="w-full py-4 bg-white text-black border-[3px] border-black font-black text-base mb-6
                                         flex items-center justify-center gap-3 hover:bg-gray-100 transition-all
                                         shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[5px_5px_0px_0px_rgba(0,0,0,1)]
-                                        hover:-translate-x-0.5 hover:-translate-y-0.5"
+                                        hover:-translate-x-0.5 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     <svg className="w-6 h-6" viewBox="0 0 24 24">
                                         <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -280,7 +303,7 @@ export default function ImplementModal({ isOpen, onClose, workflowId, workflowTi
                                         <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
                                         <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
                                     </svg>
-                                    Hubungkan Google Calendar
+                                    {loading ? 'Menghubungkan...' : 'Hubungkan Google Calendar'}
                                 </button>
                             )}
 
@@ -296,11 +319,11 @@ export default function ImplementModal({ isOpen, onClose, workflowId, workflowTi
                                 </button>
                                 <button
                                     onClick={handleImplement}
-                                    disabled={!googleToken}
+                                    disabled={!isGoogleConnected || loading}
                                     className="flex-1 py-3 text-base bg-blue-500 hover:bg-blue-400 disabled:bg-gray-400
                                         text-white border-[3px] border-black font-black transition-all
                                         shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:shadow-[5px_5px_0px_0px_rgba(0,0,0,1)]
-                                        hover:-translate-x-0.5 hover:-translate-y-0.5 disabled:hover:translate-x-0 disabled:hover:translate-y-0"
+                                        hover:-translate-x-0.5 hover:-translate-y-0.5 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:cursor-not-allowed"
                                 >
                                     📅 Buat Jadwal
                                 </button>
