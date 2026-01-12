@@ -287,7 +287,7 @@ export default function LearningPathPage() {
                 <div className="flex items-center gap-5">
                   <div className="flex-shrink-0 w-20 h-20 lg:w-20 lg:h-20 flex items-center justify-center">
                     <img
-                    src="/immat.png"
+                    src="/immate.png"
                     alt="Import from Knowledge Base"
                     className="w-70 h-70 lg:w-15 lg:h-15 object-contain"
                     />

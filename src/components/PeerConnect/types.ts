@@ -4,6 +4,7 @@ export interface Interest {
   id: number
   name: string
   description: string
+  icon?: string | null
 }
 
 export interface ChatRoom {
@@ -11,6 +12,7 @@ export interface ChatRoom {
   interest_id: number
   name: string
   created_at: string
+  icon?: string | null
 }
 
 export interface MaterialLinkData {

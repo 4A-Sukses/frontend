@@ -44,9 +44,24 @@ export default function GroupChatArea({
   return (
     <>
       {/* Chat Header */}
-      <div className="bg-green-300 border-b-2 border-black px-6 py-4 flex items-center justify-between">
+      <div className="bg-emerald-300 border-b-2 border-black px-6 py-4 flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-black text-black">💬 {chatRoom.name}</h2>
+          <div className="flex items-center gap-3">
+  {chatRoom.icon ? (
+    <img 
+      src={chatRoom.icon} 
+      alt={chatRoom.name}
+      className="w-10 h-10 rounded-full object-cover border-2 border-black"
+    />
+  ) : (
+    <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center">
+      <span className="text-gray-600 font-semibold text-lg">
+        {chatRoom.name?.charAt(0).toUpperCase()}
+      </span>
+    </div>
+  )}
+  <h2 className="text-lg font-black text-black">{chatRoom.name}</h2>
+</div>
           <p className="text-sm text-gray-800 font-semibold">{groupMembers.length} members</p>
         </div>
       </div>
