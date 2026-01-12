@@ -159,16 +159,21 @@ export default function ImplementModal({ isOpen, onClose, workflowId, workflowTi
     const handleConnectGoogle = async () => {
         setLoading(true);
         try {
-            // Save current page state to localStorage so we can restore after OAuth
-            // This is needed because OAuth will reload the page
+            console.log('🔐 Starting Google OAuth...');
+
+            // Save state to localStorage BEFORE OAuth redirect
             try {
-                // Try to get current canvas state from parent
-                // We'll save minimal info to restore the canvas view
                 localStorage.setItem('n8n_modal_should_open', 'true');
                 localStorage.setItem('n8n_modal_workflow_id', workflowId || '');
                 localStorage.setItem('n8n_modal_workflow_title', workflowTitle || '');
+
+                console.log('💾 Saved to localStorage:', {
+                    should_open: localStorage.getItem('n8n_modal_should_open'),
+                    workflow_id: localStorage.getItem('n8n_modal_workflow_id'),
+                    workflow_title: localStorage.getItem('n8n_modal_workflow_title')
+                });
             } catch (err) {
-                console.warn('Failed to save state:', err);
+                console.error('❌ Failed to save state:', err);
             }
 
             // Sign in with Google via Supabase with Calendar scope
@@ -185,11 +190,14 @@ export default function ImplementModal({ isOpen, onClose, workflowId, workflowTi
             });
 
             if (error) {
+                console.error('❌ OAuth error:', error);
                 setError('Gagal terhubung ke Google Calendar');
                 setLoading(false);
             }
+
             // User will be redirected to Google, then back here with ?google_calendar_auth=success
         } catch (err) {
+            console.error('❌ Connect Google error:', err);
             setError('Gagal terhubung ke Google');
             setLoading(false);
         }

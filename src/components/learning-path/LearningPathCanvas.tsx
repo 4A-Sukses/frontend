@@ -79,12 +79,28 @@ function LearningPathCanvasInner({ topic, workflowId, userId, onSave, initialDat
 
     // Check if modal should auto-open after OAuth redirect
     useEffect(() => {
+        console.log('🔍 Checking if modal should auto-open...');
+
         const shouldOpen = localStorage.getItem('n8n_modal_should_open');
+        const savedWorkflowId = localStorage.getItem('n8n_modal_workflow_id');
+        const savedWorkflowTitle = localStorage.getItem('n8n_modal_workflow_title');
+
+        console.log('📦 LocalStorage values:', {
+            should_open: shouldOpen,
+            workflow_id: savedWorkflowId,
+            workflow_title: savedWorkflowTitle
+        });
+
         if (shouldOpen === 'true') {
+            console.log('✅ Auto-opening Implement Modal...');
             setShowImplement(true);
+
+            // Clean up localStorage
             localStorage.removeItem('n8n_modal_should_open');
             localStorage.removeItem('n8n_modal_workflow_id');
             localStorage.removeItem('n8n_modal_workflow_title');
+        } else {
+            console.log('❌ Modal should NOT auto-open');
         }
     }, []);
 
