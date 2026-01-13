@@ -94,15 +94,24 @@ export default function PrivateChatArea({
           )}
         </div>
         {/* Video Call Button */}
-        <button
-          onClick={onVideoCall}
-          className="p-3 bg-green-400 border-2 border-black rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 transition-all"
-          title="Start video call"
-        >
-          <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-          </svg>
-        </button>
+        <div className="">
+          <div className="pr-14">
+            <button
+              onClick={onVideoCall}
+              className="p-3 bg-green-400 border-2 border-black rounded-xl shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:shadow-none hover:translate-x-0.5 hover:translate-y-0.5 transition-all "
+              title="Start video call"
+            >
+              <div className="flex items-center gap-2">
+                <svg className="w-6 h-6 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+                <div>
+                  <p className="text-black font-inter font-bold">Video Call</p>
+                </div>
+              </div>
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Messages */}

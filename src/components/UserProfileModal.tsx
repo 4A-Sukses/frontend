@@ -150,6 +150,23 @@ export default function UserProfileModal({ userId, onClose }: UserProfileModalPr
       setSaving(true)
       setMessage(null)
 
+      // 1. Update Password if provided
+      if (showPasswordSection && passwordFormData.newPassword) {
+        if (passwordFormData.newPassword.length < 6) {
+          throw new Error('Password must be at least 6 characters')
+        }
+        if (passwordFormData.newPassword !== passwordFormData.confirmPassword) {
+          throw new Error('Passwords do not match')
+        }
+
+        const { error: authError } = await supabase.auth.updateUser({
+          password: passwordFormData.newPassword
+        })
+
+        if (authError) throw authError
+      }
+
+      // 2. Update Profile
       const profileData: UserProfileUpdate = {
         nama: formData.nama,
         tanggal_lahir: formData.tanggal_lahir || null,
@@ -168,8 +185,14 @@ export default function UserProfileModal({ userId, onClose }: UserProfileModalPr
 
       setMessage({
         type: 'success',
-        text: 'Profile updated successfully!'
+        text: showPasswordSection && passwordFormData.newPassword
+          ? 'Profile and password updated successfully!'
+          : 'Profile updated successfully!'
       })
+
+      // Reset password form
+      setPasswordFormData({ newPassword: '', confirmPassword: '' })
+      setShowPasswordSection(false)
 
       // Reload profile
       await loadProfile()
@@ -472,6 +495,47 @@ export default function UserProfileModal({ userId, onClose }: UserProfileModalPr
                 <p className="mt-2 text-sm font-bold text-gray-600">
                   Ceritakan minat atau hobi Anda secara bebas.
                 </p>
+              </div>
+
+              {/* Password Change Section */}
+              <div className="border-t-2 border-dashed border-black/20 pt-4 mt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowPasswordSection(!showPasswordSection)}
+                  className="flex items-center gap-2 text-sm font-black text-pink-500 hover:text-pink-600 transition-colors"
+                >
+                  <span className="text-lg">{showPasswordSection ? '−' : '+'}</span>
+                  {showPasswordSection ? 'Batal Ganti Password' : 'Ganti Password'}
+                </button>
+
+                {showPasswordSection && (
+                  <div className="mt-4 space-y-4 bg-pink-50 p-4 rounded-xl border-2 border-pink-200 animate-in fade-in slide-in-from-top-2">
+                    <div>
+                      <label className="block text-sm font-black text-black mb-2">
+                        Password Baru
+                      </label>
+                      <input
+                        type="password"
+                        value={passwordFormData.newPassword}
+                        onChange={(e) => setPasswordFormData(prev => ({ ...prev, newPassword: e.target.value }))}
+                        className="w-full px-4 py-2 border-2 border-black rounded-xl focus:ring-2 focus:ring-black focus:border-transparent bg-white text-black font-semibold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                        placeholder="Minimal 6 karakter"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-black text-black mb-2">
+                        Konfirmasi Password
+                      </label>
+                      <input
+                        type="password"
+                        value={passwordFormData.confirmPassword}
+                        onChange={(e) => setPasswordFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                        className="w-full px-4 py-2 border-2 border-black rounded-xl focus:ring-2 focus:ring-black focus:border-transparent bg-white text-black font-semibold shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                        placeholder="Ulangi password baru"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           ) : (

@@ -443,7 +443,7 @@ export default function HomePage() {
         {/* Skateboard Character Divider */}
         <div className="relative w-full" style={{ height: '400px' }}>
           {/* Smooth gradient transition from white to blue */}
-          <div className="absolute inset-0 bg-gradient-to-b from-white via-blue-50 to-blue-100"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-[#FFFDF5] via-blue-50 to-blue-100"></div>
 
           {/* Character Image - 3x bigger in left corner */}
           <motion.div

@@ -200,7 +200,13 @@ export default function FeatureShowcase() {
     };
 
     return (
-        <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <motion.div
+            className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20"
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: false, amount: 0.3 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+        >
             {/* Header Region */}
             <div className="text-center mb-16">
                 <AnimatePresence mode="wait">
@@ -339,6 +345,6 @@ export default function FeatureShowcase() {
                     {currentIndex + 1} / {features.length}
                 </span>
             </div>
-        </div>
+        </motion.div>
     );
 }
